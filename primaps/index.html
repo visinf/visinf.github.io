@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Boosting Unsupervised Semantic Segmentation with Principal Mask Proposals</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,500,600' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="data/assets/css/Highlight-Clean.css">
+    <link rel="stylesheet" href="data/assets/css/styles.css">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="data/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="data/favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <!-- <meta name="robots" content="noindex"> -->
+
+    <meta property="og:site_name" content="PriMaPs" />
+    <meta property="og:type" content="video.other" />
+    <meta property="og:title" content="Boosting Unsupervised Semantic Segmentation with Principal Mask Proposals" />
+    <meta property="og:description" content="Boosting Unsupervised Semantic Segmentation with Principal Mask Proposals" />
+    <meta property="og:url" content="" />
+
+</head>
+
+<body>
+    <div class="highlight-clean" style="padding-bottom: 0px; padding-top: 20px;">
+        <div class="container" style="max-width: 1024px; margin-bottom: 20px">
+            <h1 class="text-center" style="font-size:35px;"><b>Boosting Unsupervised Semantic Segmentation <br/> with Principal Mask Proposals</b></h1>
+        </div>
+        <div class="container" style="max-width: 1024px; margin-bottom: 20px;">
+            <div class="authors">
+                <a href=https://olvrhhn.github.io/>
+                Oliver Hahn<sup> 1</sup>
+                </a>&nbsp;
+                <a href=https://arnike.github.io//>
+                Nikita Araslanov<sup> 2,3</sup>
+                </a>&nbsp;
+                <a href=https://schaubsi.github.io//>
+                Simone Schaub-Meyer<sup> 1,4</sup>
+                </a>&nbsp;
+                <a href=https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/stefan_roth.en.jsp/>
+                Stefan Roth<sup> 1,4</sup>&nbsp;
+                </a>
+                <br>
+            </div>
+            <div class="affiliations">
+                <span><sup>1</sup> TU Darmstadt </span>&nbsp;
+                <span><sup>2</sup> TU Munich </span>&nbsp;
+                <span><sup>3</sup> MCML </span>&nbsp;
+                <span><sup>4</sup> hessian.AI </span>
+            </div>
+            <div class="container" style="max-width: 1024px; margin-bottom: 20px">
+                <h1 class="text-center" style="font-size:22px;">TMLR 2024</h1>
+            </div>
+        </div>
+        <div id="container">
+        <div class="buttons" style="margin-top: 8px; margin-bottom: 8px;">
+            <a class="btn btn-light" role="button" href="https://arxiv.org/abs/2404.16818">
+                <svg style="width:24px;height:24px;margin-left:-12px;margin-right:12px" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M16 0H8C6.9 0 6 .9 6 2V18C6 19.1 6.9 20 8 20H20C21.1 20 22 19.1 22 18V6L16 0M20 18H8V2H15V7H20V18M4 4V22H20V24H4C2.9 24 2 23.1 2 22V4H4M10 10V12H18V10H10M10 14V16H15V14H10Z"></path>
+                </svg>Paper
+            </a>
+            <a class="btn btn-light" role="button" href="data/primaps_poster.pdf">
+                <svg style="width:24px;height:24px;margin-left:-12px;margin-right:12px" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M16 0H8C6.9 0 6 .9 6 2V18C6 19.1 6.9 20 8 20H20C21.1 20 22 19.1 22 18V6L16 0M20 18H8V2H15V7H20V18M4 4V22H20V24H4C2.9 24 2 23.1 2 22V4H4M10 10V12H18V10H10M10 14V16H15V14H10Z"></path>
+                </svg>Poster
+            </a>
+            <a class="btn btn-light" role="button" href="https://github.com/visinf/primaps">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;margin-left:-12px;margin-right:12px" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 
+                            1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 
+                            3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 
+                            2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+                </svg>
+                Code
+            </a>
+            <!-- <a class="btn btn-light" role="button" href="https://huggingface.co/">
+                <svg style="width:24px;height:24px;margin-left:-12px;margin-right:12px" width="24px" height="24px" viewBox="0 0 375 531">
+                    <polygon stroke="#000000" points="0.5,0.866 459.5,265.87 0.5,530.874 "></polygon>
+                </svg>
+                Demo 🤗
+            </a> -->
+        </div>
+        </div>
+    </div>
+
+    <hr class="divider" />
+    <div class="container" style="max-width: 768px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h2><b>TL;DR</b></h2>
+                    </div>
+                </div>
+                <p align="justify">
+                    We present PriMaPs – Principal Mask Proposals – decomposing images into semantically meaningful masks based on their feature representation. This enables unsupervised semantic segmentation by fitting class prototypes to PriMaPs with stochastic expectation-maximization.
+                </p>
+                &nbsp;
+                <img src="data/teaser.png" alt="teaser" style="width: 100%">
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+    </div>
+    <hr class="divider" />
+    <div class="container" style="max-width: 768px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h2><b>Abstract</b></h2>
+                    </div>
+                </div>
+                <p align="justify">
+                    Unsupervised semantic segmentation aims to automatically partition images into semantically meaningful regions by identifying global categories within an image corpus without any form of annotation. Building upon recent advances in self-supervised representation learning, we focus on how to leverage these large pre-trained models for the downstream task of unsupervised segmentation. We present PriMaPs – Principal Mask Proposals – decomposing images into semantically meaningful masks based on their feature representation. This allows us to realize unsupervised semantic segmentation by fitting class prototypes to PriMaPs with a stochastic expectation-maximization algorithm, PriMaPs-EM. Despite its conceptual simplicity, PriMaPs-EM leads to competitive results across various pre-trained backbone models, including DINO and DINOv2, and across datasets, such as Cityscapes, COCO-Stuff, and Potsdam-3. Importantly, PriMaPs-EM is able to boost results when applied orthogonally to current state-of-the-art unsupervised semantic segmentation pipelines.
+                </p>
+            </div>
+        </div>
+    </div>
+    <hr class="divider" />
+    <div class="container" style="max-width: 768px;">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2><b>Method</b></h2>
+            </div>
+        </div>
+        <div class="row captioned_videos">
+            <div class="col-md-12">
+                <img src="data/method.png" alt="architecture" style="width: 100%">
+                &nbsp;
+                <p align="justify">
+                    <u>PriMaPs-EM architecture (left):</u> An image I and its augmented version I′ are embedded by the
+                    frozen self-supervised backbone F, resulting in the dense features f and f′. The segmentation prediction y
+                    by the momentum class prototypes θ<sub>M</sub> arises via the dot product with f. Likewise, y′ arises from the dot
+                    product of the running class prototypes θ<sub>R</sub> with f′. Pseudo labels P* are constructed using PriMaPs, I,
+                    and y. We use the pseudo labels to optimize θ<sub>R</sub>, applying a focal loss. θ<sub>R</sub> is gradually transferred to θ<sub>M</sub> by
+                    means of an EMA. <u>PriMaPs pseudo label generation (right):</u> Masks P are proposed by iterative binary
+                    partitioning based on the cosine similarity of the features of any unassigned pixel to their first principal component’s nearest neighbor feature. Gray indicates these iterative steps. Next, the masks P are aligned to the image I using a CRF. Finally, a per-mask pseudo-class ID is assigned using majority voting based on
+                    the segmentation prediction y, resulting in the pseudo label P*.
+                </p>
+            </div>
+        </div>
+    </div>
+    <hr class="divider" />
+    <div class="container" style="max-width: 768px;">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2><b>Results</b></h2>
+            </div>
+            <div class="col-sm-12">
+                <p align="justify">
+                    <u>Cityscapes</u> – PriMaPs-EM (Ours) comparison to existing unsupervised semantic segmentation methods, using Accuracy and mean IoU (in %) for unsupervised and supervised probing.
+                </p>
+                <img src="data/results_cityscapes.png" alt="architecture" style="width: 100%">
+            </div>
+            &nbsp;
+            <div class="col-sm-12">
+                <p align="justify">
+                    <u>COCO-Stuff</u> – PriMaPs-EM (Ours) comparison to existing unsupervised semantic segmentation methods, using Accuracy and mean IoU (in %) for unsupervised and supervised probing.
+                </p>
+                <img src="data/results_coco.png" alt="architecture" style="width: 100%">
+            </div>
+            &nbsp;
+            <div class="col-sm-12">
+                <p align="justify">
+                    <u>Potsdam-3</u> – PriMaPs-EM (Ours) comparison to existing unsupervised semantic segmentation methods, using Accuracy and mean IoU (in %) for unsupervised and supervised probing.
+                </p>
+                <img src="data/results_potsdam.png" alt="architecture" style="width: 100%">
+            </div>
+            &nbsp;
+            <div class="col-sm-12">
+                <p align="justify">
+                    Qualitative results for the DINO ViT-B/8 baseline, PriMaPs-EM (Ours), STEGO, and STEGO+PriMaPs-EM (Ours) for Cityscapes, COCO-Stuff, and Potsdam-3. Our method produces locally more consistent segmentation results reducing overall misclassification compared to the corresponding baseline.
+                </p>
+                <img src="data/results_qual.png" alt="architecture" style="width: 100%">
+                &nbsp;
+                <p align="justify">
+                    PriMaPs-EM provides modest but consistent benefits over a wide range of baselines and datasets and
+                    reaches competitive segmentation performance w. r. t. the state-of-the-art using identical hyperparameters across all backbones and datasets. Recalling the simplicity of the techniques behind PriMaPs, we believe that this is a significant result. PriMaPs-EM constitutes a straightforward, entirely orthogonal tool for boosting unsupervised semantic segmentation.
+                    </p>
+            </div>
+        
+    </div>
+
+
+
+    <hr class="divider" />
+    <div class="container" style="max-width: 768px;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Citation</h2>
+            </div>
+            <div style="font-size: 16px;">
+                <code>
+                    @article{Hahn:2024:BUS,<br>
+                    &nbsp; title  = {Boosting Unsupervised Semantic Segmentation with Principal Mask Proposals},<br>
+                    &nbsp; author = {Oliver Hahn and Nikita Araslanov and Simone Schaub-Meyer and Stefan Roth},<br>
+                    &nbsp; journal = {Transactions on Machine Learning Research (TMLR)},<br>
+                    &nbsp; year   = {2024},<br>
+                }
+            </code>
+        </div>
+        </div>
+        </div>
+    </div>
+    <hr class="divider" />
+    <div class="container" style="max-width: 768px;">
+        <footer>
+            <p> Website template from <a href="https://dreamfusion3d.github.io/">DreamFusion</a> and <a href="https://mv-dream.github.io/">MVDream</a>.</p>
+        </footer>
+    </div>
+    <script src="data/assets/js/yall.js"></script>
+    <script>
+        yall(
+            {
+                observeChanges: true
+            }
+        );
+    </script>
+</body>
+
+</html>
