@@ -1,3 +1,464 @@
 <!DOCTYPE html>
+<html>
 
-.
+
+<head>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    * {box-sizing: border-box;}
+    
+    .img-comp-container {
+        position: relative;
+        flex: 50%;
+    }
+    
+    br {
+            display: block; /* makes it have a width */
+            content: ""; /* clears default height */
+            margin-top: 0; /* change this to whatever height you want it */
+    }
+
+    /* Default for larger screens (computers) */
+    .responsive-img {
+        width: 600px;
+    }
+
+    /* For smaller screens (phones) */
+    @media (max-width: 768px) {
+        .responsive-img {
+        width: 375px; /* or any other suitable value like 300px */
+        }
+    }
+
+    .img-comp-img {
+        position: relative;
+        width: auto;
+        height: auto;
+        overflow: hidden;
+    }
+
+    .img-comp-overlay {
+        /* border-right: 2px solid rgba(51, 51, 51, 0.5); */
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    
+    .img-comp-slider {
+      position: absolute;
+      z-index:9;
+      cursor: ew-resize;
+      height: 100%;
+      width: 3px;
+      background-color: #FFFFFF;
+      opacity: 0.75;
+
+ 
+    }
+    .img-comp-slider-horizontalline{
+      
+      /*set the appearance of the slider:*/
+      width: 30px;
+      height: 30px;
+      
+      background: url("data/left-and-right-arrows.png"), no-repeat, center;
+      background-color: inherit;
+      background-size: contain;
+      border-radius: 50%;
+
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    </style>
+    <script>
+    function initComparisons() {
+      var x, i;
+      /*find all elements with an "overlay" class:*/
+      x = document.getElementsByClassName("img-comp-overlay");
+      for (i = 0; i < x.length; i++) {
+        /*once for each "overlay" element:
+        pass the "overlay" element as a parameter when executing the compareImages function:*/
+        compareImages(x[i]);
+      }
+      function compareImages(img) {
+        var slider, img, clicked = 0, w, h;
+        /*get the width and height of the img element*/
+        w = img.offsetWidth;
+        h = img.offsetHeight;
+        /*set the width of the img element to 50%:*/
+        img.style.width = (w / 2) + "px";
+        /*create slider:*/
+        slider = document.createElement("DIV");
+        line = document.createElement("DIV");
+        line.setAttribute("class", "img-comp-slider-horizontalline")
+        slider.appendChild(line)
+        slider.setAttribute("class", "img-comp-slider");
+        /*insert slider*/
+        img.parentElement.insertBefore(slider, img);
+        /*position the slider in the middle:*/
+        slider.style.top = (h / 2) - (slider.offsetHeight / 2) + "px";
+        slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
+        /*execute a function when the mouse button is pressed:*/
+        slider.addEventListener("mousedown", slideReady);
+        /*and another function when the mouse button is released:*/
+        window.addEventListener("mouseup", slideFinish);
+        /*or touched (for touch screens:*/
+        slider.addEventListener("touchstart", slideReady);
+        /*and released (for touch screens:*/
+        window.addEventListener("touchend", slideFinish);
+        function slideReady(e) {
+          /*prevent any other actions that may occur when moving over the image:*/
+          e.preventDefault();
+          /*the slider is now clicked and ready to move:*/
+          clicked = 1;
+          /*execute a function when the slider is moved:*/
+          window.addEventListener("mousemove", slideMove);
+          window.addEventListener("touchmove", slideMove);
+        }
+        function slideFinish() {
+          /*the slider is no longer clicked:*/
+          clicked = 0;
+        }
+        function slideMove(e) {
+          var pos;
+          /*if the slider is no longer clicked, exit this function:*/
+          if (clicked == 0) return false;
+          /*get the cursor's x position:*/
+          pos = getCursorPos(e)
+          /*prevent the slider from being positioned outside the image:*/
+          if (pos < 0) pos = 0;
+          if (pos > w) pos = w;
+          /*execute a function that will resize the overlay image according to the cursor:*/
+          slide(pos);
+        }
+        function getCursorPos(e) {
+          var a, x = 0;
+          e = (e.changedTouches) ? e.changedTouches[0] : e;
+          /*get the x positions of the image:*/
+          a = img.getBoundingClientRect();
+          /*calculate the cursor's x coordinate, relative to the image:*/
+          x = e.pageX - a.left;
+          /*consider any page scrolling:*/
+          x = x - window.pageXOffset;
+          return x;
+        }
+        function slide(x) {
+          /*resize the image:*/
+          img.style.width = x + "px";
+          /*position the slider:*/
+          slider.style.left = img.offsetWidth - (slider.offsetWidth / 2) + "px";
+        }
+      }
+    }
+</script>
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<title>Scene-Centric Unsupervised Panoptic Segmentation</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,500,600' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="data/assets/css/Highlight-Clean.css">
+<link rel="stylesheet" href="data/assets/css/styles.css">
+
+<link rel="apple-touch-icon" sizes="180x180" href="data/cups_logo.png">
+<link rel="icon" type="image/png" sizes="32x32" href="data/cups_logo.png">
+<link rel="icon" type="image/png" sizes="16x16" href="data/cups_logo.png">
+<link rel="manifest" href="site.webmanifest">
+
+<meta property="og:site_name" content="CUPS" />
+<meta property="og:type" content="video.other" />
+<meta property="og:title" content="Scene-Centric Unsupervised Panoptic Segmentation (CVPR 2025)" />
+<meta property="og:description" content="Scene-Centric Unsupervised Panoptic Segmentation (CVPR 2025)" />
+<meta property="og:url" content="" />
+
+</head>
+
+<body>
+<div class="highlight-clean" style="padding-bottom: 0px; padding-top: 20px;">
+    <div class="container" style="max-width: 1024px; margin-bottom: 20px">
+        <h1 class="text-center" style="font-size:35px;"><b>Scene-Centric Unsupervised Panoptic Segmentation</b></h1>
+    </div>
+    <div class="container" style="max-width: 1024px; margin-bottom: 20px;">
+        <div class="authors">
+            <a href=https://olvrhhn.github.io>
+            Oliver Hahn<sup>* 1</sup>
+            </a>&nbsp;&nbsp;
+            <a href=https://christophreich1996.github.io>
+            Christoph Reich<sup>* 1,2,4,5</sup>
+            </a>&nbsp;&nbsp;
+            <a href=https://arnike.github.io>
+            Nikita Araslanov<sup> 2,4</sup>
+            </a><br/>
+            <a href=https://cvg.cit.tum.de/members/cremers>
+            Daniel Cremers<sup> 2,4,5</sup>
+            </a>&nbsp;&nbsp;
+            <a href=https://chrirupp.github.io>
+            Christian Rupprecht<sup> 3</sup>
+            </a>&nbsp;&nbsp;
+            <a href=https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/stefan_roth.en.jsp>
+            Stefan Roth<sup> 1,5,6</sup>
+            </a>
+            <br>
+        </div>
+        <div class="affiliations">
+            <span><sup>1</sup>TU Darmstadt </span>&nbsp;&nbsp;
+            <span><sup>2</sup>TU Munich </span>&nbsp;&nbsp;
+            <span><sup>3</sup>University of Oxford </span>&nbsp;&nbsp;
+            <span><sup>4</sup>MCML </span>&nbsp;&nbsp;
+            <span><sup>5</sup>ELIZA </span>&nbsp;&nbsp;
+            <span><sup>6</sup>hessian.AI </span>&nbsp;&nbsp;
+            <span>*equal contribution </span>
+        </div>
+        <div class="container" style="max-width: 1024px; margin-bottom: 20px">
+            <h1 class="text-center" style="font-size:22px;">CVPR 2025</h1>
+        </div>
+    </div>
+    <div id="container">
+    <div class="buttons" style="margin-top: 8px; margin-bottom: 8px;">
+        <a class="btn btn-light" role="button" href="https://arxiv.org">
+            <svg style="width:24px;height:24px;margin-left:-12px;margin-right:12px" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M16 0H8C6.9 0 6 .9 6 2V18C6 19.1 6.9 20 8 20H20C21.1 20 22 19.1 22 18V6L16 0M20 18H8V2H15V7H20V18M4 4V22H20V24H4C2.9 24 2 23.1 2 22V4H4M10 10V12H18V10H10M10 14V16H15V14H10Z"></path>
+            </svg>Paper
+        </a>
+        <a class="btn btn-light" role="button" href="https://github.com/visinf/cups">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;margin-left:-8px;margin-right:8px" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 
+                        1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 
+                        3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 
+                        2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+            </svg>
+            Code
+        </a>
+    </div>
+    </div>
+</div>
+
+<hr class="divider" />
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <video style="width: 100%" autoplay loop muted playsinline>
+                <source src="data/video.mp4" type="video/mp4" alt="teaser" style="width: 100%">
+                Your browser does not support HTML5 video.
+            </video>
+            <p align="justify">
+                <b>TL;DR:</b> We present CUPS, a Scene-Centric Unsupervised Panoptic Segmentation method leveraging motion and depth from stereo pairs to generate pseudo-labels. Using these labels, we train a monocular panoptic network, achieving state-of-the-art results across multiple scene-centric benchmarks.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+</div>
+<hr class="divider" />
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h2><b>Abstract</b></h2>
+                </div>
+            </div>
+            <p align="justify">
+                Unsupervised panoptic segmentation aims to partition an image into semantically meaningful regions and distinct object instances without training on manually annotated data. In contrast to prior work on unsupervised panoptic scene understanding, we eliminate the need for object-centric training data, enabling the unsupervised understanding of complex scenes. To that end, we present the first unsupervised panoptic method that directly trains on scene-centric imagery. In particular, we propose an approach to obtain high-resolution panoptic pseudo labels on complex scene-centric data combining visual representations, depth, and motion cues. Utilizing both pseudo-label training and a panoptic self-training strategy yields a novel approach that accurately predicts panoptic segmentation of complex scenes without requiring any human annotations. Our approach significantly improves panoptic quality, e.g., surpassing the recent state of the art in unsupervised panoptic segmentation on Cityscapes by 9.4% points in PQ.
+            </p>
+        </div>
+    </div>
+</div>
+<hr class="divider" />
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <h2><b>Method: CUPS <img src="data/cups_logo.png" style="height:25px; position:relative; top:-3.5px;"> </b></h2>
+        </div>
+    </div>
+    <div class="row captioned_videos">
+        <div class="col-md-12">
+            <img src="data/method.png" alt="architecture" style="width: 100%">
+            &nbsp;
+            <p align="justify">
+                We propose CUPS, an unsupervised panoptic segmentation framework leveraging stereo video for pseudo-labeling while training and inferring on monocular images. Our pipeline consists of pseudo-label generation, panoptic network bootstrapping, and self-training.
+                Pseudo-Label Generation: We obtain semantic pseudo labels via a DINO-based semantic network with depth-guided inference. Instance pseudo labels are extracted using SF2SE3 motion segmentation from scene flow. Both labels are fused into panoptic pseudo labels.
+                Training and Self-Training: The network is trained on pseudo labels with copy-paste augmentation. Self-training refines predictions via a momentum network, aligning and filtering augmented outputs into self-labels.
+                CUPS integrates semantic-depth fusion, motion-based instance segmentation, and self-training, achieving fully unsupervised panoptic segmentation.
+            </p>
+        </div>
+    </div>
+</div>
+<hr class="divider" />
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <h2><b>Results</b></h2>
+        </div>
+        <div class="col-sm-12">
+            <p align="justify">
+                Unsupervised panoptic segmentation on Cityscapes val. Comparing CUPS to existing unsupervised panoptic methods, using
+                PQ, SQ, and RQ, as well the PQ for “thing” and “stuff” classes (all in %). † denotes results reported by U2Seg. CUPS significantly outperforms the baseline and U2Seg.
+            </p>
+            <img src="data/table_cs.png" alt="architecture" style="width: 100%">
+        </div>
+        &nbsp;
+        <div class="col-sm-12">
+            <p align="justify">
+                Comparing CUPS with unsupervised panoptic segmentation methods, using PQ, SQ, and RQ (in %) in terms of generalization to KITTI panoptic, BDD, MUSES, and Waymo. In addition, we analyze generalization to the OOD dataset MOTS. CUPS maintains strong panoptic segmentation accuracy under domain shift, unlike the supervised baseline, which suffers a significant accuracy drop. This highlights the generalization advantage of unsupervised approaches. CUPS achieves outstanding panoptic segmentation accuracy, substantially surpassing the baseline and U2Seg.
+            </p>
+            <img src="data/table_generalization.png" alt="architecture" style="width: 100%">
+        </div>
+    </div>
+</div>
+        
+<hr class="divider" />
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <h2><b>Qualitative Results</b></h2>
+        </div>
+        <div class="col-sm-12">
+            <p align="justify">
+                We compare CUPS to the previous state of the art approach U2Seg, across various scene-centric datasets. CUPS predicts noticeably less noisy and more accurate semantics, aligning well with the image while predicting significantly more and better instance masks.
+            </p>
+                <p align="justify">
+                    <center><h4><b>Cityscapes</b></h4></center>
+                </p>
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                    <div style="flex-grow:0.5;"></div>
+                    <div class="img-comp-container">
+                        <div class="img-comp-img">
+                            <img src="data/cs_cups_text.png" class="responsive-img">
+                        </div>
+                        <div class="img-comp-img img-comp-overlay">
+                            <img src="data/cs_u2seg_text.png" class="responsive-img">
+                        </div>
+                    </div>
+                    <div style="flex-grow:0.5;"></div>
+                </div>
+        </div>
+        &nbsp;
+        <div class="col-sm-12">
+            <p align="justify">
+                <center><h4><b>KITTI</b></h4></center>
+            </p>
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                    <div style="flex-grow:0.5;"></div>
+                    <div class="img-comp-container">
+                        <div class="img-comp-img">
+                            <img src="data/kitti_cups_text.png" class="responsive-img">
+                        </div>
+                        <div class="img-comp-img img-comp-overlay">
+                            <img src="data/kitti_u2seg_text.png" class="responsive-img">
+                        </div>
+                    </div>
+                    <div style="flex-grow:0.5;"></div>
+                </div>
+        </div>
+        &nbsp;
+        <div class="col-sm-12">
+            <p align="justify">
+                <center><h4><b>BDD</b></h4></center>
+            </p>
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                    <div style="flex-grow:0.5;"></div>
+                    <div class="img-comp-container">
+                        <div class="img-comp-img">
+                            <img src="data/bdd_cups_text.png" class="responsive-img">
+                        </div>
+                        <div class="img-comp-img img-comp-overlay">
+                            <img src="data/bdd_u2seg_text.png" class="responsive-img">
+                        </div>
+                    </div>
+                    <div style="flex-grow:0.5;"></div>
+                </div>
+        </div>
+        &nbsp;
+        <div class="col-sm-12">
+            <p align="justify">
+                <center><h4><b>MUSES</b></h4></center>
+            </p>
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                    <div style="flex-grow:0.5;"></div>
+                    <div class="img-comp-container">
+                        <div class="img-comp-img">
+                            <img src="data/muses_cups_text.png" class="responsive-img">
+                        </div>
+                        <div class="img-comp-img img-comp-overlay">
+                            <img src="data/muses_u2seg_text.png" class="responsive-img">
+                        </div>
+                    </div>
+                    <div style="flex-grow:0.5;"></div>
+                </div>
+        </div>
+        &nbsp;
+        <div class="col-sm-12">
+            <p align="justify">
+                <center><h4><b>Waymo</b></h4></center>
+            </p>
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                    <div style="flex-grow:0.5;"></div>
+                    <div class="img-comp-container">
+                        <div class="img-comp-img">
+                            <img src="data/waymo_cups_text.png" class="responsive-img">
+                        </div>
+                        <div class="img-comp-img img-comp-overlay">
+                            <img src="data/waymo_u2seg_text.png" class="responsive-img">
+                        </div>
+                    </div>
+                    <div style="flex-grow:0.5;"></div>
+                </div>
+        </div>   
+</div>
+
+
+
+<hr class="divider" />
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Citation</h2>
+        </div>
+        <div class="col-md-12" style="font-size: 14px;">
+            <code style="color: #000000;">
+                @inproceedings{Hahn:2025:UPS,<br>
+                &nbsp; title  = {Scene-Centric Unsupervised Panoptic Segmentation},<br>
+                &nbsp; author = {Oliver Hahn and Christoph Reich and Nikita Araslanov and Daniel Cremers and Christian Rupprecht and Stefan Roth},<br>
+                &nbsp; booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},<br>
+                &nbsp; year   = {2025},<br>
+            }
+        </code>
+    </div>
+    </div>
+    </div>
+</div>
+<hr class="divider" />
+<div class="container" style="max-width: 768px;">
+    <p align="justify" style="font-size: 11px; color: grey;">
+        <b>Acknowledgments: </b> This project was partially supported by the European Research Council (ERC) Advanced Grant SIMULACRON, DFG project CR 250/26-1 ``4D-YouTube'', and GNI Project ``AICC''. This project has also received funding from the ERC under the European Union’s Horizon 2020 research and innovation programme (grant agreement No. 866008). Additionally, this work has further been co-funded by the LOEWE initiative (Hesse, Germany) within the emergenCITY center [LOEWE/1/12/519/03/05.001(0016)/72] and by the State of Hesse through the cluster project ``The Adaptive Mind (TAM)''. Christoph Reich is supported by the Konrad Zuse School of Excellence in Learning and Intelligent Systems (ELIZA) through the DAAD programme Konrad Zuse Schools of Excellence in Artificial Intelligence, sponsored by the Federal Ministry of Education and Research. Finally, we acknowledge the support of the European Laboratory for Learning and Intelligent Systems (ELLIS) and thank Simone Schaub-Meyer and Leonhard Sommer for insightful discussions.
+    </p>
+    <footer>
+        <p style="font-size: 11px; color: grey;"> Website template from <a href="https://dreamfusion3d.github.io/">DreamFusion</a> and <a href="https://mv-dream.github.io/">MVDream</a>.</p>
+    </footer>
+</div>
+<script src="data/assets/js/yall.js"></script>
+<script>
+    yall(
+        {
+            observeChanges: true
+        }
+    );
+</script>
+<script>
+    initComparisons();
+</script>
+</body>
+
+</html>
