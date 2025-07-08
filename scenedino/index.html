@@ -107,7 +107,7 @@
       <div class="container is-max-desktop">
         <div class="columns is-centered">
           <div class="column has-text-centered">
-            <h1 class="title is-size-3-mobile is-size-2-tablet publication-title">Feed-Forward <span class="color1">S</span><span class="color2">c</span><span class="color3">e</span><span class="color4">n</span><span class="color5">e</span><span class="color6">D</span><span class="color7">I</span><span class="color8">N</span><span class="color9">O</span><br>for Unsupervised Semantic Scene Completion</h1>
+            <h1 class="title is-size-4-mobile is-size-2-tablet publication-title">Feed-Forward <span class="color1">S</span><span class="color2">c</span><span class="color3">e</span><span class="color4">n</span><span class="color5">e</span><span class="color6">D</span><span class="color7">I</span><span class="color8">N</span><span class="color9">O</span><br>for Unsupervised Semantic Scene Completion</h1>
             <div class="is-size-6-mobile is-size-5-tablet publication-authors">
               <span class="author-block">
                 <a href="https://jev-aleks.github.io/">Aleksandar Jevtić</a><sup>* 1</sup>
@@ -167,6 +167,13 @@
                       <i class="fab fa-github"></i>
                     </span>
                     <span>Code</span>
+                  </a>
+                </span>
+                <!-- Demo Link. -->
+                <span class="link-block">
+                  <a href="https://huggingface.co/spaces/jev-aleks/SceneDINO"
+                    class="external-link button is-normal is-rounded is-dark is-size-7-mobile is-size-6-tablet">
+                    <span>🤗 Demo</span>
                   </a>
                 </span>
               </div>
@@ -272,7 +279,7 @@
 <section class="section hero is-light" style="padding-top: 1rem; padding-bottom: 1rem;">
   <div class="container is-max-desktop">
     <div class="column is-full-width has-text-centered">
-        <h2 class="title is-3" style="font-weight: 700;">Abstract</h2>
+        <h2 class="title is-size-4-mobile is-size-3-tablet" style="font-weight: 700;">Abstract</h2>
         <div class="content has-text-justified">
           <p>
             Semantic scene completion (SSC) aims to infer both the 3D geometry and semantics of a scene from single images. 
@@ -296,7 +303,7 @@
       <div class="columns is-centered">
         <div class="column is-full-width has-text-centered">
 
-          <h2 class="title is-3" style="font-weight: 700;">Method</h2>
+          <h2 class="title is-size-4-mobile is-size-3-tablet" style="font-weight: 700;">Method</h2>
           <div class="content has-text-justified">
             <p>
               SceneDINO is trained using multi-view self-supervision and learns a feature field composed of high-dimensional DINO features and 3D geometry. Distilling SceneDINO's feature field results in unsupervised semantic prediction. During inference, SceneDINO performs SSC, given a single RGB input image.
@@ -319,7 +326,7 @@
           </div>
           <br><br>
 
-          <h2 class="title is-3" style="font-weight: 700;">3D Visualization</h2>
+          <h2 class="title is-size-4-mobile is-size-3-tablet" style="font-weight: 700;">3D Visualization</h2>
           <div class="content has-text-justified">
             <p>
               We provide visualizations of SceneDINO's feature field and semantic scene completion for three scenes from KITTI-360, alongside the corresponding 3D ground truth. 
@@ -354,7 +361,7 @@
             </div>  
           </div>
 
-          <br><br>
+          <br>
 
           <style>
             .button-container {
@@ -512,7 +519,7 @@
             });
           </script>
 
-          <h2 class="title is-3" style="font-weight: 700;">2D Visualization</h2>
+          <h2 class="title is-size-4-mobile is-size-3-tablet" style="font-weight: 700;">2D Visualization</h2>
           <div class="content has-text-justified">
             <p>
               We compare the original dense DINO features with our SceneDINO features rendered back into the image plane. 
@@ -656,7 +663,7 @@
   <br>
   <section class="section" id="BibTeX" style="padding-top: 0rem;">
     <div class="container is-max-desktop content">
-      <h2 class="title is-3" style="font-weight: 700;">BibTeX</h2>
+      <h2 class="title is-size-4-mobile is-size-3-tablet" style="font-weight: 700;">BibTeX</h2>
       <pre><code>@inproceedings{Jevtic:2025:SceneDINO,
     author    = {Aleksandar Jevti{\'c} and
                  Christoph Reich and
@@ -674,7 +681,7 @@
 
   <section class="section" id="Acknowledgements" style="padding-top: 0rem;">
     <div class="container is-max-desktop content">
-      <h2 class="title is-3" style="font-weight: 700;">Acknowledgements</h2>
+      <h2 class="title is-size-4-mobile is-size-3-tablet" style="font-weight: 700;">Acknowledgements</h2>
       <p align="justify" style="font-size: 11px; color: grey;">
         This project was partially supported by the European Research Council (ERC) Advanced Grant SIMULACRON, DFG project CR 250/26-1 ``4D-YouTube'', and GNI Project ``AICC''. This project has also received funding from the ERC under the European Union’s Horizon 2020 research and innovation programme (grant agreement No. 866008). Additionally, this work has further been co-funded by the LOEWE initiative (Hesse, Germany) within the emergenCITY center [LOEWE/1/12/519/03/05.001(0016)/72] and by the State of Hesse through the cluster project ``The Adaptive Mind (TAM)''. Christoph Reich is supported by the Konrad Zuse School of Excellence in Learning and Intelligent Systems (ELIZA) through the DAAD programme Konrad Zuse Schools of Excellence in Artificial Intelligence, sponsored by the Federal Ministry of Education and Research. Christian Rupprecht is supported by an Amazon Research Award. Finally, we acknowledge the support of the European Laboratory for Learning and Intelligent Systems (ELLIS) and thank Mateo de Mayo as well as Igor Cvišić for help with estimating camera poses.
       </p>
