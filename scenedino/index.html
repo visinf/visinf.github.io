@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+    content="Feed-forward SceneDINO: Single input image -> 3D geometry and features -> unsupervised semantics (SSC).">
+  <meta name="keywords" content="SceneDINO, SSC, Semantic scene completion, Unsupervised learning, 3D reconstruction">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SceneDINO</title>
+
+
+  <meta property="og:title" content="SceneDINO" />
+  <meta property="og:description"
+    content="Feed-forward SceneDINO: Single input image -> 3D geometry and features -> unsupervised semantics (SSC)." />
+  <!-- Twitter automatically scrapes this. Go to https://cards-dev.twitter.com/validator?
+      if you update and want to force Twitter to re-scrape. -->
+  <meta property="twitter:card" content="summary" />
+  <meta property="twitter:title" content="Feed-Forward SceneDINO for Unsupervised Semantic Scene Completion." />
+  <meta property="twitter:description"
+    content="Feed-forward SceneDINO: Single input image -> 3D geometry and features -> unsupervised semantics (SSC)." />
+  <meta property="twitter:image"         content="https://christophreich1996.github.io/scenedino/resources/scenedino.png" />
+
+  <!-- MathJax library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TSQGH8Q0WV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-TSQGH8Q0WV');
+  </script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+
+  <link rel="icon" href="/favicon-96x96.ico" type="image/x-icon">
+</head>
+
+<style>
+    .color1 {
+      color: rgb(107,  76, 233);
+    }
+</style>
+<style>
+    .color2 {
+      color: rgb(117,  83, 222);
+    }
+</style>
+<style>
+    .color3 {
+      color: rgb(160, 115, 181);
+    }
+</style>
+<style>
+    .color4 {
+      color: rgb(202, 146, 140);
+    }
+</style>
+<style>
+    .color5 {
+      color: rgb(213, 154, 130);
+    }
+</style>
+<style>
+    .color6 {
+      color: rgb(213, 154, 130);
+    }
+</style>
+<style>
+    .color7 {
+      color: rgb(218, 169, 103);
+    }
+</style>
+<style>
+    .color8 {
+      color: rgb(228, 201,  51);
+    }
+</style>
+<style>
+    .color9 {
+      color: rgb(233, 217,  25);
+    }
+</style>
+
+<body>
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-size-3-mobile is-size-2-tablet publication-title">Feed-Forward <span class="color1">S</span><span class="color2">c</span><span class="color3">e</span><span class="color4">n</span><span class="color5">e</span><span class="color6">D</span><span class="color7">I</span><span class="color8">N</span><span class="color9">O</span><br>for Unsupervised Semantic Scene Completion</h1>
+            <div class="is-size-6-mobile is-size-5-tablet publication-authors">
+              <span class="author-block">
+                <a href="https://jev-aleks.github.io/">Aleksandar Jevtić</a><sup>* 1</sup>
+              </span>
+              &nbsp;&nbsp;&nbsp;
+              <span class="author-block">
+                <a href="https://christophreich1996.github.io/">Christoph Reich</a><sup>* 1, 2, 4, 5</sup>
+              </span>
+              &nbsp;&nbsp;&nbsp;
+              <span class="author-block"> 
+                <a href="https://fwmb.github.io/">Felix Wimbauer</a><sup>1, 4</sup>
+              </span>
+              &nbsp;&nbsp;&nbsp;
+              <span class="author-block">
+                <a href="https://olvrhhn.github.io/">Oliver Hahn</a><sup>2</sup>
+              </span>
+              &nbsp;&nbsp;&nbsp;
+              <span class="author-block">
+                <a href="https://chrirupp.github.io/">Christian Rupprecht</a><sup>3</sup>
+              </span>
+              &nbsp;&nbsp;&nbsp;
+              <span class="author-block">
+                <a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/stefan_roth.en.jsp">Stefan Roth</a><sup>2, 5, 6</sup>
+              </span>
+              &nbsp;&nbsp;&nbsp;
+              <span class="author-block">
+                <a href="https://cvg.cit.tum.de/members/cremers/">Daniel Cremers</a><sup>1, 4, 5</sup>
+              </span>
+            </div>
+
+            <div class="is-size-7-mobile is-size-6-tablet publication-authors" style="margin-bottom: 10px;">
+              <span class="author-block" style="margin-right: 20px;"><sup>1</sup>TU Munich</span>
+              <span class="author-block" style="margin-right: 20px;"><sup>2</sup>TU Darmstadt</span>
+              <span class="author-block" style="margin-right: 20px;"><sup>3</sup>University of Oxford</span>
+              <span class="author-block" style="margin-right: 20px;"><sup>4</sup>MCML</span>
+              <span class="author-block" style="margin-right: 20px;"><sup>5</sup>ELIZA</span>
+              <span class="author-block" style="margin-right: 20px;"><sup>6</sup>Hessian AI</span>
+              <span class="author-block"><sup>*</sup>equal contribution</span>
+            </div>
+            <h1 class="is-size-5-mobile is-size-4-tablet has-text-weight-bold">ICCV 2025</h1>
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <!-- PDF Link. -->
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/xxxx.xxxxx" class="external-link button is-normal is-rounded is-dark is-size-7-mobile is-size-6-tablet">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+                <!-- Code Link. -->
+                <span class="link-block">
+                  <a href="https://github.com/tum-vision/scenedino"
+                    class="external-link button is-normal is-rounded is-dark is-size-7-mobile is-size-6-tablet">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <style>
+    .video-border {
+      display: inline-block;
+      padding: 2px; /* adjust thickness of your 'border' */
+      border-radius: 4px;
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4); /* try different gradient colors */
+    }
+    .video-border video {
+      display: block;
+      border: none;
+      border-radius: 4px; /* match the wrapper for a consistent look */
+    }
+  </style>
+
+  <style>
+    #teaser-video {
+      max-width: 100%;
+      margin: 0 auto;
+      display: block;
+      border: none;
+      border-radius: 4px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    @media (min-width: 768px) {
+      #teaser-video {
+        max-width: 80%;
+      }
+    }
+
+    #architecture-img {
+      display: flex; /* Important for nowrap scroll */
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      #architecture-wrapper {
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap; /* Prevent line wrapping */
+      }
+      
+      #architecture-img {
+        display: inline-block;
+        max-width: none;
+        width: 175%;
+      }
+    }
+    
+    /* Enhanced style to further reduce space between buttons and teaser video */
+    .hero.teaser {
+      padding-top: 0;
+      margin-top: -3rem; /* Added negative margin to pull the teaser section up */
+      margin-bottom: -2rem;
+    }
+    .hero.teaser .hero-body {
+      padding-top: 0; /* Reduced from 1rem to 0 */
+    }
+
+  </style>
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <video id="teaser-video" autoplay muted loop playsinline height="100%">
+          <source src="./resources/project-page-video-v2.mp4" type="video/mp4">
+        </video>
+        <h2 class="subtitle" style="text-align: center;"></h2>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 1rem; padding-bottom: 0rem;">
+    <div class="container is-max-desktop">
+
+      <div class="columns is-centered">
+        <div class="column is-full-width has-text-centered">
+
+          <div class="content has-text-justified">
+            <p>
+              <strong>TL;DR</strong>: SceneDINO is unsupervised and infers 3D geometry and features from a single image in a feed-forward manner. Distilling and clustering features lead to unsupervised semantic scene completion predictions. SceneDINO is trained using multi-view self-supervision.
+            </p>
+          </div>
+          </div>
+    </div>
+    </div>
+  </section>
+
+  <br>
+
+  <!-- Paper abstract -->
+<section class="section hero is-light" style="padding-top: 1rem; padding-bottom: 1rem;">
+  <div class="container is-max-desktop">
+    <div class="column is-full-width has-text-centered">
+        <h2 class="title is-3" style="font-weight: 700;">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Semantic scene completion (SSC) aims to infer both the 3D geometry and semantics of a scene from single images. 
+              In contrast to prior work on SSC that heavily relies on expensive ground-truth annotations, we approach SSC in an unsupervised setting. 
+              Our novel method, SceneDINO, adapts techniques from self-supervised representation learning and 2D unsupervised scene understanding to SSC. 
+              Our training exclusively utilizes multi-view consistency self-supervision without any form of semantic or geometric ground truth. 
+              Given a single input image, SceneDINO infers the 3D geometry and expressive 3D DINO features in a feed-forward manner. Through a novel 3D feature distillation approach, we obtain unsupervised 3D semantics. 
+              In both 3D and 2D unsupervised scene understanding, SceneDINO reaches state-of-the-art segmentation accuracy. Linear probing our 3D features matches the segmentation accuracy of a current supervised SSC approach. 
+              Additionally, we showcase the domain generalization and multi-view consistency of SceneDINO, taking the first steps towards a strong foundation for single image 3D scene understanding.
+          </p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+
+  <section class="section" style="padding-top: 1rem; padding-bottom: 0rem;">
+    <div class="container is-max-desktop">
+
+      <div class="columns is-centered">
+        <div class="column is-full-width has-text-centered">
+
+          <h2 class="title is-3" style="font-weight: 700;">Method</h2>
+          <div class="content has-text-justified">
+            <p>
+              SceneDINO is trained using multi-view self-supervision and learns a feature field composed of high-dimensional DINO features and 3D geometry. Distilling SceneDINO's feature field results in unsupervised semantic prediction. During inference, SceneDINO performs SSC, given a single RGB input image.
+            </p>
+            <p>
+              <strong>(a) Inference</strong>: Given a single input image \(\mathbf{I}_{0}\) during inference, a 2D encoder-decoder \(\xi\) produces the embedding \(\mathbf{E}\) from which the local embedding \(\mathbf{e}_{\mathbf{u}}\) is interpolated. 
+              The MLP encoder \(\phi\) takes in \(\mathbf{e}_{\mathbf{u}}\) and 3D position \(\mathbf{x}_{i}\), and predicts both the density \(\sigma_{\mathbf{x}_{i}}\) and the 3D feature \(f_{\mathbf{x}_{i}}\). 
+              Using a lightweight unsupervised segmentation head \(h\), we can obtain semantic predictions \(p_{\mathbf{x}_{i}}\) using \(f_{\mathbf{x}_{i}}\).
+            </p>
+            <p>
+              <strong>(b) Rendering</strong>: Our feature field allows for volume rendering by shooting a ray through it, yielding depth \(\hat{d}\) and \(\hat{f}\) in 2D. 
+              Color \(c_{i}\) is sampled from an another view (e.g., \(\mathbf{I}_{1}\)) using \(\mathbf{u}_{s}\) and rendered to obtain the reconstructed color \(\hat{c}\).
+            </p>
+            <p>
+              <strong>(c) Multi-view training</strong>: We render 2D views (features & images) from our feature field and reconstruct the training views.
+            </p>
+          </div>
+          <div id="architecture-wrapper">
+            <img id="architecture-img" src="./resources/fig-2.svg" alt="Architecture">
+          </div>
+          <br><br>
+
+          <h2 class="title is-3" style="font-weight: 700;">3D Visualization</h2>
+          <div class="content has-text-justified">
+            <p>
+              We provide visualizations of SceneDINO's feature field and semantic scene completion for three scenes from KITTI-360, alongside the corresponding 3D ground truth. 
+              We visualize the top 3 PCA components of the feature field. Click on any input image below to view SceneDINO's predictions. We only visualize surface voxels within the field of view for the sake of clarity.
+            </p>
+          </div>
+
+          <div class="visualization-wrapper">
+            <div class="model-viewer-container" style="border-radius: 0;">
+              <model-viewer id="QualitativeResult"
+                            src="resources/scenedino/000120_feat.glb"
+                            alt="3D Model"
+                            loading="eager"
+                            touch-action="pan-y" environment-image="legacy"
+                            camera-orbit="90deg 75deg 40m" 
+                            camera-target="5m 0m -25m"
+                            zoom-sensitivity="0" camera-controls disable-zoom disable-tap min-camera-orbit="70deg 60deg 40m"
+                            max-camera-orbit="110deg 90deg 40m" interaction-prompt="none" shadow-intensity="0" ar
+                            disable-shadow ar-modes="webxr scene-viewer quick-look"
+                            style="width: 100%; height: 100%; background: #ffffff; margin: 0 0;">
+              </model-viewer>
+            </div>
+            <div class="button-container" id="version-buttons">
+              <button class="version-button" data-version="feat">SceneDINO Features</button>
+              <button class="version-button" data-version="ssc">SSC Prediction</button>
+              <button class="version-button" data-version="gt">SSC Ground Truth</button>
+            </div>
+            <div class="thumbnail-container" id="thumbnail-qualitative">
+              <img src="resources/scenedino/000120_image_0.png" data-scene="000120">
+              <img src="resources/scenedino/000795_image_0.png" data-scene="000795">
+              <img src="resources/scenedino/000500_image_0.png" data-scene="000500">
+            </div>  
+          </div>
+
+          <br><br>
+
+          <style>
+            .button-container {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 10px;
+              justify-content: center;
+              padding: 10px;
+            }
+
+            .thumbnail-container {
+              display: flex;
+              justify-content: flex-start;
+              overflow-x: scroll;
+              gap: 10px;
+              padding: 10px 0;
+              scroll-snap-type: x mandatory;
+              -webkit-overflow-scrolling: touch;
+            }
+
+            .thumbnail-container img:hover {
+              transform: scale(1.0);
+              border: 6px solid transparent;
+              opacity: 0.8;
+            }
+
+            .input-selected {
+              border-color: #79b4f2 !important; 
+              box-shadow: 0 0 10px rgba(121, 180, 242, 0.5);
+              z-index: 10;
+              position: relative;
+            }
+            
+            /* Custom scrollbar styling */
+            .thumbnail-container::-webkit-scrollbar {
+              height: 6px;
+            }
+            
+            .thumbnail-container::-webkit-scrollbar-track {
+              background: #f1f1f1;
+              border-radius: 10px;
+            }
+            
+            .thumbnail-container::-webkit-scrollbar-thumb {
+              background: #888;
+              border-radius: 10px;
+            }
+            
+            .thumbnail-container::-webkit-scrollbar-thumb:hover {
+              background: #555;
+            }
+
+            .button-container {
+              padding: 20px 20px;
+            }
+
+            .version-button[data-version="feat"] {
+              background: linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.2),
+                rgba(255, 165, 0, 0.2),
+                rgba(255, 255, 0, 0.2),
+                rgba(0, 128, 0, 0.2),
+                rgba(0, 0, 255, 0.2),
+                rgba(75, 0, 130, 0.2),
+                rgba(238, 130, 238, 0.2)
+              );
+              color: black;
+              border: 2px solid #999;
+            }
+
+            .version-button {
+              padding: 10px 10px;
+              border: 2px solid #999;
+              border-radius: 10px;
+              background-color: #fff;
+              cursor: pointer;
+              font-size: 18px;
+              font-weight: bold;
+              transition: all 0.2s ease;
+            }
+
+            .version-button:hover {
+              background-color: #f5f5f5;
+            }
+
+            .version-button.vis-selected {
+              background-color: #d0e8ff;
+              border-color: #007BFF;
+              color: #007BFF;
+            }
+            
+            /* Adjust for smaller screens */
+            @media (max-width: 768px) {
+              .thumbnail-container img,
+              .thumbnail-container video {
+                height: 100px;
+              }
+              .version-button {
+                font-size: 14px;
+              }
+            }
+          </style>
+
+          <script>
+            const modelViewer = document.getElementById('QualitativeResult');
+            const versionButtons = document.querySelectorAll('.version-button');
+            const sceneThumbnails = document.querySelectorAll('#thumbnail-qualitative img, #thumbnail-scenes video');
+
+            let currentScene = '000120'; // default
+            let currentVersion = 'feat'; // default
+
+            function updateModel() {
+              const currentOrbit = modelViewer.getCameraOrbit();
+              const currentTarget = modelViewer.getCameraTarget();
+
+              const path = `resources/scenedino/${currentScene}_${currentVersion}.glb`;
+              // modelViewer.style.visibility = 'hidden';
+
+              modelViewer.setAttribute('src', path);
+
+              modelViewer.addEventListener('load', () => {
+                modelViewer.cameraOrbit = `${currentOrbit.theta}rad ${currentOrbit.phi}rad ${currentOrbit.radius}m`;
+                modelViewer.cameraTarget = `${currentTarget.x}m ${currentTarget.y}m ${currentTarget.z}m`;
+                modelViewer.jumpCameraToGoal();
+                // modelViewer.style.visibility = 'visible';
+              }, { once: true });
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+              // Initialize default selection
+              sceneThumbnails[0].classList.add('input-selected');
+              versionButtons[0].classList.add('vis-selected');
+              updateModel();
+
+              sceneThumbnails.forEach(el => {
+                el.addEventListener('click', () => {
+                  console.log('Scene clicked:', el);
+                  currentScene = el.getAttribute('data-scene');
+                  sceneThumbnails.forEach(e => e.classList.remove('input-selected'));
+                  el.classList.add('input-selected');
+                  updateModel();
+                });
+              });
+
+              versionButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                  console.log('Button clicked:', btn);
+                  currentVersion = btn.getAttribute('data-version');
+                  versionButtons.forEach(b => b.classList.remove('vis-selected'));
+                  btn.classList.add('vis-selected');
+                  updateModel();
+                });
+              });
+            });
+          </script>
+
+          <h2 class="title is-3" style="font-weight: 700;">2D Visualization</h2>
+          <div class="content has-text-justified">
+            <p>
+              We compare the original dense DINO features with our SceneDINO features rendered back into the image plane. 
+              The visualized PCA components are mapped to RGB channels. Interactively adjust which components to display.
+            </p>
+          </div>
+          <div class="2d-visualization-wrapper">
+            <div class="video-container">
+              <video id="pca-video-1" class="pca-video visible" autoplay muted loop playsinline preload="auto">
+                <source src="./resources/pca-video-1.mp4" type="video/mp4">
+              </video>
+              <video id="pca-video-2" class="pca-video" autoplay muted loop playsinline preload="auto">
+                <source src="./resources/pca-video-2.mp4" type="video/mp4">
+              </video>
+              <video id="pca-video-3" class="pca-video" autoplay muted loop playsinline preload="auto">
+                <source src="./resources/pca-video-3.mp4" type="video/mp4">
+              </video>
+            </div>
+
+            <div class="button-container">
+              <button class="pca-button" pca-target="pca-video-1">Feature PCA 1-3</button>
+              <button class="pca-button" pca-target="pca-video-2">Feature PCA 4-6</button>
+              <button class="pca-button" pca-target="pca-video-3">Feature PCA 7-9</button>
+            </div>
+          </div>
+
+          <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const videos = document.querySelectorAll('.pca-video');
+            const buttons = document.querySelectorAll('.pca-button');
+
+            let currentVideo = document.getElementById('pca-video-1');
+            currentVideo.classList.add('visible');
+            buttons[0].classList.add('pca-selected');
+
+            buttons.forEach(button => {
+              button.addEventListener('click', () => {
+                const targetId = button.getAttribute('pca-target');
+                const nextVideo = document.getElementById(targetId);
+
+                if (!nextVideo || nextVideo === currentVideo) return;
+
+                const currentTime = currentVideo.currentTime;
+
+                nextVideo.pause();
+                nextVideo.currentTime = currentTime;
+
+                // This ensures the video is visible after seeking
+                nextVideo.addEventListener('seeked', function onSeeked() {
+                  nextVideo.removeEventListener('seeked', onSeeked);
+
+                  currentVideo.classList.remove('visible');  // Hide old
+                  nextVideo.classList.add('visible');        // Show new
+                  nextVideo.play();
+
+                  currentVideo = nextVideo;
+                });
+
+                // Update button UI
+                buttons.forEach(b => b.classList.remove('pca-selected'));
+                button.classList.add('pca-selected');
+              });
+            });
+          });
+          </script>
+
+          <style>
+            .button-container {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 10px;
+              justify-content: center;
+              padding: 10px;
+            }
+
+            .button-container {
+              padding: 20px 20px;
+            }
+
+            .pca-button {
+              padding: 10px 10px;
+              border: 2px solid #999;
+              border-radius: 10px;
+              background-color: #fff;
+              cursor: pointer;
+              font-size: 18px;
+              font-weight: bold;
+              transition: all 0.2s ease;
+            }
+
+            .pca-button:hover {
+              background-color: #f5f5f5;
+            }
+
+            .pca-button.pca-selected {
+              background-color: #d0e8ff;
+              border-color: #007BFF;
+              color: #007BFF;
+            }
+
+            .video-container {
+              position: relative;
+              width: 100%;
+              height: 400px;
+              overflow: hidden;
+            }
+
+            .pca-video {
+              position: absolute;
+              top: 0;
+              left: 0;
+              height: 100%;
+              width: 100%;
+              object-fit: contain;
+              opacity: 0;
+              pointer-events: none;
+              transition: opacity 0.3s ease;
+            }
+
+            .pca-video.visible {
+              opacity: 1;
+              pointer-events: auto;
+            }
+
+            /* Adjust for smaller screens */
+            @media (max-width: 768px) {
+              .video-container {
+                height: 250px;
+              }
+              .pca-button {
+                font-size: 14px;
+              }
+            }
+          </style>
+          <br>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <br>
+  <section class="section" id="BibTeX" style="padding-top: 0rem;">
+    <div class="container is-max-desktop content">
+      <h2 class="title is-3" style="font-weight: 700;">BibTeX</h2>
+      <pre><code>@inproceedings{Jevtic:2025:SceneDINO,
+    author  = {Aleksandar Jevti{\'c} and
+               Christoph Reich and
+               Felix Wimbauer and
+               Oliver Hahn and
+               Christian Rupprecht and
+               Stefan Roth and
+               Daniel Cremers},
+    title   = {Feed-Forward {SceneDINO} for Unsupervised Semantic Scene Completion},
+    journal = {IEEE/CVF International Conference on Computer Vision (ICCV)},
+    year    = {2025},
+}</code></pre>
+    </div>
+  </section>
+
+  <section class="section" id="Acknowledgements" style="padding-top: 0rem;">
+    <div class="container is-max-desktop content">
+      <h2 class="title is-3" style="font-weight: 700;">Acknowledgements</h2>
+      <p align="justify" style="font-size: 11px; color: grey;">
+        This project was partially supported by the European Research Council (ERC) Advanced Grant SIMULACRON, DFG project CR 250/26-1 ``4D-YouTube'', and GNI Project ``AICC''. This project has also received funding from the ERC under the European Union’s Horizon 2020 research and innovation programme (grant agreement No. 866008). Additionally, this work has further been co-funded by the LOEWE initiative (Hesse, Germany) within the emergenCITY center [LOEWE/1/12/519/03/05.001(0016)/72] and by the State of Hesse through the cluster project ``The Adaptive Mind (TAM)''. Christoph Reich is supported by the Konrad Zuse School of Excellence in Learning and Intelligent Systems (ELIZA) through the DAAD programme Konrad Zuse Schools of Excellence in Artificial Intelligence, sponsored by the Federal Ministry of Education and Research. Christian Rupprecht is supported by an Amazon Research Award. Finally, we acknowledge the support of the European Laboratory for Learning and Intelligent Systems (ELLIS) and thank Mateo de Mayo as well as Igor Cvišić for help with estimating camera poses.
+      </p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This webpage template is adapted from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>,
+              under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0 License</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="static/js/comparison.js"></script>
+
+</body>
+
+</html>
