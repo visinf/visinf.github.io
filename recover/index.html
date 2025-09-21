@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
+    <!-- Replace the content tag with appropriate information -->
+    <meta name="description" content="DESCRIPTION META TAG">
+    <meta property="og:title" content="Removing Cost Volumes from Optical Flow Estimators"/>
+    <meta property="og:description" content="We present ReCoVEr - A training strategy for removing the cost volume from an optical flow estimator during training."/>
+    <meta property="og:url" content="https://visinf.github.io/recover"/>
+    <!-- Path to banner image, should be in the path listed below. Optimal dimensions are 1200X630-->
+    <meta property="og:image" content="https://visinf.github.io/recover/static/images/twitter.webp"/>
+    <meta property="og:image:width" content="800"/>
+    <meta property="og:image:height" content="418"/>
+    <meta name="twitter:title" content="Removing Cost Volumes from Optical Flow Estimators">
+    <meta name="twitter:description" content="TWITTER BANNER DESCRIPTION META TAG">
+    <!-- Path to banner image, should be in the path listed below. Optimal dimensions are 1200X600-->
+    <meta name="twitter:image" content="https://cdn.skief.de/temp/static/images/twitter.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@visinf" />
+    <meta name="twitter:creator" content="@SimonKiefhaber" />
+
+    <!-- Keywords for your paper to be indexed by-->
+    <meta name="keywords" content="ReCoVEr, Optical Flow, Efficient Optical Flow">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Removing Cost Volumes from Optical Flow Estimators</title>
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+          rel="stylesheet">
+    <link rel="stylesheet" href="static/css/bulma.min.css">
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="static/css/index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!--script src="https://documentcloud.adobe.com/view-sdk/main.js"></script-->
+    <script defer src="static/js/fontawesome.all.min.js"></script>
+    <script src="static/js/bulma-carousel.js"></script>
+    <script src="static/js/bulma-slider.js"></script><script src="static/js/index.js"></script>
+</head>
+<body>
+<section class="hero">
+    <div class="hero-body">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered">
+                <div class="column has-text-centered">
+                    <h1 class="title is-1 publication-title">Removing Cost Volumes from Optical Flow Estimators</h1>
+                    <div class="is-size-5 publication-authors">
+                        <!-- Paper authors -->
+                        <span class="author-block">
+                        <a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/visinf_team_details_125120.en.jsp" target="_blank">Simon Kiefhaber</a><sup>1,2</sup>,</span>
+                        <span class="author-block">
+                        <a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/stefan_roth.en.jsp"
+                           target="_blank">Stefan Roth</a><sup>1,2</sup>,</span>
+                        <span class="author-block">
+                        <a href="https://schaubsi.github.io/" target="_blank">Simone Schaub-Meyer</a><sup>1,2</sup>
+                        </span>
+                    </div>
+                    <div class="is-size-5 publication-authors">
+                        <span class="author-block">
+                           <small>
+                           <sup>1</sup>Department of Computer Science, Technical University of Darmstadt<br>
+                           <sup>2</sup>Hessian Center for AI (hessian.AI)<br>
+                           </small>
+                           <p class="has-text-weight-semibold is-size-4">ICCV 2025 (Oral)</p>
+                        </span>
+                    </div>
+                    <div class="column has-text-centered">
+                        <div class="publication-links">
+                            <!-- Arxiv PDF link -->
+                            <span class="link-block">
+                           <a href="static/docs/ReCoVEr.pdf" target="_blank"
+                              class="external-link button is-normal is-rounded is-dark">
+                           <span class="icon">
+                           <i class="fas fa-file-pdf"></i>
+                           </span>
+                           <span>Paper</span>
+                           </a>
+                           </span>
+                            <!-- Github link -->
+                            <span class="link-block">
+                           <a href="https://github.com/visinf/recover" target="_blank"
+                              class="external-link button is-normal is-rounded is-dark">
+                           <span class="icon">
+                           <i class="fab fa-github"></i>
+                           </span>
+                           <span>Code</span>
+                           </a>
+                           </span>
+                            <!-- ArXiv abstract Link -->
+                            <!--span class="link-block">
+                           <a href="https://arxiv.org/abs/<ARXIV PAPER ID>" target="_blank"
+                              class="external-link button is-normal is-rounded is-dark">
+                           <span class="icon">
+                           <i class="ai ai-arxiv"></i>
+                           </span>
+                           <span>arXiv</span>
+                           </a>
+                           </span-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Teaser-->
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+            <div class="column is-fullwidth">
+                <img src="static/images/teaser_ours.webp" width="100%"/>
+
+                <p class="has-text-left">
+                    We propose a method to remove cost volumes from optical flow estimators during training, and thereby, we are able
+                    to create fast and accurate optical flow estimators with a significantly reduced memory footprint. Our most accurate model, ReCoVEr-CX,
+                    reaches state-of-the-art accuracy while being efficient w.r.t. inference and memory.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End teaser video -->
+<!-- Paper abstract -->
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+            <div class="column is-fullwidth">
+                <h2 class="title is-3">Abstract</h2>
+                <div class="content has-text-justified is-italic">
+                    <p>
+                        Cost volumes are used in every modern optical flow estimator,
+                        but due to their computational and space complexity,
+                        they are often a limiting factor in optical flow methods
+                        regarding both processing speed and the resolution of input
+                        frames. Motivated by our empirical observation that
+                        cost volumes lose their importance once all other network
+                        parts of, e.g., a RAFT-based pipeline have been sufficiently
+                        trained, we introduce a training strategy that allows to remove
+                        the cost volume from optical flow estimators throughout
+                        training. This leads to significantly improved inference
+                        speed and reduced memory requirements. Using our training
+                        strategy, we create three different models covering different
+                        compute budgets. Our most accurate model reaches
+                        state-of-the-art accuracy while being 1.2× faster and having
+                        a 6× lower memory footprint than comparable models;
+                        our fastest model is capable of processing Full HD frames
+                        at 20FPS using only 500MB of GPU memory.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End paper abstract -->
+
+<!-- Results -->
+<section class="section">
+    <div class="container is-max-desktop content">
+        <div class="container is-centered">
+            <h2 class="title is-3 has-text-centered">Qualitative Results</h2>
+
+            <div id="results-carousel" class="carousel results-carousel">
+                <div class="item">
+                    <img src="static/images/examples_1200/davis_a.webp" alt="MY ALT TEXT"/>
+                </div>
+                <div class="item">
+                    <img src="static/images/examples_1200/davis_b.webp" alt="MY ALT TEXT"/>
+                </div>
+                <div class="item">
+                    <img src="static/images/examples_1200/davis_c.webp" alt="MY ALT TEXT"/>
+                </div>
+                <div class="item">
+                    <img src="static/images/examples_1200/davis_d.webp" alt="MY ALT TEXT"/>
+                </div>
+                <div class="item">
+                    <img src="static/images/examples_1200/davis_f.webp" alt="MY ALT TEXT"/>
+                </div>
+                <div class="item">
+                    <img src="static/images/examples_1200/spring_a.webp" alt="MY ALT TEXT"/>
+                </div>
+                <div class="item">
+                    <img src="static/images/examples_1200/spring_b.webp" alt="MY ALT TEXT"/>
+                </div>
+                <div class="item">
+                    <img src="static/images/examples_1200/spring_d.webp" alt="MY ALT TEXT"/>
+                </div>
+                <div class="item">
+                    <img src="static/images/examples_1200/spring_e.webp" alt="MY ALT TEXT"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container is-max-desktop content">
+        <div class="columns is-centered has-text-centered">
+            <div class="column is-fullwidth">
+                <h2 class="title is-3">Quantitative Results</h2>
+                <div class="content has-text-justified">
+                    <div class="is-flex is-flex-direction-column is-align-items-center mb-5">
+                        <img src="./static/images/ood_small.svg" width="74%" />
+                        <p>
+                            <b>Out-of-domain evaluations</b> of EPE on datasets that were not used during training without any additional finetuning. We find no significant differences between SEA-RAFT and our best method regarding the achieved accuracies on unseen datasets, showing that our training method has no negative impact on the generalization capabilities of the resulting network.
+                        </p>
+                    </div>
+
+                    <div class="is-flex is-flex-direction-column is-align-items-center mb-5">
+                        <img src="./static/images/table_spring.svg" width="100%" />
+                        <p>
+                            <b>Comparison of the EPE</b> of different methods on the different annotated regions of the Spring training split. None of the methods
+                            were fine-tuned on Spring, and all of them were at least trained on FlyingChairs and FlyingThings, but since the training schedules changed
+                            over time, we marked the methods that were trained using additional data from TartanAir or Sintel. All evaluated methods received the
+                            full-resolution frames as inputs without any resizing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Results -->
+<!-- Acknowledgments -->
+<section class="section">
+    <div class="container is-max-desktop content">
+        <div class="columns is-centered has-text-centered">
+            <div class="column is-fullwidth">
+                <h2 class="title is-3">Acknowledgements</h2>
+                <div class="content has-text-justified">
+                    <div class="media is-align-items-center">
+                        <div class="media-content content">
+                            <p>
+                                This work was funded by the Hessian Ministry of Science and the Arts (HMWK) through the project “The Third Wave of Artificial Intelligence – 3AI”. The work was further supported by the Deutsche Forschungsgemeinschaft (German Research Foundation, DFG) – project number 529680848 and under Germany’s Excellence Strategy (EXC 3057/1 “Reasonable Artificial Intelligence”, Project No.\ 533677015). Stefan Roth acknowledges support by the European Research Council (ERC) under the European Union’s Horizon 2020 research and innovation programme (grant agreement No.\ 866008)
+                            </p>
+                        </div>
+                        <div class="media-right">
+                            <p class="image is-64x64">
+                                <img src="static/images/logo-erc.png">
+                            </p>
+                            <p class="image is-64x64">
+                                <img src="static/images/logo-emmy-noether.jpg">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Acknowledgments -->
+<!--BibTex citation -->
+<section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+        <h2 class="title">BibTeX</h2>
+        <pre><code>@inproceedings{Kiefhaber:2025:recover,
+    title     = {Removing Cost Volumes from Optical Flow Estimators},
+    author    = {Simon Kiefhaber and Stefan Roth and Simone Schaub-Meyer},
+    booktitle = {IEEE/CVF International Conference on Computer Vision (ICCV)},
+    year      = {2025}
+}</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+<footer class="footer">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-8">
+                <div class="content">
+                    <p class="is-size-7">
+                        This page was built using the
+                        <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">
+                            Academic Project Page Template
+                        </a>
+                        which was adopted from the
+                        <a href="https://nerfies.github.io" target="_blank">
+                            Nerfies
+                        </a>
+                        project page.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
