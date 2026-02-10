@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Evaluating Object-Centric Models beyond Object Discovery">
+  <meta name="keywords" content="Object-Centric learning, OCL, Evalution of OCL">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evaluating Object-Centric Models beyond Object Discovery</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body" style="padding-bottom: 1rem;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title section-title">Evaluating Object-Centric Models beyond Object Discovery</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://kris-singh.github.io/">Krishnakant Singh</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://schaubsi.github.io/">Simone Schaub-Meyer</a><sup>1,2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/stefan_roth.en.jsp">Stefan Roth</a><sup>1,2</sup>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Technical Univeristy of Darmstadt,</span>
+            <span class="author-block"><sup>2</sup>hessian.AI</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2602.07532"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code (Coming Soon)</span>
+                  </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top: 1.5rem;">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+        <div class="column is-four-fifths"
+            style="text-align: center; background-color: #d0d5ec;">
+            <div class="content has-text-justified">
+            <p style="text-align: center; color:rgb(0, 0, 0)"><strong>TL;DR</strong>: We evaluate object-centric representations with VLMs for real visual reasoning and introduce a unified metric that jointly measures localization and representation usefulness.</p>
+            </div>
+        </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top: 1.5rem;">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="display: inline-block; border-bottom: 2px solid rgb(210, 210, 210) !important; padding-bottom: 5px; padding-left: 10px; padding-right: 10px;"> Issues with existing evalutions</h2>
+        <div class="object-and-details">
+          <div class="has-text-centered">
+            <h4 style="color: rgb(0, 0, 0); display: inline-block; border-bottom: 2px solid rgb(210, 210, 210) !important; padding-bottom: 0px; padding-left: 10px; padding-right: 10px;"> Disjoint Evaluation.</h4>
+          </div>
+          <div style="margin-top: 10px;">
+          <img src="./static/images/fragmentation.jpg" alt="Disjoint evaluation metrics causes representation and localization fragmentation" loading="lazy">
+          </div>
+          <div class="content has-text-justified" style="margin-top: 10px;">
+            <b>Disjoint evaluation.</b> Separate metrics miss localization and representation fragmentation: (top) M1 and M2 score equally despite different localization quality; (bottom) VQA probing cannot distinguish correct-slot answers (M4) from wrong-slot answers (M3).
+          </div>
+          <div class="has-text-centered" style="margin-top: 10px;">
+            <h4 style="color: rgb(0, 0, 0); display: inline-block; border-bottom: 2px solid rgb(210, 210, 210) !important; padding-bottom: 0px; padding-left: 10px; padding-right: 10px;"> Limited evalution.</h4>
+          </div>
+          <div class="has-text-centered" style="margin-top: 10px;">
+            <img src="./static/images/limited_eval.png" alt="Limited evalution" loading="lazy" width="450px">
+          </div>
+          <div class="content has-text-justified" style="margin-top: 10px;">
+            <b>Limited evalution.</b> Existing probes are costly and limited to simple classification tasks; VLMs scale but still suffer from disjoint evaluation. VLMs + AwGA provide a unified, fragmentation-aware evaluation.
+          </div>
+          </div>
+        </div>
+        </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section>
+
+<section class="section" style="padding-top: 1.5rem;">
+  <div class="container is-max-desktop">
+    <!-- Method. -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="display: inline-block; border-bottom: 2px solid rgb(210, 210, 210) !important; padding-bottom: 5px; padding-left: 10px; padding-right: 10px;">VLMs to the rescue</h2>
+        <div class="has-text-centered">
+          <img src="./static/images/eval_proto.jpg" alt="Network Diagram" loading="lazy">
+        </div>
+        <div class="content has-text-justified">
+        <br><br>
+        <b>Training.</b> 
+        <br>
+        Our training is akin to LLaVA. In <i>Stage I</i>, only the MLP connector is trained on the LLaVA pre-training dataset. This aligns the slot embeddings with the language model's embedding space. 
+        In <i>Stage II</i>, the MLP network and the language model are trained on the instruction-tuning dataset from LLaVA. 
+        This enables the language model to follow instructions and perform tasks based on slots as visual tokens. 
+        <br><br>
+        <b>Evaluation.</b> 
+        <br>
+        We perform evaluation in a zero-shot fashion on various VQA benchmarks letting us evaluate the usefulness of OCL models for complex visual reasoning tasks.
+
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Awga. -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="display: inline-block; border-bottom: 2px solid rgb(210, 210, 210) !important; padding-bottom: 5px; padding-left: 10px; padding-right: 10px;">AwGA: Enabling joint evaluation</h2>
+        <div class="has-text-centered">
+          <img src="./static/images/metrics.jpg" alt="Metrics Diagram" loading="lazy" width="600px">
+        </div>
+        <br>
+        <div class="content has-text-justified">
+          Accuracy and mIoU evaluate usefulness and localization separately; G-Acc partially unifies them but misses representation fragmentation, while AwGA jointly evaluates both and penalizes both fragmentation types.
+          <br>
+          <b>AwGA</b> is computed by first computing the attribution score for each slot with respect to the predicted answer and then selecting the top K slots with the highest attributions and computing the mean intersection over union (mIoU) using the union of their predicted masks.</b>
+          <br>
+          Formally, it is written as:
+          <div id="wrapper">
+            <img src="./static/images/awga_formula.png" style="width: 60%; height: auto;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top: 1.5rem;">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="display: inline-block; border-bottom: 2px solid rgb(210, 210, 210) !important; padding-bottom: 5px; padding-left: 10px; padding-right: 10px;">Results</h2>
+        <div class="content has-text-justified">
+      </div>
+    </div>
+   </div>
+    <!--/ Matting. -->
+
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-4">General Perception Benchmarks</h2>
+        <div class="content has-text-justified">
+          <div id="wrapper">
+            <img src="./static/images/gen_vqa.png" style="width: 100%; height: auto;">
+          </div>
+        <div style="position: relative; background-color: #d0e8ff; border-radius: 10px; padding: 20px 10px 10px 10px; text-align: center; margin-top: 15px; border: 2px solid black;">
+            <span style="position: absolute; top: -15px; left: -25px; padding: 2px 10px;"><i class="fas fa-star" style="color: #f5a623; font-size: 1.5rem;"></i> </span>
+            <b>Takeaway 1.</b> Under our VLM evaluation, OCL models are competitive despite far fewer tokens, with feature-based and hybrid reconstructions performing best.
+        </div>
+        </div> 
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-4">Robust Perception Benchmarks</h2>
+        <div class="content has-text-justified">
+          <div id="wrapper">
+            <img src="./static/images/robust_vqa.png" style="width: 100%; height: auto;">
+          </div>
+        <div style="position: relative; background-color: #d0e8ff; border-radius: 10px; padding: 20px 10px 10px 10px; text-align: center; margin-top: 15px; border: 2px solid black;">
+            <span style="position: absolute; top: -15px; left: -25px; padding: 2px 10px;"><i class="fas fa-star" style="color: #f5a623; font-size: 1.5rem;"></i> </span>
+            <b>Takeaway 2.</b> Under VLM probing, OCL models perform well on OOD and numeric counterfactual tasks but trail DINOv2 on compositional and adversarial benchmarks, with <i>feature reconstruction</i> being more robust.
+        </div>
+      </div> 
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-4">Mismatch between Object Discovery and Representation Usefulness</h2>
+        <div class="content has-text-justified">
+          <div id="wrapper">
+            <img src="./static/images/mismatch_mbo_vqa.png" style="width: 60%; height: auto;">
+          </div>
+          <div style="position: relative; background-color: #d0e8ff; border-radius: 10px; padding: 20px 10px 10px 10px; text-align: center; margin-top: 15px; border: 2px solid black;">
+            <span style="position: absolute; top: -15px; left: -25px; padding: 2px 10px;"><i class="fas fa-star" style="color: #f5a623; font-size: 1.5rem;"></i> </span>
+            <b>Takeaway 3.</b> In our VLM-based setting, object discovery scores poorly reflect representation usefulness, motivating joint localization–utility metrics.</i>
+          </div>
+         </div>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-4">Joint evalution of "what" and "where"</h2>
+        <div class="content has-text-justified">
+          <div id="wrapper">
+          <img src="./static/images/awga_Res.png" width="450px">
+          </div>
+          <div style="position: relative; background-color: #d0e8ff; border-radius: 10px; padding: 20px 10px 10px 10px; text-align: center; margin-top: 15px; border: 2px solid black;">
+            <span style="position: absolute; top: -15px; left: -25px; padding: 2px 10px;"><i class="fas fa-star" style="color: #f5a623; font-size: 1.5rem;"></i> </span>
+            <b>Takeaway 4.</b> Object discovery or semantic accuracy alone is insufficient; AwGA jointly evaluates what and where and penalizes both localization and representation fragmentation.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-4">Grounding Failure Examples</h2>
+        <div class="content has-text-justified">
+          <div id="wrapper">
+          <img src="./static/images/qual_1.png" width="450px">
+          </div>
+          <div id="wrapper">
+            <img src="./static/images/qual_2.png" width="450px">
+          </div>
+          <div class="content has-text-justified" style="margin-top: 10px;">
+            <b>Grounding failures.</b> DINOSAURv2 and StableLSD achieve high accuracy or G-Acc but low AwGA because answer-attributed slots poorly overlap with the grounded masks.
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{singh2026evaluating,
+  author    = {Krishnakant Singh and Simone Schaub-Meyer and Stefan Roth},
+  title     = {Evaluating Object-Centric Models beyond Object Discovery},
+  booktitle = {arXiv:2602.07532 [cs.CV]},
+  year      = {2026},
+}</code></pre>
+  </div>
+</section>
+  
+<hr class="divider" />
+<div class="container" style="max-width: 768px;">
+    <p align="justify" style="font-size: 11px; color: grey;">
+        <b>Acknowledgments: </b> This project has received funding from the European Research Council (ERC) under the European Union’s Horizon 2020 program (grant agreement No. 866008). The project was also supported in part by the State of Hesse through the “The Third Wave of Artificial Intelligence (3AI)” project.
+    </p>
+    <footer>
+        <p style="font-size: 11px; color: grey;"> The website template is borrowed from the awesome <a href="https://github.com/nerfies/nerfies.github.io"> Nerfies</a> website.</p>
+    </footer>
+</div>
+</body>
+</html>
