@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Is Synthetic Data all We Need?\\ Benchmarking the Robustness of Models Trained with Synthetic Images">
+  <meta name="keywords" content="Synthgetic data, robustness, gan, diffusion, generative">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Is Synthetic Data all We Need? Benchmarking the Robustness of Models Trained with Synthetic Images</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Is Synthetic Data all We Need? Benchmarking the Robustness of Models Trained with Synthetic Images</h1>
+          <p style="background-color:red;"> SyntaGen CVPR 2024 (Best Paper Award) </p>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://kris-singh.github.io/">Krishnakant Singh</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="">Thanush Navratanam</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="">Jannik Holmer</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://schaubsi.github.io/">Simone Schaub-Meyer</a><sup>1,2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/stefan_roth.en.jsp">Stefan Roth</a><sup>1,2</sup>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Technical Univeristy of Darmstadt,</span>
+            <span class="author-block"><sup>2</sup>hessian.AI</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://openreview.net/pdf?id=wPW3k20lkW"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2405.20469"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/visinf/benchmarking-synthetic-clones"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+     <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="color: #FB4264; border-bottom: 2px solid">TL;DR &#128640;</h2>
+        <p>
+          We find that models trained with synthetic data are comparable with SOTA models trained with real data on a wide array of robustness metrics like shape bias, context bias, background bias etc. 
+          Still, two major area where current models trained with synthetic images lack behind are the robustness of common corruptions and adversarial pertubations.
+        </p>
+        <div class="content has-text-justified">
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src = "./static/images/spider_plot_supervised.svg" width="450px">
+      <img src = "./static/images/spider_plot_ssl.svg" width="450px">
+      <img src = "./static/images/spider_plot_clip.svg" width="450px" class="clip-sp">
+      <h2 class="subtitle has-text-centered">
+        Self-supervised and multi-modal synthetic clones are close in performance on various robustness measures to baseline models trained on real images.
+        All synthetic clones suffer in performance with respect to adversarial and common corruption robustness.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="color:#FB4264; border-bottom: 2px solid">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+          A long-standing challenge in developing machine learning approaches has been the lack of high-quality labeled data. 
+          Recently, models trained with purely synthetic data, here termed <b>synthetic clones</b>, generated using large-scale pre-trained diffusion models have shown promising results in overcoming this annotation bottleneck. 
+          As these synthetic clone models progress, they are likely to be deployed in challenging real-world settings, yet their suitability remains understudied. 
+          </p>
+          <p>
+          Our work addresses this gap by providing the first benchmark for three classes of synthetic clone models, namely supervised,  self-supervised,  and multi-modal ones,  across a range of robustness measures.
+          We show that existing synthetic self-supervised and multi-modal clones are comparable to or outperform state-of-the-art real-image baselines for a range of robustness metrics &hyphen;&hyphen; shape bias, background bias, calibration, etc.
+          However, we also find that synthetic clones are much more susceptible to adversarial and real-world noise than models trained with real data. 
+          To address this, we find that combining both real and synthetic data further increases the robustness, and that the choice of prompt used for generating synthetic images plays an important part in the robustness of synthetic clones. 
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="color:#FB4264; border-bottom: 2px solid">Results</h2>
+        <div class="content has-text-justified">
+      </div>
+    </div>
+   </div>
+    <div class="columns is-centered">
+      <!-- Visual Effects. -->
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Context Bias</h2>
+          <p>
+          <i> Syn</i>CLIP and <i>Syn</i>CLR models are robust to changes in context and comparable strong self-supervised models like DINOv2 and ConvNeXt.
+          <!-- While, <i>Syn</i>ViT and <i>Syn</i>ResNet are prone to changes in the context. -->
+          </p>
+          <img src="./static/images/context_bias.png" height="8px">
+        </div>
+      </div>
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Background Bias</h2>
+          <p>
+            Synthetic clones perform on par in terms of background bias with a SOTA baseline model trained with real data.
+            <br>
+            <br>
+          </p>
+          <img src="./static/images/background_bias.png" height="8px">
+        </div>
+      </div>
+
+      <!--/ Visual Effects. -->
+
+      <!-- Matting. -->
+   </div>
+    <!--/ Matting. -->
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Calibration</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            Synthetic clones are (mostly) well calibrated for the in-distribution dataset.
+            On slightly out-of-distribution (OOD) dataset like ImageNet-R synthetic again are well calibrated compared to their real counterparts.
+            For more diffcult OOD dataset such as ImageNet-A synthetic clones are not well calibrated.
+          </p>
+          <img src="./static/images/calibration.png">
+
+        </div>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">OOD Detection</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            <i>Syn</i>CLR and <i>Syn</i>CLIP are comparable to the baseline models in their category for OOD detection. 
+            Even with 16 times more data than the baseline, <i>Syn</i> ViT-B clearly lags behind supervised models trained with real data.
+          </p>
+          <img src="./static/images/ood_detection.png">
+
+        </div>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Common Corruptions Robustness</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            Synthetic clones are significantly less robust to common corruptions in images than baselines trained with real images.
+          </p>
+          <img src="./static/images/common_corruptions.png">
+
+        </div>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Shape Bias</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            Synthetic clones tend to be more shape-biased than texture-biased. <i>(left)</i> Total shape bias for synthetic clones and thier real counterparts 
+            <i> (right) </i> Class-wise shape bias of synthetic clones and their real counterparts. Solid lines respresent the avg shape bias of a model.
+          </p>
+          <img src="./static/images/shape_bias.png">
+
+        </div>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Effect of Prompts</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            Prompts based on captions and CLIP templates are much better for creating robust synthetic clones compared to just using class names. 
+            This can be attributed to more diverse images being generated with more descriptive text.
+          </p>
+          <img src="./static/images/ablation_prompt_type.png">
+
+        </div>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Effect of Dataset</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            The table below shows that adding real data improves the performance on many key metrics (ECE, adversarial accuracy, shape bias) while remaining comparable on others.
+            Training with just synthetic images or a combination of synthetic and real images creates more robust models compared to models trained just on real data. 
+          </p>
+          <img src="./static/images/ablation_data_type.png">
+
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <h2 class="title is-3">Adversarial Robustness</h2>
+      <div class="columns is-centered">
+        <div class="column content">
+          <p>
+            Synthetic clone models are significantly more vulnerable to adversarial examples, particularly supervised synthetic clones, than models trained with real data. 
+          </p>
+          <center>
+          <img src="./static/images/adv_robustness.png" width="450px">
+          </center>
+        </div>
+      </div>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{singh2024synthetic,
+  author    = {Krishnakant Singh and Thanush Navratanam and Jannik Holmer and Simone Scahub-Meyer and Stefan Roth},
+  title     = {Is Synthetic Data all We Need? Benchmarking the Robustness of Models Trained with Synthetic Images},
+  booktitle = {CVPR 2024 Workshop SyntaGen: Harnessing Generative Models for Synthetic Visual Datasets},
+  year      = {2024},
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+      The website template is borrowed from the awesome <a href="https://github.com/nerfies/nerfies.github.io"> Nerfies</a> website.
+      </p>
+        </div>
+      </div>
+    </div>
+   </div>
+  </div>
+</footer>
+
+</body>
+</html>
