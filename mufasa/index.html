@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="MUFASA: lightweight, plug-and play multi-layer framework for slot attention-based models to enhance performance in unsupervised object segmentation (UOS)">
+  <meta name="keywords" content="Slot Attention, Object-centric Learning, Unsupervised Object Segmentation ">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MUFASA: A Multi-Layer Framework for Slot Attention</title>
+
+  <!-- MathJax for rendering LaTeX -->
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/bulma.min.css">
+  <link rel="stylesheet" href="./css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <link rel="icon" href="./images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./js/fontawesome.all.min.js"></script>
+  <script src="./js/bulma-carousel.min.js"></script>
+  <script src="./js/bulma-slider.min.js"></script>
+  <script src="./js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  
+</nav>
+
+<style>
+  @media (max-width: 768px) {
+    #architecture-wrapper {
+      overflow-x: scroll;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap; 
+    }
+  }
+
+  /* Make margins smaller to reduce overly large borders / gaps */
+  .hero.teaser {
+      padding-top: 0;
+      margin-top: -1.7rem; 
+      margin-bottom: -4.2rem;
+    }
+    .hero.teaser .hero-body {
+      padding-top: 0;
+    }
+</style>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">MUFASA: A Multi-Layer Framework <br>for Slot Attention</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              Sebastian Bock<sup>* 1, 2</sup></span>
+            &nbsp;
+            <span class="author-block">
+              Leonie Schüßler<sup>* 1, 2</sup></span>
+            &nbsp;
+            <span class="author-block">
+              Krishnakant Singh<sup>1</sup>
+            &nbsp;
+            </span>
+            <span class="author-block">
+              Simone Schaub-Meyer<sup>1, 3</sup>
+            &nbsp;
+            </span>
+            <span class="author-block">
+              Stefan Roth<sup>1, 2, 3</sup>
+            &nbsp;
+            </span>
+            
+          </div>
+
+          <div class="is-size-6 publication-authors" style="margin-bottom: 10px;">
+            <span class="author-block" style="margin-right: 20px;"><sup>1</sup>TU Darmstadt</span>
+            <span class="author-block" style="margin-right: 20px;"><sup>2</sup>Zuse School ELIZA</span>
+            <span class="author-block" style="margin-right: 20px;"><sup>3</sup>hessian.AI</span>
+            <span class="author-block"><sup>*</sup>equal contribution</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <!--
+              <span class="link-block">
+                <a href="todo"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              -->
+              <span class="link-block">
+                <a href="http://arxiv.org/abs/2602.07544"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>              
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/leonieschuessler/mufasa"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Teaser figure -->
+<section class="hero teaser">
+  <div class="container">
+    <div class="hero-body">
+        <div id="wrapper">
+          <img src="./images/mufasa_teaser.png" width="600px">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TL,DR section -->
+ <section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <div class="content has-text-justified">
+          <p>
+            <strong>TL,DR</strong>: MUFASA is a plug-and-play framework for slot attention-based approaches that leverages complementary semantics encoded across multiple layers of the vision encoder,
+            enhancing performance in unsupervised object segmentation while simultaneously improving training convergence. 
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section hero is-light" style="padding-top: 1rem;">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Unsupervised object-centric learning (OCL) decomposes visual scenes into distinct entities.
+            Slot attention is a popular approach that represents individual objects as latent vectors, called slots.
+            Current methods obtain these slot representations solely from the last layer of a pre-trained vision transformer (ViT), ignoring valuable, semantically rich information encoded across the other layers.
+            To better utilize this latent semantic information, we introduce MUFASA, a lightweight plug-and-play framework for slot attention-based approaches to unsupervised object segmentation.
+            Our model computes slot attention across multiple feature layers of the ViT encoder, fully leveraging their semantic richness.
+            We propose a fusion strategy to aggregate slots obtained on multiple layers into a unified object-centric representation.
+            Integrating MUFASA into existing OCL methods improves their segmentation results across multiple datasets, setting a new state of the art while simultaneously improving training convergence with only minor inference overhead.
+          </p> 
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Body -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+
+        <!-- Method -->
+        <h2 class="title is-3">Overview of MUFASA</h2>
+
+          <div id="architecture-wrapper">
+              <img id="architecture-img" src="./images/mufasa_architecture.svg" alt="Architecture">
+          </div>
+
+          <div class="content has-text-justified">
+            <p> 
+            MUFASA is designed as a plug-and-play component, allowing seamless integration into existing slot attention-based methods by replacing their single-layer slot-attention module
+            with our proposed multi-layer framework. MUFASA is trained with no additional losses, relying solely on training signals of the base model. 
+            </p>
+
+            <p>
+              <strong>(a) Multi-layer slot-attention</strong>: Given an input image, features from multiple layers of a DINO encoder are extracted and processed by multiple slot-attention modules \(\mathrm{SA}_m\).
+              The slot-attention modules are independent of another, enabling adaptation to layer-specific information. Each \(\mathrm{SA}_m\) produces layer-specific slots \(\mathcal{S}_m\) and corresponding attention masks \(\mathcal{A}_m^{\mathrm{Slot}}\).
+              After Hungarian Matching, a fusion module merges slots and masks.
+              A ViT decoder reconstructs the last encoder layer's features from fused slots.
+            </p>
+
+            <p>
+              <strong>(b) Hungarian Matching</strong>: Prior to fusion, we ensure that two slot sets \(\mathcal{S}_m\) and \(\mathcal{S}_{m+1}\) of adjacent layers are aligned in the sense that the slots at corresponding indices learn to bind to the same objects across layers.
+              This is achieved via Hungarian Matching between the corresponding slot-attention masks \(\mathcal{A}_m^{\mathrm{Slot}}\) and \(\mathcal{A}_{m+1}^{\mathrm{Slot}}\).
+            </p>
+
+            <p>
+              <strong>(c) Fusion module</strong>: To integrate the semantic information encoded across layers, we fuse all slot sets \(\mathcal{S}_m\) into a single set of slots \(\mathcal{S}_{\mathrm{fused}}\). 
+              For this, we propose M-Fusion: First, each subsequent pair of slot sets are summed in a sliding window-like fashion to encode an inductive bias of local interactions of adjacent slots.
+              The resulting sequence is concatenated and projected onto the fused set of slots through a learned MLP. 
+              We analogously fuse the slot-attention masks \(\mathcal{A}_m^{\mathrm{Slot}}\) into a joint representation \(\mathcal{A}_{\mathrm{fused}}^{\mathrm{Slot}}\) through a weighted linear combination.
+            </p>
+
+          </div>
+          
+        <!-- UOS Results-->
+        <h3 class="title is-3">Unsupervised Object Segmentation</h3>
+
+        <div class="content has-text-justified">
+          
+          <p> 
+          We integrate MUFASA into state-of-the-art slot attention-based models, SPOT and DINOSAUR, to highlight the benefit of our approach.
+          In the task of unsupervised object segmentation, we substantially improve the performance of the respective base models,
+          thus establishing a new state of the art among unsupervised OCL methods on these benchmarks.
+          </p>
+
+          <div id="wrapper" class="has-text-centered">
+            <img src="./images/mufasa_results.png" style="max-width: 45%; height: auto;">
+          </div>
+
+          <p>
+          The segmentation results of MUFASA are of higher quality compared to the baselines, producing masks more consistent in shape that follow the object boundaries more closely.
+          </p>
+
+          <div id="wrapper" class="has-text-centered">
+            <img src="./images/mufasa_qualitatives.png" style="max-width: 100%; height: auto;">
+          </div>
+
+          <p>
+          In addition to enhanced UOS performance, integrating MUFASA improves training efficiency: MUFASA performs on-par with baseline models
+          in substantially fewer epochs (\(\text{T}_\text{Base}\)) and training converges earlier (\(\text{T}_\text{Peak}\)), all while inducing minor overhead during inference. 
+          </p>
+
+          <div id="wrapper" class="has-text-centered">
+            <img src="./images/mufasa_efficiency.png" style="max-width: 45%; height: auto;">
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{bock2026mufasa,
+      title={MUFASA: A Multi-Layer Framework for Slot Attention}, 
+      author={Sebastian Bock and Leonie Sch{\"u}{\ss}ler and Krishnakant Singh and Simone Schaub-Meyer and Stefan Roth},
+      booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (To Appear)},
+      year={2026},
+    }
+  </code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+          The website template is taken and adapted from 
+            <a href="https://github.com/nerfies/nerfies.github.io"> Nerfies</a>
+          and licensed under a 
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
