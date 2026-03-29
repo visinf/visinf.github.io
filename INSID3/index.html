@@ -1,2 +1,885 @@
 <!DOCTYPE html>
-<html></html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="INSID3: Training-Free In-Context Segmentation with DINOv3">
+  <meta name="keywords" content="INSID3, DINOv3, In-Context Segmentation, CVPR 2026">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>INSID3: Training-Free In-Context Segmentation with DINOv3</title>
+
+  <link href="static/css/bootstrap-4.4.1.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+
+  <style>
+    :root {
+      --page-max: 1120px;
+      --wide-max: 1700px;
+      --text: #1f2430;
+      --muted: #667085;
+      --soft-bg: #f5f7fc;
+      --soft-bg-2: #fbfcff;
+      --card: #ffffff;
+      --line: rgba(255,255,255,0.96);
+      --shadow: 0 12px 32px rgba(16, 24, 40, 0.08);
+      --shadow-strong: 0 18px 48px rgba(16, 24, 40, 0.12);
+      --radius: 20px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Google Sans', 'Noto Sans', sans-serif;
+      color: var(--text);
+      background: #ffffff;
+    }
+
+    .section-spacious {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+    }
+
+    .page-container {
+      max-width: var(--page-max);
+    }
+
+    .wide-container {
+      max-width: var(--wide-max);
+      width: 96%;
+    }
+
+    .publication-title {
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.9rem;
+    }
+
+    .title-underline {
+      text-decoration: underline;
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.12em;
+    }
+
+    .hero-subtitle {
+      color: var(--muted);
+      max-width: 900px;
+      margin: 0 auto;
+      line-height: 1.7;
+      font-size: 1.1rem;
+    }
+
+
+    .contact-line a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(31, 36, 48, 0.18);
+    }
+
+    .hero .link-block {
+      margin: 0.2rem 0.28rem;
+      display: inline-block;
+    }
+
+    .button.is-dark.is-rounded {
+      box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+    }
+
+    .teaser-shell {
+      max-width: 560px;
+      width: min(78vw, 560px);
+      margin: 0 auto;
+    }
+
+    .teaser-video {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      height: auto;
+      display: block;
+      object-fit: cover;
+      border-radius: 24px;
+      box-shadow: var(--shadow-strong);
+      background: #000;
+    }
+
+    .soft-section {
+      background: linear-gradient(180deg, var(--soft-bg-2) 0%, var(--soft-bg) 100%);
+    }
+
+    .feature-box {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.7rem 1.85rem;
+    }
+
+    .feature-box ul {
+      margin-bottom: 0;
+    }
+
+    .feature-box li {
+      margin-bottom: 0.8rem;
+      line-height: 1.75;
+      font-size: 1.06rem;
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: #3155b7;
+      background: #ebf1ff;
+      padding: 0.36rem 0.82rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+
+    .section-intro {
+      max-width: 940px;
+      margin: 0 auto;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 1.08rem;
+    }
+
+    .figure-frame {
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 0.9rem;
+    }
+
+    .main-figure {
+      width: 100%;
+      display: block;
+      border-radius: 14px;
+    }
+
+    .caption-text {
+      line-height: 1.8;
+      font-size: 1.05rem;
+      color: #2b3342;
+    }
+
+    .performance-shell {
+      max-width: 1100px;
+      width: min(96vw, 1100px);
+      margin: 0 auto;
+    }
+
+    .compare-scroll {
+      overflow-x: auto;
+      padding-bottom: 0.35rem;
+      margin-top: 2rem;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(185px, 1fr));
+      gap: 0.95rem;
+      min-width: 1260px;
+    }
+
+    .compare-card {
+      background: white;
+      border-radius: 16px;
+      padding: 0.45rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .compare-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 34px rgba(16,24,40,0.12);
+    }
+
+    .image-compare {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #eef2f8;
+      isolation: isolate;
+    }
+
+    .compare-bg,
+    .compare-fg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center center;
+      background: #eef2f8;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+
+    .compare-bg {
+      z-index: 1;
+    }
+
+    .compare-fg {
+      z-index: 2;
+      clip-path: inset(0 50% 0 0);
+      -webkit-clip-path: inset(0 50% 0 0);
+    }
+
+    .compare-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      transform: translateX(-50%);
+      background: var(--line);
+      z-index: 3;
+      pointer-events: none;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    }
+
+    .compare-divider::before {
+      content: "↔";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.98);
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.96rem;
+      box-shadow: 0 4px 14px rgba(16,24,40,0.16);
+    }
+
+    .compare-slider {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      margin: 0;
+      z-index: 4;
+      cursor: ew-resize;
+    }
+
+    .compare-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.45rem;
+      padding: 0 0.12rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .panel-box {
+      background: linear-gradient(180deg, #fafcff 0%, #f3f6fc 100%);
+      border-radius: 22px;
+      padding: 2rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+
+    .bias-grid-top {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .bias-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 0.55rem;
+    }
+
+    .bias-card-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.45rem;
+      padding-left: 0.15rem;
+    }
+
+    .bias-card img {
+      width: 100%;
+      display: block;
+      border-radius: 10px;
+      background: #eef2f8;
+    }
+
+    .pca-block {
+      margin-top: 1.8rem;
+    }
+
+    .pca-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      color: #2d3952;
+    }
+
+    .pca-scroll {
+      overflow-x: auto;
+      padding-bottom: 0.3rem;
+    }
+
+    .pca-grid {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(95px, 1fr));
+      gap: 0.45rem;
+      min-width: 940px;
+    }
+
+    .pca-thumb {
+      background: white;
+      border-radius: 10px;
+      padding: 0.2rem;
+      box-shadow: 0 6px 18px rgba(16,24,40,0.07);
+    }
+
+    .pca-thumb img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+      background: #eef2f8;
+    }
+
+    .bias-secondary-figure {
+      margin-top: 1.6rem;
+    }
+
+    pre code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+
+    @media screen and (max-width: 1024px) {
+      .feature-box li,
+      .section-intro,
+      .caption-text {
+        font-size: 1rem;
+      }
+
+      .bias-grid-top {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .performance-shell {
+        width: min(92vw, 680px);
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .section-spacious {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+
+      .teaser-shell {
+        width: min(86vw, 480px);
+      }
+
+      .compare-row {
+        min-width: 1140px;
+      }
+
+      .bias-grid-top {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.65rem;
+      }
+
+      .panel-box {
+        padding: 1.25rem;
+      }
+
+      .performance-shell {
+        width: min(94vw, 560px);
+      }
+    }
+
+    @media screen and (max-width: 520px) {
+      .bias-grid-top {
+        grid-template-columns: 1fr;
+      }
+
+      .performance-shell {
+        width: 100%;
+      }
+
+      .figure-frame {
+        padding: 0.55rem;
+        border-radius: 16px;
+      }
+    }
+      .performance-shell,
+      .figure-frame {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        box-sizing: border-box;
+      }
+
+      .main-figure {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+
+    .coming-soon {
+      position: relative;
+      cursor: default;
+      overflow: visible !important;
+    }
+
+    .coming-soon::after {
+      content: "Coming Soon";
+      visibility: hidden;
+      opacity: 0;
+
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding: 5px 10px;
+      border-radius: 5px;
+      white-space: nowrap;
+      font-size: 12px;
+      line-height: 1.2;
+
+      z-index: 9999;
+      pointer-events: none;
+
+      transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+    }
+
+    .coming-soon:hover::after {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container page-container">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+
+            <h1 class="title is-1 publication-title">
+              INSID3: Training-Free
+              <span class="title-underline">I</span><span class="title-underline">n</span>-Context
+              <span class="title-underline">S</span>egmentation
+              w<span class="title-underline">i</span>th
+              <span class="title-underline">D</span>INOv<span class="title-underline">3</span>
+            </h1>
+
+            <div class="is-size-5 publication-authors">
+              <h2 class="subtitle is-3">✨ CVPR 2026 ✨</h2>
+
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=W7lNKNsAAAAJ">Claudia Cuttano</a><sup>1,2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=JXf_iToAAAAJ">Gabriele Trivigno</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=0OYstzAAAAAJ&hl=de">Christoph Reich</a><sup>2,3,5,6</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=cXQciMEAAAAJ&hl=en">Daniel Cremers</a><sup>3,5,6</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=cM3Iz_4AAAAJ">Carlo Masone</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=0yDoR0AAAAAJ&hl=en">Stefan Roth</a><sup>2,4,5</sup>
+              </span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><sup>1</sup>Politecnico di Torino,</span>
+              <span class="author-block"><sup>2</sup>TU Darmstadt,</span>
+              <span class="author-block"><sup>3</sup>TU Munich,</span>
+              <span class="author-block"><sup>4</sup>hessian.AI,</span>
+              <span class="author-block"><sup>5</sup>ELIZA,</span>
+              <span class="author-block"><sup>6</sup>MCML</span>
+            </div>
+
+            <div class="column has-text-centered">
+
+              <span class="link-block">
+                <a href="LINK_TO_ARXIV" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+
+              <span class="link-block">
+                <a href="https://github.com/visinf/INSID3" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code</span>
+                </a>
+              </span>
+
+            <span class="link-block">
+              <a class="external-link button is-normal is-rounded is-dark coming-soon">
+                <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                <span>Poster</span>
+              </a>
+            </span>
+            </div>
+
+            <p class="hero-subtitle">
+              INSID3 performs in-context segmentation directly from a <strong>single frozen DINOv3 backbone</strong>,
+              without fine-tuning, segmentation decoders, or auxiliary models.
+            </p>
+
+            <div class="hero-subtitle" style="margin-top: 0.8rem;">
+              Annotate one or a few examples of a reference category, and INSID3 segments that category in new images.
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="hero-body" style="padding-inline: 4vh;">
+      <div class="container page-container has-text-centered">
+        <div class="teaser-shell">
+          <video class="teaser-video" autoplay muted loop playsinline>
+            <source src="static/videos/insid3_demo.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section soft-section section-spacious">
+    <div class="container page-container">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">Highlights</h2>
+
+          <div class="feature-box">
+            <ul>
+              <li><strong>Single frozen backbone:</strong> INSID3 performs in-context segmentation directly from DINOv3 features, without segmentation decoders, fine-tuning, or auxiliary models.</li>
+              <li><strong>Emergent segmentation:</strong> DINOv3 dense features naturally form coherent object- and part-level groups, enabling structured region decomposition of the target image.</li>
+              <li><strong>Positional debiasing:</strong> we identify a positional bias in DINOv3 features and remove it with a simple training-free projection, <strong>disentangling position from semantics</strong> to improve correspondences.</li>
+              <li><strong>Strong generalization:</strong> INSID3 handles object-level, part-level, and personalized segmentation across natural, medical, underwater and aerial domains with a unified training-free solution.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section soft-section section-spacious">
+    <div class="container page-container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <span class="pill">Generalization</span>
+          <h2 class="title is-3">Strong Generalization Across Granularities and Domains</h2>
+
+          <div class="performance-shell">
+            <div class="figure-frame">
+              <img src="static/images/teaser.png" alt="Performance radar plot" class="main-figure">
+            </div>
+          </div>
+
+          <div class="content centered" style="margin-top: 1.5rem;">
+            <p class="caption-text">
+              INSID3 generalizes across <strong>object-level</strong>, <strong>part-level</strong>, and <strong>personalized</strong> segmentation,
+              and across diverse domains including <strong>natural</strong>, <strong>medical</strong>, <strong>underwater</strong> and <strong>aerial</strong> imagery.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-spacious">
+    <div class="container wide-container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <span class="pill">Dense DINOv3 Features</span>
+          <h2 class="title is-3">Region-level Grouping from DINOv3</h2>
+          <p class="section-intro">
+Dense DINOv3 features naturally induce a structured decomposition of the scene.
+By clustering them, we obtain coherent <strong>object- and part-level regions</strong> without supervision, directly enabling <strong>segmentation</strong> in feature space.
+          </p>
+        </div>
+      </div>
+
+      <div class="compare-scroll">
+        <div class="compare-row">
+
+          <div class="compare-card">
+            <div class="image-compare">
+              <img class="compare-bg" src="static/images/clustering/000000026926_img.png" alt="Clustered map 1">
+              <img class="compare-fg" src="static/images/clustering/000000026926.png" alt="Input image 1">
+              <div class="compare-divider" style="left:50%;"></div>
+              <input class="compare-slider" type="range" min="0" max="100" value="50" aria-label="Image clustering slider 1">
+            </div>
+            <div class="compare-labels"><span>Image</span><span>Clusters</span></div>
+          </div>
+
+          <div class="compare-card">
+            <div class="image-compare">
+              <img class="compare-bg" src="static/images/clustering/000000079446_img.png" alt="Clustered map 2">
+              <img class="compare-fg" src="static/images/clustering/000000079446.png" alt="Input image 2">
+              <div class="compare-divider" style="left:50%;"></div>
+              <input class="compare-slider" type="range" min="0" max="100" value="50" aria-label="Image clustering slider 2">
+            </div>
+            <div class="compare-labels"><span>Image</span><span>Clusters</span></div>
+          </div>
+
+          <div class="compare-card">
+            <div class="image-compare">
+              <img class="compare-bg" src="static/images/clustering/000000103837_img.png" alt="Clustered map 3">
+              <img class="compare-fg" src="static/images/clustering/000000103837.png" alt="Input image 3">
+              <div class="compare-divider" style="left:50%;"></div>
+              <input class="compare-slider" type="range" min="0" max="100" value="50" aria-label="Image clustering slider 3">
+            </div>
+            <div class="compare-labels"><span>Image</span><span>Clusters</span></div>
+          </div>
+
+          <div class="compare-card">
+            <div class="image-compare">
+              <img class="compare-bg" src="static/images/clustering/000000189163_img.png" alt="Clustered map 4">
+              <img class="compare-fg" src="static/images/clustering/000000189163.png" alt="Input image 4">
+              <div class="compare-divider" style="left:50%;"></div>
+              <input class="compare-slider" type="range" min="0" max="100" value="50" aria-label="Image clustering slider 4">
+            </div>
+            <div class="compare-labels"><span>Image</span><span>Clusters</span></div>
+          </div>
+
+          <div class="compare-card">
+            <div class="image-compare">
+              <img class="compare-bg" src="static/images/clustering/000000225715_img.png" alt="Clustered map 5">
+              <img class="compare-fg" src="static/images/clustering/000000225715.png" alt="Input image 5">
+              <div class="compare-divider" style="left:50%;"></div>
+              <input class="compare-slider" type="range" min="0" max="100" value="50" aria-label="Image clustering slider 5">
+            </div>
+            <div class="compare-labels"><span>Image</span><span>Clusters</span></div>
+          </div>
+
+          <div class="compare-card">
+            <div class="image-compare">
+              <img class="compare-bg" src="static/images/clustering/000000396727_img.png" alt="Clustered map 6">
+              <img class="compare-fg" src="static/images/clustering/000000396727.png" alt="Input image 6">
+              <div class="compare-divider" style="left:50%;"></div>
+              <input class="compare-slider" type="range" min="0" max="100" value="50" aria-label="Image clustering slider 6">
+            </div>
+            <div class="compare-labels"><span>Image</span><span>Clusters</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-spacious">
+    <div class="container page-container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <span class="pill">Debiasing</span>
+          <h2 class="title is-3">Uncovering and Removing Positional Bias</h2>
+
+          <div class="panel-box">
+            <div class="content has-text-justified">
+
+              <div class="bias-grid-top">
+                <div class="bias-card">
+                  <div class="bias-card-label">Reference</div>
+                  <img src="static/images/pca_pos_bias/568_support.png" alt="Support image">
+                </div>
+
+                <div class="bias-card">
+                  <div class="bias-card-label">Target</div>
+                  <img src="static/images/pca_pos_bias/568_query.png" alt="Query image">
+                </div>
+
+                <div class="bias-card">
+                  <div class="bias-card-label">Similarity w/ DINOv3</div>
+                  <img src="static/images/pca_pos_bias/568_sim.png" alt="Similarity map with DINOv3">
+                </div>
+
+                <div class="bias-card">
+                  <div class="bias-card-label">w/ Debiased DINOv3</div>
+                  <img src="static/images/pca_pos_bias/568_sim_debias.png" alt="Similarity map with debiased DINOv3">
+                </div>
+              </div>
+
+              <p class="caption-text">
+                Given a <strong>reference embedding on the baseball bat</strong> and a <strong>target image</strong>, the resulting <strong>similarity map</strong> should ideally highlight the corresponding bat region. However, besides semantic matches, it also responds to <strong>absolute image position</strong>: in addition to the baseball bat, it activates in the top-left region, mirroring the bat’s location in the reference image.              </p>
+
+              <div class="pca-block">
+                <div class="pca-title">A low-dimensional positional subspace in DINOv3 features</div>
+
+                <div class="pca-scroll">
+                  <div class="pca-grid">
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-002.png" alt="PCA component 1"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-003.png" alt="PCA component 2"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-004.png" alt="PCA component 3"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-005.png" alt="PCA component 4"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-006.png" alt="PCA component 5"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-007.png" alt="PCA component 6"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-008.png" alt="PCA component 7"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-009.png" alt="PCA component 8"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-011.png" alt="PCA component 9"></div>
+
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-014.png" alt="PCA component 10"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-015.png" alt="PCA component 11"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-016.png" alt="PCA component 12"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-017.png" alt="PCA component 13"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-018.png" alt="PCA component 14"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-019.png" alt="PCA component 15"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-020.png" alt="PCA component 16"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-021.png" alt="PCA component 17"></div>
+                    <div class="pca-thumb"><img src="static/images/pca_pos_bias/extracted-023.png" alt="PCA component 18"></div>
+                  </div>
+                </div>
+              </div>
+
+              <p class="caption-text" style="margin-top: 1.2rem;">
+                PCA on low-semantic-content images reveals that this effect lives in a stable <strong>low-dimensional subspace</strong>.
+                INSID3 removes it in a simple training-free way: we identify the positional component of DINOv3 features and project onto its <strong>orthogonal complement</strong>.
+                This suppresses coordinate-driven responses while preserving semantic structure.
+              </p>
+
+              <div class="bias-secondary-figure">
+                <div class="pca-title">And what about DINOv2?</div>
+                <div class="figure-frame">
+                  <img src="static/images/positional_bias.png" alt="Positional bias comparison between DINOv2 and DINOv3" class="main-figure">
+                </div>
+              </div>
+
+              <p class="caption-text" style="margin-top: 1.2rem;">
+                This positional bias is <strong>much weaker in DINOv2</strong>.
+                This suggests that DINOv3 encodes stronger positional information, likely as a by-product of its training objective:
+                <em>local-consistency constraints</em> and <em>Gram-anchoring</em> may amplify absolute spatial correlations when semantic cues are weak,
+                and its different <em>positional encoding</em> may further reinforce this effect.
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="section section-spacious" id="Contact">
+    <div class="container page-container">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">Contact</h2>
+          <div class="figure-frame">
+            <p class="caption-text has-text-centered" style="margin: 0;">
+              For questions, contact
+              <a href="mailto:claudia.cuttano@polito.it"><strong>claudia.cuttano@polito.it</strong></a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section soft-section section-spacious" id="BibTeX">
+    <div class="container page-container">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">BibTeX</h2>
+          <div class="figure-frame">
+<pre><code>@inproceedings{cuttano2026insid3,
+  title     = {{INSID3}: Training-Free In-Context Segmentation with {DINOv3}},
+  author    = {Claudia Cuttano and Gabriele Trivigno and Christoph Reich and Daniel Cremers and Carlo Masone and Stefan Roth},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2026}
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const compareBlocks = document.querySelectorAll('.image-compare');
+
+      compareBlocks.forEach(function (block) {
+        const slider = block.querySelector('.compare-slider');
+        const fg = block.querySelector('.compare-fg');
+        const divider = block.querySelector('.compare-divider');
+
+        function updateReveal(value) {
+          const rightInset = 100 - value;
+          const clipValue = 'inset(0 ' + rightInset + '% 0 0)';
+          fg.style.clipPath = clipValue;
+          fg.style.webkitClipPath = clipValue;
+          divider.style.left = value + '%';
+        }
+
+        updateReveal(parseFloat(slider.value));
+
+        slider.addEventListener('input', function (e) {
+          updateReveal(parseFloat(e.target.value));
+        });
+      });
+    });
+
+
+  </script>
+    <section class="section" style="padding-top: 1.5rem; padding-bottom: 2rem;">
+    <div class="container page-container">
+      <div class="content" style="font-size: 0.78rem; line-height: 1.55; color: #667085;">
+        <p style="margin: 0;">
+          <strong>Acknowledgments.</strong>
+          Claudia Cuttano was supported by the Sustainable Mobility Center (CNMS), which received funding from the European Union Next Generation EU (Piano Nazionale di Ripresa e Resilienza (PNRR), Missione 4 Componente 2 Investimento 1.4 “Potenziamento strutture di ricerca e creazione di campioni nazionali di R&amp;S su alcune Key Enabling Technologies”) with grant agreement no. CN_00000023.
+          Christoph Reich is supported by the Konrad Zuse School of Excellence in Learning and Intelligent Systems (<a href="https://eliza.school">ELIZA</a>) through the DAAD programme Konrad Zuse Schools of Excellence in Artificial Intelligence, sponsored by the German Federal Ministry of Education and Research.
+          Stefan Roth has received funding from the European Research Council (ERC) under the European Union's Horizon 2020 research and innovation programme (grant agreement No. 866008).
+          Further, he was supported by the DFG under Germany's Excellence Strategy (EXC-3057/1 “Reasonable Artificial Intelligence”, Project No. 533677015) and by the LOEWE initiative (Hesse, Germany) within the emergenCITY center [LOEWE/1/12/519/03/05.001(0016)/72].
+          Daniel Cremers has received funding by the European Research Council (ERC) Advanced Grant SIMULACRON (grant agreement No. 884679).
+          We acknowledge the CINECA award under the ISCRA initiative, for the availability of high-performance computing resources.
+          We also acknowledge the support of the European Laboratory for Learning and Intelligent Systems (ELLIS).
+          Finally, we thank Barı̧ş Zöngür for the insightful feedback.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>
