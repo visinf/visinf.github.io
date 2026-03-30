@@ -29,6 +29,9 @@
       --shadow: 0 12px 32px rgba(16, 24, 40, 0.08);
       --shadow-strong: 0 18px 48px rgba(16, 24, 40, 0.12);
       --radius: 20px;
+      --accent: #ff7a59;
+      --accent-2: #ff5fa2;
+      --accent-3: #7c6cff;
     }
 
     html {
@@ -38,7 +41,10 @@
     body {
       font-family: 'Google Sans', 'Noto Sans', sans-serif;
       color: var(--text);
-      background: #ffffff;
+      background:
+        radial-gradient(circle at top left, rgba(91, 124, 255, 0.05), transparent 24%),
+        radial-gradient(circle at top right, rgba(155, 107, 255, 0.05), transparent 28%),
+        #ffffff;
     }
 
     .section-spacious {
@@ -55,10 +61,52 @@
       width: 96%;
     }
 
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, #fbfcff 0%, #f5f7fd 100%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(95, 210, 255, 0.10), transparent 18%),
+        radial-gradient(circle at 82% 14%, rgba(155, 107, 255, 0.10), transparent 20%),
+        linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    .hero .hero-body,
+    .section {
+      position: relative;
+      z-index: 1;
+    }
+
     .publication-title {
       line-height: 1.08;
-      letter-spacing: -0.03em;
-      margin-bottom: 0.9rem;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.75rem;
+      font-size: clamp(2.5rem, 5.6vw, 4.9rem);
+      color: #162033;
+    }
+
+    .gradient-word {
+      display: inline-block;
+      padding-right: 0.03em;
+      background: linear-gradient(135deg, #ff7a59 0%, #ff5fa2 52%, #7c6cff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .cvpr-line {
+      font-size: clamp(1.25rem, 2.3vw, 2rem);
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #53627e;
+      margin-bottom: 1.15rem;
     }
 
     .title-underline {
@@ -75,7 +123,6 @@
       font-size: 1.1rem;
     }
 
-
     .contact-line a {
       color: inherit;
       text-decoration: none;
@@ -88,7 +135,13 @@
     }
 
     .button.is-dark.is-rounded {
-      box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .button.is-dark.is-rounded:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
     }
 
     .teaser-shell {
@@ -372,6 +425,189 @@
       line-height: 1.65;
     }
 
+    /* Highlights section */
+    .highlights-shell {
+      background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 1.2rem;
+    }
+
+    .highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.95rem;
+    }
+
+    .highlight-card {
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 20px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+      padding: 1.15rem 1.05rem;
+      text-align: left;
+    }
+
+    .highlight-card.card-blue {
+      background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+    }
+
+    .highlight-card.card-lilac {
+      background: linear-gradient(180deg, #ffffff 0%, #f8f4ff 100%);
+    }
+
+    .highlight-card.card-cyan {
+      background: linear-gradient(180deg, #ffffff 0%, #f3fcff 100%);
+    }
+
+    .highlight-card.card-rose {
+      background: linear-gradient(180deg, #ffffff 0%, #fff6fb 100%);
+    }
+
+    .highlight-topline {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #7282a0;
+      margin-bottom: 0.65rem;
+    }
+
+    .highlight-title {
+      font-size: 1.18rem;
+      line-height: 1.2;
+      color: #162033;
+      margin-bottom: 0.7rem;
+      font-weight: 800;
+    }
+
+    .highlight-text {
+      font-size: 1rem;
+      line-height: 1.68;
+      color: #5d6a7b;
+    }
+
+    .highlight-text strong {
+      color: #22314d;
+    }
+
+    /* Latency section */
+    .latency-shell {
+      margin-top: 1.8rem;
+      width: 100%;
+      background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 1.35rem 1.3rem 1.2rem;
+      text-align: left;
+    }
+
+    .latency-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .latency-title {
+      font-size: 1.2rem;
+      line-height: 1.2;
+      font-weight: 800;
+      color: #162033;
+      margin: 0;
+    }
+
+    .latency-subtitle {
+      font-size: 0.98rem;
+      color: #66758b;
+      line-height: 1.65;
+      margin: 0.35rem 0 0;
+    }
+
+    .latency-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: #eef3ff;
+      color: #33456a;
+      border-radius: 999px;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.92rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .latency-grid {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .latency-row {
+      display: grid;
+      grid-template-columns: minmax(220px, 1.15fr) minmax(150px, 0.9fr) minmax(0, 3fr) 90px;
+      gap: 0.9rem;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 18px;
+      padding: 0.9rem 1rem;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .latency-method {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #22314d;
+    }
+
+    .latency-backbone {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #627086;
+    }
+
+    .latency-bar-track {
+      position: relative;
+      height: 14px;
+      background: #eef2f8;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .latency-bar-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: var(--w);
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(91,124,255,0.95), rgba(155,107,255,0.95));
+    }
+
+    .latency-bar-fill.alt {
+      background: linear-gradient(90deg, rgba(148,163,184,0.95), rgba(148,163,184,0.95));
+    }
+
+    .latency-bar-fill.alt2 {
+      background: linear-gradient(90deg, rgba(186,195,209,0.95), rgba(186,195,209,0.95));
+    }
+
+    .latency-value {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #2b3953;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .latency-note {
+      margin-top: 0.9rem;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #66758b;
+    }
+
     @media screen and (max-width: 1024px) {
       .feature-box li,
       .section-intro,
@@ -385,6 +621,14 @@
 
       .performance-shell {
         width: min(92vw, 680px);
+      }
+
+      .highlights-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .latency-row {
+        grid-template-columns: 1.2fr 0.9fr 2fr 80px;
       }
     }
 
@@ -418,6 +662,23 @@
       .performance-shell {
         width: min(94vw, 560px);
       }
+
+      .highlight-text {
+        font-size: 1rem;
+      }
+
+      .highlights-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .latency-row {
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
+      }
+
+      .latency-value {
+        text-align: left;
+      }
     }
 
     @media screen and (max-width: 520px) {
@@ -434,21 +695,22 @@
         border-radius: 16px;
       }
     }
-      .performance-shell,
-      .figure-frame {
-        width: 100%;
-        max-width: 1100px;
-        margin: 0 auto;
-        box-sizing: border-box;
-      }
 
-      .main-figure {
-        display: block;
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        object-fit: contain;
-      }
+    .performance-shell,
+    .figure-frame {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .main-figure {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
 
     .coming-soon {
       position: relative;
@@ -460,12 +722,10 @@
       content: "Coming Soon";
       visibility: hidden;
       opacity: 0;
-
       position: absolute;
       left: 50%;
       bottom: calc(100% + 8px);
       transform: translateX(-50%);
-
       background-color: black;
       color: white;
       text-align: center;
@@ -474,10 +734,8 @@
       white-space: nowrap;
       font-size: 12px;
       line-height: 1.2;
-
       z-index: 9999;
       pointer-events: none;
-
       transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
     }
 
@@ -495,17 +753,16 @@
         <div class="columns is-centered">
           <div class="column has-text-centered">
 
-            <h1 class="title is-1 publication-title">
-              INSID3: Training-Free
+            <h1 class="title publication-title">
+              <span class="gradient-word">INSID3</span>: Training-Free
               <span class="title-underline">I</span><span class="title-underline">n</span>-Context
               <span class="title-underline">S</span>egmentation
-              w<span class="title-underline">i</span>th
-              <span class="title-underline">D</span>INOv<span class="title-underline">3</span>
+              w<span class="title-underline">i</span>th <span class="title-underline">D</span>INOv<span class="title-underline">3</span>
             </h1>
 
-            <div class="is-size-5 publication-authors">
-              <h2 class="subtitle is-3">✨ CVPR 2026 ✨</h2>
+            <div class="cvpr-line">✨ CVPR 2026 ✨</div>
 
+            <div class="is-size-5 publication-authors">
               <span class="author-block">
                 <a href="https://scholar.google.com/citations?user=W7lNKNsAAAAJ">Claudia Cuttano</a><sup>1,2</sup>,
               </span>
@@ -551,12 +808,12 @@
                 </a>
               </span>
 
-            <span class="link-block">
-              <a class="external-link button is-normal is-rounded is-dark coming-soon">
-                <span class="icon"><i class="fas fa-file-pdf"></i></span>
-                <span>Poster</span>
-              </a>
-            </span>
+              <span class="link-block">
+                <a class="external-link button is-normal is-rounded is-dark coming-soon">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Poster</span>
+                </a>
+              </span>
             </div>
 
             <p class="hero-subtitle">
@@ -567,7 +824,6 @@
             <div class="hero-subtitle" style="margin-top: 0.8rem;">
               Annotate one or a few examples of a reference category, and INSID3 segments that category in new images.
             </div>
-
 
           </div>
         </div>
@@ -590,33 +846,59 @@
   <section class="section soft-section section-spacious">
     <div class="container page-container">
       <div class="columns is-centered">
-        <div class="column is-four-fifths">
+        <div class="column">
           <h2 class="title is-3 has-text-centered">Highlights</h2>
 
-          <div class="feature-box">
-            <ul>
-              <li><strong>Single frozen backbone:</strong> INSID3 performs in-context segmentation directly from DINOv3 features, without segmentation decoders, fine-tuning, or auxiliary models.</li>
-              <li><strong>Emergent segmentation:</strong> DINOv3 dense features naturally form coherent object- and part-level groups, enabling structured region decomposition of the target image.</li>
-              <li><strong>Positional debiasing:</strong> we identify a positional bias in DINOv3 features and remove it with a simple training-free projection, <strong>disentangling position from semantics</strong> to improve correspondences.</li>
-              <li><strong>Strong generalization:</strong> INSID3 handles object-level, part-level, and personalized segmentation across natural, medical, underwater and aerial domains with a unified training-free solution.</li>
-            </ul>
+          <div class="highlights-shell">
+            <div class="highlights-grid">
+              <div class="highlight-card card-blue">
+                <div class="highlight-topline">Architecture</div>
+                <div class="highlight-title">Single frozen backbone</div>
+                <div class="highlight-text">
+                  INSID3 performs in-context segmentation directly from <strong>DINOv3 features</strong>, without segmentation decoders, fine-tuning, or auxiliary models.
+                </div>
+              </div>
+
+              <div class="highlight-card card-lilac">
+                <div class="highlight-topline">Dense features</div>
+                <div class="highlight-title">Emergent segmentation</div>
+                <div class="highlight-text">
+                  DINOv3 dense features naturally form coherent <strong>object- and part-level groups</strong>, enabling structured region decomposition of the target image.
+                </div>
+              </div>
+
+              <div class="highlight-card card-cyan">
+                <div class="highlight-topline">Debiasing</div>
+                <div class="highlight-title">Positional bias</div>
+                <div class="highlight-text">
+                  We identify a positional bias in DINOv3 features and remove it with a simple training-free projection, <strong>disentangling position from semantics</strong> to improve correspondences.
+                </div>
+              </div>
+
+              <div class="highlight-card card-rose">
+                <div class="highlight-topline">Generalization</div>
+                <div class="highlight-title">Across domains and granularities</div>
+                <div class="highlight-text">
+                  INSID3 handles <strong>object-level</strong>, <strong>part-level</strong>, and <strong>personalized</strong> segmentation across natural, medical, underwater, and aerial domains with a unified training-free solution.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section soft-section section-spacious">
-    <div class="container page-container">
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
-          <span class="pill">Generalization</span>
-          <h2 class="title is-3">Strong Generalization Across Granularities and Domains</h2>
+<section class="section soft-section section-spacious">
+  <div class="container page-container">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <span class="pill">Generalization</span>
+        <h2 class="title is-3">Strong Generalization Across Granularities and Domains</h2>
 
-          <div class="performance-shell">
-            <div class="figure-frame">
-              <img src="static/images/teaser.png" alt="Performance radar plot" class="main-figure">
-            </div>
+        <div class="performance-shell">
+          <div class="figure-frame">
+            <img src="static/images/teaser.png" alt="Performance radar plot" class="main-figure">
           </div>
 
           <div class="content centered" style="margin-top: 1.5rem;">
@@ -625,10 +907,56 @@
               and across diverse domains including <strong>natural</strong>, <strong>medical</strong>, <strong>underwater</strong> and <strong>aerial</strong> imagery.
             </p>
           </div>
+
+          <div class="latency-shell">
+            <div class="latency-header">
+              <div>
+                <h3 class="latency-title">Fastest among compared methods</h3>
+                <p class="latency-subtitle">
+                  In frames per second, INSID3 runs substantially faster than DINOv2 + SAM based pipelines.
+                </p>
+              </div>
+            </div>
+
+            <div class="latency-grid">
+              <div class="latency-row">
+                <div class="latency-method">Matcher</div>
+                <div class="latency-backbone">DINOv2 + SAM</div>
+                <div class="latency-bar-track">
+                  <div class="latency-bar-fill alt2" style="--w:3.36%;"></div>
+                </div>
+                <div class="latency-value">0.11 FPS</div>
+              </div>
+
+              <div class="latency-row">
+                <div class="latency-method">GF-SAM</div>
+                <div class="latency-backbone">DINOv2 + SAM</div>
+                <div class="latency-bar-track">
+                  <div class="latency-bar-fill alt" style="--w:29.33%;"></div>
+                </div>
+                <div class="latency-value">0.97 FPS</div>
+              </div>
+
+              <div class="latency-row">
+                <div class="latency-method">INSID3 (ours)</div>
+                <div class="latency-backbone">DINOv3</div>
+                <div class="latency-bar-track">
+                  <div class="latency-bar-fill" style="--w:100%;"></div>
+                </div>
+                <div class="latency-value">3.31 FPS</div>
+              </div>
+            </div>
+
+            <p class="latency-note">
+              Higher is better. INSID3 runs about <strong>3.4× faster</strong> than GF-SAM and about <strong>29.8× faster</strong> than Matcher.
+            </p>
+          </div>
         </div>
+
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
   <section class="section section-spacious">
     <div class="container wide-container">
@@ -637,8 +965,8 @@
           <span class="pill">Dense DINOv3 Features</span>
           <h2 class="title is-3">Region-level Grouping from DINOv3</h2>
           <p class="section-intro">
-Dense DINOv3 features naturally induce a structured decomposition of the scene.
-By clustering them, we obtain coherent <strong>object- and part-level regions</strong> without supervision, directly enabling <strong>segmentation</strong> in feature space.
+            Dense DINOv3 features naturally induce a structured decomposition of the scene.
+            By clustering them, we obtain coherent <strong>object- and part-level regions</strong> without supervision, directly enabling <strong>segmentation</strong> in feature space.
           </p>
         </div>
       </div>
@@ -744,7 +1072,8 @@ By clustering them, we obtain coherent <strong>object- and part-level regions</s
               </div>
 
               <p class="caption-text">
-                Given a <strong>reference embedding on the baseball bat</strong> and a <strong>target image</strong>, the resulting <strong>similarity map</strong> should ideally highlight the corresponding bat region. However, besides semantic matches, it also responds to <strong>absolute image position</strong>: in addition to the baseball bat, it activates in the top-left region, mirroring the bat’s location in the reference image.              </p>
+                Given a <strong>reference embedding on the baseball bat</strong> and a <strong>target image</strong>, the resulting <strong>similarity map</strong> should ideally highlight the corresponding bat region. However, besides semantic matches, it also responds to <strong>absolute image position</strong>: in addition to the baseball bat, it activates in the top-left region, mirroring the bat’s location in the reference image.
+              </p>
 
               <div class="pca-block">
                 <div class="pca-title">A low-dimensional positional subspace in DINOv3 features</div>
@@ -777,7 +1106,7 @@ By clustering them, we obtain coherent <strong>object- and part-level regions</s
               <p class="caption-text" style="margin-top: 1.2rem;">
                 PCA on low-semantic-content images reveals that this effect lives in a stable <strong>low-dimensional subspace</strong>.
                 INSID3 removes it in a simple training-free way: we identify the positional component of DINOv3 features and project onto its <strong>orthogonal complement</strong>.
-                This suppresses coordinate-driven responses while preserving semantic structure.
+                This suppresses coordinate-driven responses while preserving semantics.
               </p>
 
               <div class="bias-secondary-figure">
@@ -800,7 +1129,6 @@ By clustering them, we obtain coherent <strong>object- and part-level regions</s
       </div>
     </div>
   </section>
-
 
   <section class="section section-spacious" id="Contact">
     <div class="container page-container">
@@ -860,10 +1188,9 @@ By clustering them, we obtain coherent <strong>object- and part-level regions</s
         });
       });
     });
-
-
   </script>
-    <section class="section" style="padding-top: 1.5rem; padding-bottom: 2rem;">
+
+  <section class="section" style="padding-top: 1.5rem; padding-bottom: 2rem;">
     <div class="container page-container">
       <div class="content" style="font-size: 0.78rem; line-height: 1.55; color: #667085;">
         <p style="margin: 0;">
