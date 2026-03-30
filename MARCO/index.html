@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="MARCO: Navigating the Unseen Space of Semantic Correspondence">
+  <meta name="keywords" content="MARCO, semantic correspondence, DINOv2, CVPR 2026, benchmark, MP-100">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MARCO: Navigating the Unseen Space of Semantic Correspondence</title>
+
+  <link href="static/css/bootstrap-4.4.1.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+
+  <style>
+    :root {
+      --page-max: 1160px;
+      --text: #1f2937;
+      --muted: #667085;
+      --soft: #f7f8fc;
+      --soft-2: #eef3ff;
+      --card: rgba(255,255,255,0.78);
+      --card-solid: #ffffff;
+      --line: rgba(31, 41, 55, 0.08);
+      --accent: #5b7cff;
+      --accent-2: #9b6bff;
+      --accent-3: #5fd2ff;
+      --shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+      --shadow-strong: 0 18px 44px rgba(15, 23, 42, 0.10);
+      --radius: 24px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Google Sans', 'Noto Sans', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(91, 124, 255, 0.08), transparent 24%),
+        radial-gradient(circle at top right, rgba(155, 107, 255, 0.08), transparent 28%),
+        #ffffff;
+    }
+
+    .section-spacious {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+    }
+
+    .page-container {
+      max-width: var(--page-max);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, #fbfcff 0%, #f5f7fd 100%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(95, 210, 255, 0.12), transparent 18%),
+        radial-gradient(circle at 82% 14%, rgba(155, 107, 255, 0.11), transparent 20%),
+        linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    .hero .hero-body,
+    .top-teaser,
+    .soft-section,
+    .section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .publication-title {
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.55rem;
+      font-size: clamp(2.5rem, 5.6vw, 4.9rem);
+      color: #162033;
+    }
+
+    .gradient-word {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 55%, var(--accent-3) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .cvpr-line {
+      font-size: clamp(1.35rem, 2.5vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: #53627e;
+      margin-bottom: 1.35rem;
+    }
+
+    .publication-authors .author-block {
+      display: inline-block;
+      margin: 0.15rem 0.3rem;
+    }
+
+    .publication-authors a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.14);
+    }
+
+    .hero-subtitle {
+      color: var(--muted);
+      max-width: 980px;
+      margin: 1rem auto 0;
+      line-height: 1.78;
+      font-size: 1.22rem;
+    }
+
+    .hero .link-block {
+      margin: 0.25rem 0.3rem;
+      display: inline-block;
+    }
+
+    .hero .button.is-dark.is-rounded {
+      background: rgba(21, 32, 51, 0.92);
+      color: white;
+      border: none;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .hero .button.is-dark.is-rounded:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+    }
+
+    .coming-soon {
+      position: relative;
+      cursor: default;
+      overflow: visible !important;
+    }
+
+    .coming-soon::after {
+      content: "Coming Soon";
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      background: #111827;
+      color: white;
+      text-align: center;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      font-size: 12px;
+      line-height: 1.2;
+      z-index: 9999;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .coming-soon:hover::after {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .top-teaser {
+      margin-top: -0.2rem;
+      padding-bottom: 1.4rem;
+    }
+
+    .teaser-shell {
+      height: 100%;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.88);
+      border-radius: 22px;
+      box-shadow: var(--shadow-strong);
+      padding: 0.95rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .teaser-video {
+      width: 100%;
+      display: block;
+      border-radius: 16px;
+      background: #000;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .teaser-caption {
+      color: #5f6b7a;
+      line-height: 1.72;
+      font-size: 1.08rem;
+      margin-top: 1rem;
+    }
+
+    .soft-section {
+      background: linear-gradient(180deg, #fcfdff 0%, var(--soft) 100%);
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #5a6d90;
+      background: var(--soft-2);
+      padding: 0.48rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+
+    .figure-frame {
+      background: var(--card-solid);
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 1.2rem 1.3rem;
+    }
+
+    .caption-text {
+      line-height: 1.8;
+      font-size: 1.12rem;
+      color: #334155;
+    }
+
+    pre code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.94rem;
+      line-height: 1.7;
+    }
+
+    .ack-text {
+      font-size: 0.95rem;
+      line-height: 1.72;
+      color: #667085;
+    }
+
+    .benchmark-download {
+      max-width: 930px;
+      margin: 1rem auto 0;
+      font-size: 1.03rem;
+      line-height: 1.78;
+      color: #5d6a7b;
+      text-align: center;
+    }
+
+    .benchmark-download a {
+      color: #3f63d8;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(63, 99, 216, 0.22);
+    }
+
+    .benchmark-download a:hover {
+      color: #2f4fb8;
+      border-bottom-color: rgba(47, 79, 184, 0.38);
+    }
+
+    /* Highlights */
+    .highlights-shell {
+      background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 1.2rem;
+    }
+
+    .highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.95rem;
+    }
+
+    .highlight-card {
+      background: #ffffff;
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 20px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+      padding: 1.15rem 1.05rem;
+      text-align: left;
+    }
+
+    .highlight-topline {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #7282a0;
+      margin-bottom: 0.65rem;
+    }
+
+    .highlight-title {
+      font-size: 1.18rem;
+      line-height: 1.2;
+      color: #162033;
+      margin-bottom: 0.7rem;
+      font-weight: 800;
+    }
+
+    .highlight-text {
+      font-size: 1rem;
+      line-height: 1.68;
+      color: #5d6a7b;
+    }
+
+    .highlight-text strong {
+      color: #22314d;
+    }
+
+    /* Flow */
+    .flow-shell {
+      background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+    }
+
+    .flow-intro {
+      max-width: 940px;
+      margin: 0 auto 1.7rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 1.12rem;
+      line-height: 1.78;
+    }
+
+    .flow-top {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+      gap: 1.2rem;
+      align-items: start;
+    }
+
+    .flow-card {
+      background: #ffffff;
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 20px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+      padding: 1rem;
+      text-align: left;
+      height: 100%;
+    }
+
+    .flow-card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #32425f;
+      margin-bottom: 0.75rem;
+    }
+
+    .flow-card img {
+      width: 100%;
+      display: block;
+      border-radius: 16px;
+      background: #eef2f8;
+    }
+
+    .flow-card-caption {
+      margin-top: 0.8rem;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #627086;
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .flow-thumb {
+      appearance: none;
+      border: 2px solid rgba(21, 32, 51, 0.05);
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+      padding: 0.8rem;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      width: 100%;
+      position: relative;
+    }
+
+    .flow-thumb:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .flow-thumb.is-active {
+      border-color: rgba(91, 124, 255, 0.55);
+      box-shadow: 0 18px 36px rgba(91, 124, 255, 0.16);
+      background: linear-gradient(180deg, #ffffff 0%, #f3f7ff 100%);
+    }
+
+    .flow-thumb.is-active::after {
+      content: "Selected";
+      position: absolute;
+      top: 0.65rem;
+      right: 0.65rem;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #4f63a8;
+      background: #e9efff;
+      padding: 0.2rem 0.4rem;
+      border-radius: 999px;
+    }
+
+    .flow-thumb-label {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #3b4b66;
+      margin-bottom: 0.55rem;
+      padding-right: 4.5rem;
+    }
+
+    .flow-thumb img {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      background: #eef2f8;
+    }
+
+    .flow-copy {
+      margin-top: 1rem;
+      background: #ffffff;
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 20px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+      padding: 1.35rem 1.5rem;
+      text-align: left;
+    }
+
+    .flow-kicker {
+      font-size: 0.83rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6d7fa1;
+      margin-bottom: 0.7rem;
+    }
+
+    .flow-title {
+      font-size: 1.32rem;
+      line-height: 1.18;
+      margin-bottom: 0.7rem;
+      color: #162033;
+    }
+
+    .flow-description {
+      font-size: 1.03rem;
+      line-height: 1.72;
+      color: #5d6a7b;
+      margin: 0;
+    }
+
+    .flow-note {
+      margin-top: 0.85rem;
+      font-size: 0.98rem;
+      line-height: 1.7;
+      color: #66758b;
+    }
+
+    .flow-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      align-items: start;
+    }
+
+    .flow-pair-item img {
+      width: 100%;
+      display: block;
+      border-radius: 16px;
+      background: #eef2f8;
+    }
+
+    .flow-pair-label {
+      margin-top: 0.45rem;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #5f6f87;
+      text-align: center;
+    }
+
+    /* Performance */
+    .perf-shell {
+      background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 1.4rem;
+    }
+
+    .perf-lead {
+      max-width: 920px;
+      margin: 0 auto 1.6rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 1.12rem;
+      line-height: 1.75;
+    }
+
+    .perf-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1.05fr 0.9fr;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .perf-panel {
+      background: #ffffff;
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 20px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+      padding: 1.15rem 1.1rem;
+      text-align: left;
+    }
+
+    .perf-panel-kicker {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #7182a0;
+      margin-bottom: 0.55rem;
+    }
+
+    .perf-panel-title {
+      font-size: 1.28rem;
+      line-height: 1.18;
+      color: #162033;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .perf-subtitle {
+      font-size: 0.98rem;
+      color: #66758b;
+      line-height: 1.65;
+      margin-bottom: 1rem;
+    }
+
+    .perf-metric {
+      margin-bottom: 1rem;
+    }
+
+    .perf-metric:last-child {
+      margin-bottom: 0;
+    }
+
+    .perf-metric-name {
+      font-size: 0.94rem;
+      font-weight: 800;
+      color: #34445f;
+      margin-bottom: 0.55rem;
+    }
+
+    .perf-bars {
+      display: grid;
+      gap: 0.48rem;
+    }
+
+    .perf-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 52px;
+      gap: 0.55rem;
+      align-items: center;
+    }
+
+    .perf-label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #5e6d84;
+    }
+
+    .perf-track {
+      position: relative;
+      height: 12px;
+      background: #eef2f8;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .perf-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: var(--w);
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(91,124,255,0.95), rgba(155,107,255,0.95));
+    }
+
+    .perf-fill.alt {
+      background: linear-gradient(90deg, rgba(148,163,184,0.95), rgba(148,163,184,0.95));
+    }
+
+    .perf-fill.alt2 {
+      background: linear-gradient(90deg, rgba(186,195,209,0.95), rgba(186,195,209,0.95));
+    }
+
+    .perf-value {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #2b3953;
+      text-align: right;
+    }
+
+    .perf-highlight {
+      margin-top: 0.9rem;
+      display: inline-flex;
+      background: #eef3ff;
+      color: #33456a;
+      border-radius: 999px;
+      padding: 0.52rem 0.9rem;
+      font-size: 0.94rem;
+      font-weight: 800;
+    }
+
+    .perf-stat-stack {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .perf-stat {
+      background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 18px;
+      padding: 1rem 1rem 0.95rem;
+    }
+
+    .perf-stat-label {
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #74839e;
+      margin-bottom: 0.35rem;
+    }
+
+    .perf-stat-main {
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 800;
+      color: #162033;
+      margin-bottom: 0.35rem;
+    }
+
+    .perf-stat-sub {
+      font-size: 0.96rem;
+      line-height: 1.6;
+      color: #64748b;
+    }
+
+    .perf-note {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #66758b;
+    }
+
+    /* Benchmark */
+    .benchmark-shell {
+      background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+    }
+
+    .benchmark-intro {
+      max-width: 900px;
+      margin: 0 auto 1.75rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 1.12rem;
+      line-height: 1.75;
+    }
+
+    .benchmark-groups {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .benchmark-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f3f6fd;
+      border: 1px solid rgba(91, 124, 255, 0.10);
+      border-radius: 999px;
+      padding: 0.35rem 0.45rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .benchmark-group-label {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #4d5d78;
+      padding: 0 0.35rem 0 0.5rem;
+      white-space: nowrap;
+    }
+
+    .benchmark-chip {
+      appearance: none;
+      border: 2px solid transparent;
+      background: transparent;
+      color: #61708a;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 0.55rem 0.85rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      position: relative;
+    }
+
+    .benchmark-chip:hover {
+      background: rgba(91, 124, 255, 0.08);
+      color: #32425f;
+    }
+
+    .benchmark-chip.is-active {
+      border-color: rgba(91, 124, 255, 0.55);
+      background: linear-gradient(180deg, #ffffff 0%, #f3f7ff 100%);
+      color: #21314e;
+      box-shadow: 0 12px 28px rgba(91, 124, 255, 0.14);
+    }
+
+    .benchmark-stage {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: 1.3rem;
+      align-items: stretch;
+    }
+
+    .benchmark-preview,
+    .benchmark-copy {
+      background: #ffffff;
+      border: 1px solid rgba(21, 32, 51, 0.05);
+      border-radius: 20px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+    }
+
+    .benchmark-preview {
+      padding: 0.95rem;
+    }
+
+    .benchmark-track {
+      display: none;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.7rem;
+      align-items: start;
+    }
+
+    .benchmark-track.is-active {
+      display: grid;
+    }
+
+    .benchmark-sample {
+      background: #f7f9fd;
+      border-radius: 16px;
+      padding: 0.35rem;
+    }
+
+    .benchmark-sample img {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      background: #eef2f8;
+    }
+
+    .benchmark-copy {
+      padding: 1.5rem 1.55rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: left;
+    }
+
+    .benchmark-kicker {
+      font-size: 0.83rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6d7fa1;
+      margin-bottom: 0.75rem;
+    }
+
+    .benchmark-title {
+      font-size: 1.55rem;
+      line-height: 1.15;
+      margin-bottom: 0.85rem;
+      color: #162033;
+    }
+
+    .benchmark-description {
+      font-size: 1.06rem;
+      line-height: 1.75;
+      color: #5d6a7b;
+      margin: 0;
+    }
+
+    .benchmark-note {
+      margin-top: 1rem;
+      font-size: 0.99rem;
+      line-height: 1.72;
+      color: #66758b;
+    }
+
+    @media screen and (max-width: 1100px) {
+      .highlights-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .perf-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .section-spacious {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+      }
+      .flow-pair {
+        grid-template-columns: 1fr;
+      }
+      .hero-subtitle,
+      .caption-text,
+      .teaser-caption,
+      .benchmark-intro,
+      .benchmark-description,
+      .benchmark-download,
+      .flow-intro,
+      .flow-description,
+      .flow-note,
+      .flow-card-caption,
+      .highlight-text,
+      .perf-lead,
+      .perf-subtitle,
+      .perf-note {
+        font-size: 1rem;
+      }
+
+      .teaser-shell {
+        padding: 0.72rem;
+      }
+
+      .teaser-video {
+        border-radius: 14px;
+      }
+
+      .cvpr-line {
+        margin-bottom: 1rem;
+      }
+
+      .benchmark-shell,
+      .flow-shell,
+      .highlights-shell,
+      .perf-shell {
+        padding: 1.15rem;
+      }
+
+      .benchmark-stage,
+      .flow-top,
+      .flow-grid,
+      .highlights-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .benchmark-track {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.45rem;
+      }
+
+      .benchmark-title,
+      .flow-title,
+      .highlight-title,
+      .perf-panel-title {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-body" style="padding-top: 4.5rem; padding-bottom: 2.4rem;">
+      <div class="container page-container">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title publication-title">
+              <span class="gradient-word">MARCO</span>: Navigating the Unseen Space of Semantic Correspondence
+            </h1>
+
+            <div class="cvpr-line">✨ CVPR 2026 ✨</div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=W7lNKNsAAAAJ">Claudia Cuttano</a><sup>1,2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=JXf_iToAAAAJ">Gabriele Trivigno</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=cM3Iz_4AAAAJ">Carlo Masone</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=0yDoR0AAAAAJ&hl=en">Stefan Roth</a><sup>2,3,4</sup>
+              </span>
+            </div>
+
+            <div class="is-size-5 publication-authors" style="margin-top: 0.35rem;">
+              <span class="author-block"><sup>1</sup>Politecnico di Torino,</span>
+              <span class="author-block"><sup>2</sup>TU Darmstadt,</span>
+              <span class="author-block"><sup>3</sup>hessian.AI,</span>
+              <span class="author-block"><sup>4</sup>ELIZA</span>
+            </div>
+
+            <div class="column has-text-centered" style="padding-bottom: 0.2rem; padding-top: 1.15rem;">
+              <span class="link-block">
+                <a href="LINK_TO_ARXIV" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+
+              <span class="link-block">
+                <a href="https://github.com/visinf/MARCO" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code</span>
+                </a>
+              </span>
+
+              <span class="link-block">
+                <a href="#benchmark-section" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-database"></i></span>
+                  <span>Benchmark</span>
+                </a>
+              </span>
+
+              <span class="link-block">
+                <a class="external-link button is-normal is-rounded is-dark coming-soon">
+                  <span class="icon"><i class="fas fa-image"></i></span>
+                  <span>Poster</span>
+                </a>
+              </span>
+            </div>
+
+            <p class="hero-subtitle">
+              MARCO learns <strong>generalizable semantic correspondence</strong> from sparse supervision, going beyond fixed keypoint vocabularies toward <strong>dense matches</strong> that transfer to <strong>unseen keypoints</strong> and <strong>novel categories</strong>.
+            </p>
+
+            <p class="hero-subtitle">
+              Built on a <strong>single DINOv2 backbone</strong>, it achieves state-of-the-art correspondence while remaining <strong>3× smaller</strong> and <strong>10× faster</strong> than diffusion-based approaches.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero top-teaser">
+    <div class="hero-body" style="padding-inline: 4vh; padding-top: 0.3rem; padding-bottom: 4rem;">
+      <div class="container page-container has-text-centered">
+        <div class="columns is-variable is-5 is-centered" style="align-items: stretch;">
+          <div class="column is-6-desktop is-12-tablet">
+            <div class="teaser-shell">
+              <div class="pill" style="margin-bottom: 0.85rem;">Training densification</div>
+              <video class="teaser-video" autoplay muted loop playsinline controls>
+                <source src="static/videos/marco_demo_1.mp4" type="video/mp4">
+              </video>
+              <p class="teaser-caption">
+                Starting from a sparse set of ground-truth keypoints, MARCO progressively builds dense supervision <strong>across the object surface</strong>: it identifies reliable matches, expands them via <strong>Delaunay triangulation</strong>, and propagates them with <strong>dense flow</strong>, turning a handful of annotations into <strong>thousands of correspondences</strong> at training time.
+              </p>
+            </div>
+          </div>
+
+          <div class="column is-6-desktop is-12-tablet">
+            <div class="teaser-shell">
+              <div class="pill" style="margin-bottom: 0.85rem;">Applications</div>
+              <video class="teaser-video" autoplay muted loop playsinline controls>
+                <source src="static/videos/marco_demo_2.mp4" type="video/mp4">
+              </video>
+              <p class="teaser-caption">
+                MARCO enables downstream applications such as <strong>semantic edit transfer</strong>, where an edit made on one object is propagated to another through correspondence, as well as
+                <strong>semantic warping</strong> between instances, by mapping semantically corresponding regions from one object to the other and back.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section soft-section section-spacious">
+    <div class="container page-container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <h2 class="title is-3">Highlights</h2>
+
+          <div class="highlights-shell">
+            <div class="highlights-grid">
+              <div class="highlight-card">
+                <div class="highlight-topline">Generalization</div>
+                <div class="highlight-title">Seen keypoints, unseen keypoints, new categories</div>
+                <div class="highlight-text">
+                  MARCO is sota not only on standard benchmarks, but also when the queried point is <strong>new</strong> or the object category was <strong>never seen during training</strong>.
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="highlight-topline">Dense supervision</div>
+                <div class="highlight-title">10–20 keypoints become thousands of correspondences</div>
+                <div class="highlight-text">
+                  Instead of learning only sparse landmarks, MARCO expands supervision <strong>across the whole object surface</strong>, building a richer training signal.
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="highlight-topline">Precision</div>
+                <div class="highlight-title">Big gains at strict thresholds</div>
+                <div class="highlight-text">
+                  We propose a new training schedule that improves <strong>localization accuracy</strong>: not roughly the correct regions, but closer to the exact point location.
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="highlight-topline">Efficiency</div>
+                <div class="highlight-title">3× smaller, 10× faster</div>
+                <div class="highlight-text">
+                  A single <strong>DINOv2</strong> backbone replaces heavier diffusion-based dual-encoder pipelines while also reaching <strong>state-of-the-art performance</strong>.
+                </div>
+              </div>
+
+              <div class="highlight-card">
+                <div class="highlight-topline">Benchmark</div>
+                <div class="highlight-title">A new testbed for true generalization</div>
+                <div class="highlight-text">
+                  We introduce the <strong>MP-100</strong> benchmark that explicitly evaluates transfer to <strong>novel keypoints</strong> and <strong>novel categories</strong>, beyond  classical in-domain benchmarks.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section soft-section section-spacious">
+    <div class="container page-container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="pill">Why densification matters</div>
+          <h2 class="title is-3">From Sparse Landmarks to Dense Pseudo-Correspondence</h2>
+          <p class="flow-intro">
+            Raw DINOv2 features already contain <strong> meaningful correspondence cues</strong> across an object.
+            Standard fine-tuning on sparse landmarks improves semantics around the annotated keypoints, but makes the field <strong>collapse around them</strong>.
+            MARCO propagates supervision across the surface, producing <strong>smoother and more geometrically consistent flow</strong>.
+          </p>
+
+          <div class="flow-shell">
+            <div class="flow-top">
+              <div class="flow-card">
+                <div class="flow-pair">
+                  <div class="flow-pair-item">
+                    <img src="static/images/HSV_flow/dog_source.jpg" alt="Source image">
+                    <div class="flow-pair-label">Source</div>
+                  </div>
+                  <div class="flow-pair-item">
+                    <img src="static/images/HSV_flow/dog_target.jpg" alt="Target image">
+                    <div class="flow-pair-label">Target</div>
+                  </div>
+                </div>
+
+                <p class="flow-card-caption">
+                  We consider a <strong>source image</strong> and a <strong>target image</strong>. From this pair, we visualize the source-to-target correspondence flow in <strong>HSV space</strong>, where color encodes the displacement field.
+                </p>
+              </div>
+
+              <div>
+                <div class="flow-grid">
+                  <button class="flow-thumb is-active" data-flow="original" type="button" aria-pressed="true">
+                    <div class="flow-thumb-label">Frozen DINOv2</div>
+                    <img src="static/images/HSV_flow/original_dinov2.png" alt="Raw DINOv2 semantic flow">
+                  </button>
+
+                  <button class="flow-thumb" data-flow="sparse" type="button" aria-pressed="false">
+                    <div class="flow-thumb-label">Sparse fine-tuning</div>
+                    <img src="static/images/HSV_flow/sparse_finetuned.png" alt="Semantic flow after sparse fine-tuning">
+                  </button>
+
+                  <button class="flow-thumb" data-flow="dense" type="button" aria-pressed="false">
+                    <div class="flow-thumb-label">MARCO densification</div>
+                    <img src="static/images/HSV_flow/dense_finetuned.png" alt="Semantic flow after MARCO densification">
+                  </button>
+                </div>
+
+                <div class="flow-copy">
+                  <div class="flow-kicker" id="flow-kicker">1. Flow consistency in DINOv2</div>
+                  <h3 class="flow-title" id="flow-title">Raw DINOv2 already produces a partially coherent correspondence field</h3>
+                  <p class="flow-description" id="flow-description">
+                  </p>
+                  <p class="flow-note" id="flow-note">
+                    This is the key observation behind MARCO: instead of discarding that structure, we use it as a source of self-supervision and to progressively densify correspondences during training.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-spacious" id="benchmark-section">
+    <div class="container page-container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="pill">Benchmark</div>
+          <h2 class="title is-3">A Benchmark for Generalization Beyond Seen Keypoints</h2>
+          <p class="benchmark-intro">
+            We build a new evaluation protocol on MP-100 spanning unseen-keypoint and unseen-category, for a total of <strong>350 unseen keypoint definitions</strong> and <strong>62 unseen categories</strong>. This setting explicitly tests transfer to new landmark vocabularies and entirely new object categories beyond the training distribution.          </p>
+          <p class="benchmark-download">
+            Download our benchmark annotations <a href="annotations/cape_pairs_json.zip" target="_blank" rel="noopener noreferrer">here</a>. The archive contains JSON files specifying source–target image pairs and their annotated corresponding keypoints. The images can be downloaded following the instructions in the <a href="https://github.com/luminxu/Pose-for-Everything/blob/main/mp100/README.md" target="_blank" rel="noopener noreferrer">MP-100 README</a>.
+          <div class="benchmark-shell">
+            <div class="benchmark-groups">
+              <div class="benchmark-group">
+                <span class="benchmark-group-label">Unseen keypoints</span>
+                <button class="benchmark-chip is-active" data-target="human-face" type="button" aria-pressed="true">Human face</button>
+                <button class="benchmark-chip" data-target="apparel-item" type="button" aria-pressed="false">Apparel item</button>
+              </div>
+
+              <div class="benchmark-group">
+                <span class="benchmark-group-label">Unseen categories</span>
+                <button class="benchmark-chip" data-target="animal-face" type="button" aria-pressed="false">Animal face</button>
+                <button class="benchmark-chip" data-target="animal-body" type="button" aria-pressed="false">Animal body</button>
+                <button class="benchmark-chip" data-target="home-furniture" type="button" aria-pressed="false">Home furniture</button>
+              </div>
+            </div>
+
+            <div class="benchmark-stage">
+              <div class="benchmark-preview">
+                <div class="benchmark-track is-active" data-panel="human-face">
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/human_face/idx0.png" alt="Human face sample 1"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/human_face/idx16.png" alt="Human face sample 2"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/human_face/idx113.png" alt="Human face sample 3"></div>
+                </div>
+
+                <div class="benchmark-track" data-panel="apparel-item">
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/clothing/idx112.png" alt="Apparel item sample 1"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/clothing/idx420.png" alt="Apparel item sample 2"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/clothing/idx142.png" alt="Apparel item sample 3"></div>
+                </div>
+
+                <div class="benchmark-track" data-panel="animal-face">
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/animal_face/idx102.png" alt="Animal face sample 1"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/animal_face/idx35.png" alt="Animal face sample 2"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/animal_face/idx22.png" alt="Animal face sample 3"></div>
+                </div>
+
+                <div class="benchmark-track" data-panel="animal-body">
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/animal_body/idx25.png" alt="Animal body sample 1"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/animal_body/idx74.png" alt="Animal body sample 2"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/animal_body/idx36.png" alt="Animal body sample 3"></div>
+                </div>
+
+                <div class="benchmark-track" data-panel="home-furniture">
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/furniture/idx25.png" alt="Home furniture sample 1"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/furniture/idx58.png" alt="Home furniture sample 2"></div>
+                  <div class="benchmark-sample"><img src="static/images/statistics_benchmark/furniture/idx140.png" alt="Home furniture sample 3"></div>
+                </div>
+              </div>
+
+              <div class="benchmark-copy">
+                <div class="benchmark-kicker">MP-100 benchmark</div>
+                <h3 class="benchmark-title" id="benchmark-title">Human face</h3>
+                <p class="benchmark-description" id="benchmark-description">
+                  Unseen-keypoint split. This domain extends the SPair-71k person category from only 7 coarse facial keypoints to a dense <strong>68-landmark</strong> facial annotation scheme.
+                </p>
+                <p class="benchmark-note" id="benchmark-note">
+                  Categories: <strong>1</strong> · Avg. keypoints per pair: <strong>68</strong> · Keypoint definitions: <strong>68</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section soft-section section-spacious">
+    <div class="container page-container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="pill">Performance</div>
+          <h2 class="title is-3">Precise, Generalizable, and Fast</h2>
+          <p class="perf-lead">
+            MARCO sets a new state of the art at <strong>strict localization thresholds</strong>, on <strong>unseen keypoints and unseen categories</strong>, while running at <strong>10× the speed</strong>.
+          </p>
+
+          <div class="perf-shell">
+            <div class="perf-grid">
+
+              <div class="perf-panel">
+                <div class="perf-panel-kicker">In-domain precision</div>
+                <div class="perf-panel-title">State of the art on keypoints seen during training, with more precise localization.</div>
+                <div class="perf-subtitle">
+                  Strict thresholds measure whether the match lands near the exact point, not just the right region.
+                </div>
+
+                <div class="perf-metric">
+                  <div class="perf-metric-name">SPair-71k · PCK@0.01</div>
+                  <div class="perf-bars">
+                    <div class="perf-row">
+                      <div class="perf-label">MARCO</div>
+                      <div class="perf-track"><div class="perf-fill" style="--w:100%;"></div></div>
+                      <div class="perf-value">27.0</div>
+                    </div>
+                    <div class="perf-row">
+                      <div class="perf-label">Geo-SC</div>
+                      <div class="perf-track"><div class="perf-fill alt" style="--w:80.4%;"></div></div>
+                      <div class="perf-value">21.7</div>
+                    </div>
+                    <div class="perf-row">
+                      <div class="perf-label">Jamais Vu</div>
+                      <div class="perf-track"><div class="perf-fill alt2" style="--w:75.9%;"></div></div>
+                      <div class="perf-value">20.5</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="perf-metric">
+                  <div class="perf-metric-name">AP-10K cross-family · PCK@0.01</div>
+                  <div class="perf-bars">
+                    <div class="perf-row">
+                      <div class="perf-label">MARCO</div>
+                      <div class="perf-track"><div class="perf-fill" style="--w:100%;"></div></div>
+                      <div class="perf-value">28.5</div>
+                    </div>
+                    <div class="perf-row">
+                      <div class="perf-label">Geo-SC</div>
+                      <div class="perf-track"><div class="perf-fill alt" style="--w:64.2%;"></div></div>
+                      <div class="perf-value">18.3</div>
+                    </div>
+                    <div class="perf-row">
+                      <div class="perf-label">Jamais Vu</div>
+                      <div class="perf-track"><div class="perf-fill alt2" style="--w:64.6%;"></div></div>
+                      <div class="perf-value">18.4</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="perf-highlight">+5.3 on SPair-71k · +10.2 avg on AP-10k vs Geo-SC</div>
+              </div>
+
+              <div class="perf-panel">
+                <div class="perf-panel-kicker">Out-of-domain</div>
+                <div class="perf-panel-title">Strong not only on seen keypoints, but also beyond the training vocabulary.</div>
+                <div class="perf-subtitle">
+                  Previous methods look strong in-domain, then drop once the queried semantics or categories change.
+                </div>
+
+                <div class="perf-metric">
+                  <div class="perf-metric-name">SPair-U · unseen keypoints · PCK@0.10</div>
+                  <div class="perf-bars">
+                    <div class="perf-row">
+                      <div class="perf-label">MARCO</div>
+                      <div class="perf-track"><div class="perf-fill" style="--w:100%;"></div></div>
+                      <div class="perf-value">67.5</div>
+                    </div>
+                    <div class="perf-row">
+                      <div class="perf-label">Jamais Vu</div>
+                      <div class="perf-track"><div class="perf-fill alt" style="--w:92.4%;"></div></div>
+                      <div class="perf-value">62.4</div>
+                    </div>
+                    <div class="perf-row">
+                      <div class="perf-label">Geo-SC</div>
+                      <div class="perf-track"><div class="perf-fill alt2" style="--w:84.3%;"></div></div>
+                      <div class="perf-value">56.9</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="perf-metric">
+                  <div class="perf-metric-name">MP-100 avg · 5 splits · PCK@0.10</div>
+                  <div class="perf-bars">
+                    <div class="perf-row">
+                      <div class="perf-label">MARCO</div>
+                      <div class="perf-track"><div class="perf-fill" style="--w:100%;"></div></div>
+                      <div class="perf-value">59.7</div>
+                    </div>
+                    <div class="perf-row">
+                      <div class="perf-label">Jamais Vu</div>
+                      <div class="perf-track"><div class="perf-fill alt" style="--w:90.7%;"></div></div>
+                      <div class="perf-value">54.2</div>
+                    </div>
+                    <div class="perf-row">
+                      <div class="perf-label">Geo-SC</div>
+                      <div class="perf-track"><div class="perf-fill alt2" style="--w:89.0%;"></div></div>
+                      <div class="perf-value">53.2</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="perf-highlight">+5.1 on SPair-U · +5.6 avg on MP-100 vs Jamais Vu</div>
+              </div>
+
+              <div class="perf-panel">
+                <div class="perf-panel-kicker">Efficiency</div>
+                <div class="perf-panel-title">A single DINOv2-based model, without the need for diffusion features.</div>
+
+                <div class="perf-stat-stack">
+                  <div class="perf-stat">
+                    <div class="perf-stat-label">Inference speed</div>
+                    <div class="perf-stat-main">8.3 FPS</div>
+                    <div class="perf-stat-sub">
+                      MARCO runs about <strong>10× faster</strong> than Geo-SC and Jamais Vu, both at <strong>0.85 FPS</strong>.
+                    </div>
+                  </div>
+
+                  <div class="perf-stat">
+                    <div class="perf-stat-label">Model size</div>
+                    <div class="perf-stat-main">323M</div>
+                    <div class="perf-stat-sub">
+                      Compared with <strong>950M</strong> parameters for Geo-SC and Jamais Vu.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-spacious" id="Contact">
+    <div class="container page-container">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">Contact</h2>
+          <div class="figure-frame">
+            <p class="caption-text has-text-centered" style="margin: 0;">
+              For questions, contact
+              <a href="mailto:claudia.cuttano@polito.it"><strong>claudia.cuttano@polito.it</strong></a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section soft-section section-spacious" id="BibTeX">
+    <div class="container page-container">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">BibTeX</h2>
+          <div class="figure-frame">
+<pre><code>@inproceedings{cuttano2026marco,
+  title     = {{MARCO}: Navigating the Unseen Space of Semantic Correspondence},
+  author    = {Claudia Cuttano and Gabriele Trivigno and Carlo Masone and Stefan Roth},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2026}
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 1.5rem; padding-bottom: 2rem;">
+    <div class="container page-container">
+      <div class="ack-text">
+        <p style="margin: 0;">
+          <strong>Acknowledgments.</strong>
+          Claudia Cuttano was supported by the Sustainable Mobility Center (CNMS), which received funding from the European Union Next Generation EU (Piano Nazionale di Ripresa e Resilienza (PNRR), Missione 4 Componente 2 Investimento 1.4 “Potenziamento strutture di ricerca e creazione di campioni nazionali di R&amp;S su alcune Key Enabling Technologies”) with grant agreement no. CN_00000023.
+          Stefan Roth has received funding from the European Research Council (ERC) under the European Union's Horizon 2020 research and innovation programme (grant agreement No. 866008).
+          Further, he was supported by the DFG under Germany's Excellence Strategy (EXC-3057/1 “Reasonable Artificial Intelligence”, Project No. 533677015).
+          We acknowledge the CINECA award under the ISCRA initiative, for the availability of high-performance computing resources.
+          We acknowledge the support of the European Laboratory for Learning and Intelligent Systems (ELLIS).
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const flowThumbs = document.querySelectorAll('.flow-thumb');
+      const flowKicker = document.getElementById('flow-kicker');
+      const flowTitle = document.getElementById('flow-title');
+      const flowDescription = document.getElementById('flow-description');
+      const flowNote = document.getElementById('flow-note');
+
+      const flowText = {
+        original: {
+          kicker: '1. Flow consistency in DINOv2',
+          title: 'Raw DINOv2 already produces a partially coherent correspondence field',
+          note: 'This is the key observation behind MARCO: instead of discarding that structure, we use it as a source of self-supervision and to progressively densify correspondences during training.'
+        },
+        sparse: {
+          kicker: '2. Flow consistency in DINOv2',
+          title: 'Sparse fine-tuning contracts around landmarks',
+          description: 'Optimizing only on annotated keypoints sharpens those supervised locations (e.g. the nose, the eyes), but weakens geometric coherence elsewhere.',
+          note: 'This explains why many correspondence models score well on seen keypoints yet fail once the queried semantics move away from the labeled set.'
+        },
+        dense: {
+          kicker: '3. Flow consistency in DINOv2',
+          title: 'MARCO restores smooth, object-wide correspondence',
+          description: 'Our self-distilled densification objective propagates supervision across the surface, encouraging features to vary smoothly and consistently over the full object rather than collapsing around the sparse anchors.',
+          note: 'Ultimately, this produces a smoother correspondence field than the frozen encoder.'
+        }
+      };
+
+      flowThumbs.forEach(function (thumb) {
+        thumb.addEventListener('click', function () {
+          const target = thumb.dataset.flow;
+          const content = flowText[target];
+          if (!content) return;
+
+          flowThumbs.forEach(function (t) {
+            t.classList.remove('is-active');
+            t.setAttribute('aria-pressed', 'false');
+          });
+
+          thumb.classList.add('is-active');
+          thumb.setAttribute('aria-pressed', 'true');
+
+          flowKicker.textContent = content.kicker;
+          flowTitle.textContent = content.title;
+          if (content.description) {
+            flowDescription.textContent = content.description;
+            flowDescription.style.display = '';
+          } else {
+            flowDescription.textContent = '';
+            flowDescription.style.display = 'none';
+          }
+
+          flowNote.textContent = content.note;
+        });
+      });
+
+      const chips = document.querySelectorAll('.benchmark-chip');
+      const panels = document.querySelectorAll('.benchmark-track');
+      const benchmarkTitle = document.getElementById('benchmark-title');
+      const benchmarkDescription = document.getElementById('benchmark-description');
+      const benchmarkNote = document.getElementById('benchmark-note');
+
+      const benchmarkText = {
+        'human-face': {
+          title: 'Human face',
+          description: 'Unseen-keypoint split. This domain extends the SPair-71k person category from only 7 coarse facial keypoints to a dense <strong>68-landmark</strong> facial annotation scheme.',
+          note: 'Categories: <strong>1</strong> · Avg. keypoints per pair: <strong>68</strong> · Keypoint definitions: <strong>68</strong>.'
+        },
+        'apparel-item': {
+          title: 'Apparel item',
+          description: 'Unseen-keypoint split. MP-100 introduces <strong>282 novel garment keypoint definitions</strong> across <strong>12 categories</strong>, including sleeve corners, skirt borders, trousers, sling dresses, and vests.',
+          note: 'Categories: <strong>12</strong> · Avg. keypoints per pair: <strong>27</strong> · Keypoint definitions: <strong>282</strong>. Example categories: short sleeved shirt, skirt, trousers, vest, sling dress.'
+        },
+        'animal-face': {
+          title: 'Animal face',
+          description: 'Unseen-category split. This domain contains <strong>26 face categories</strong> that are absent from SPair-71k, making it a strict zero-shot test of semantic transfer beyond the training taxonomy.',
+          note: 'Categories: <strong>26</strong> · Avg. keypoints per pair: <strong>9</strong> · Keypoint definitions: <strong>9</strong>. Example categories: alpaca, chipmunk, camel, gentoo penguin, grey seal, quokka.'
+        },
+        'animal-body': {
+          title: 'Animal body',
+          description: 'Unseen-category split. A broad zero-shot benchmark spanning <strong>32 body categories</strong> not seen during training, with substantial variation in pose, articulation, texture, and species-level shape.',
+          note: 'Categories: <strong>32</strong> · Avg. keypoints per pair: <strong>15</strong> · Keypoint definitions: <strong>101</strong>. Example categories: macaque, cheetah, giraffe, elephant, panda, zebra.'
+        },
+        'home-furniture': {
+          title: 'Home furniture',
+          description: 'Unseen-category split. A challenging domain with <strong>furniture-specific</strong> part structure, designed to test transfer beyond the usual animal and person-centric categories.',
+          note: 'Categories: <strong>4</strong> · Avg. keypoints per pair: <strong>12</strong> · Keypoint definitions: <strong>45</strong>. Categories: couch, table, bed, swivel chair.'
+        }
+      };
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          const target = chip.dataset.target;
+          const content = benchmarkText[target];
+          if (!content) return;
+
+          chips.forEach(function (c) {
+            c.classList.remove('is-active');
+            c.setAttribute('aria-pressed', 'false');
+          });
+
+          chip.classList.add('is-active');
+          chip.setAttribute('aria-pressed', 'true');
+
+          panels.forEach(function (panel) {
+            panel.classList.toggle('is-active', panel.dataset.panel === target);
+          });
+
+          benchmarkTitle.textContent = content.title;
+          benchmarkDescription.innerHTML = content.description;
+          benchmarkNote.innerHTML = content.note;
+        });
+      });
+    });
+  </script>
+</body>
+</html>
