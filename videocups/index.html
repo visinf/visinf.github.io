@@ -1,2 +1,500 @@
 <!DOCTYPE html>
-<html></html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>Scene-Centric Unsupervised Video Panoptic Segmentation</title>
+
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+  <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,500,600' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="data/assets/css/Highlight-Clean.css">
+  <link rel="stylesheet" href="data/assets/css/styles.css">
+
+  <meta property="og:site_name" content="VideoCUPS" />
+  <meta property="og:type" content="video.other" />
+  <meta property="og:title" content="Scene-Centric Unsupervised Video Panoptic Segmentation (CVPR 2026)" />
+  <meta property="og:description" content="The first method for unsupervised video panoptic segmentation. CVPR 2026." />
+  <meta property="og:url" content="https://visinf.github.io/videocups" />
+
+  <style>
+* { box-sizing: border-box; }
+
+.vid-comp-block { margin-bottom: 36px; }
+
+.vid-comp-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.vid-comp-tabs button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.vid-comp-tabs button:hover { background: #f2f2f2; }
+.vid-comp-tabs button.active { background: #333; color: #fff; border-color: #333; }
+
+.vid-comp-container {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.vid-comp-base {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.vid-comp-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  object-fit: cover;
+  object-position: left top;
+  overflow: hidden;
+}
+
+.vid-comp-slider {
+  position: absolute;
+  z-index: 9;
+  cursor: ew-resize;
+  height: 100%;
+  width: 3px;
+  background-color: #FFFFFF;
+  opacity: 0.85;
+  top: 0;
+}
+.vid-comp-slider-horizontalline {
+  width: 30px;
+  height: 30px;
+  background: url("data/left-and-right-arrows.png") no-repeat center;
+  background-color: inherit;
+  background-size: contain;
+  border-radius: 50%;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.vid-comp-corner {
+  position: absolute;
+  top: 10px;
+  z-index: 8;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 4px 10px;
+  border-radius: 3px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.vid-comp-corner-left  { left: 10px; }
+.vid-comp-corner-right { right: 10px; }
+
+@media (max-width: 768px) {
+  .vid-comp-tabs button { font-size: 12px; padding: 5px 8px; }
+}
+
+.affiliations sup { margin-right: 2px; }
+.authors .eq, .affiliations .eq { font-size: 1.1em; }
+  </style>
+</head>
+
+<body>
+
+<div class="highlight-clean" style="padding-bottom: 0px; padding-top: 20px;">
+    <div class="container" style="max-width: 1024px; margin-bottom: 20px">
+        <h1 class="text-center" style="font-size:35px;"><b>Scene-Centric Unsupervised Video Panoptic Segmentation</b></h1>
+    </div>
+    <div class="container" style="max-width: 1024px; margin-bottom: 20px;">
+        <div class="authors">
+            <a href="https://christophreich1996.github.io">
+            Christoph Reich<sup><span class="eq">*</span> 1,2,5,6</sup>
+            </a>&nbsp;&nbsp;
+            <a href="https://olvrhhn.github.io">
+            Oliver Hahn<sup><span class="eq">*</span> 2,3</sup>
+            </a>&nbsp;&nbsp;
+            <a href="https://arnike.github.io">
+            Nikita Araslanov<sup> 1,5</sup>
+            </a>&nbsp;&nbsp;
+            <a href="https://research.nvidia.com/labs/dvl/author/laura-leal-taixe/">
+            Laura Leal-Taix&eacute;<sup> 3</sup>
+            </a><br/>
+            <a href="https://chrirupp.github.io">
+            Christian Rupprecht<sup> 4</sup>
+            </a>&nbsp;&nbsp;
+            <a href="https://cvg.cit.tum.de/members/cremers">
+            Daniel Cremers<sup><span class="eq">&dagger;</span> 1,5,6</sup>
+            </a>&nbsp;&nbsp;
+            <a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/stefan_roth.en.jsp">
+            Stefan Roth<sup><span class="eq">&dagger;</span> 2,6,7</sup>
+            </a>
+            <br>
+        </div>
+        <div class="affiliations">
+            <span><sup>1</sup>TU Munich </span>&nbsp;&nbsp;
+            <span><sup>2</sup>TU Darmstadt </span>&nbsp;&nbsp;
+            <span><sup>3</sup>NVIDIA </span>&nbsp;&nbsp;
+            <span><sup>4</sup>University of Oxford </span>&nbsp;&nbsp;
+            <span><sup>5</sup>MCML </span>&nbsp;&nbsp;
+            <span><sup>6</sup>ELIZA </span>&nbsp;&nbsp;
+            <span><sup>7</sup>hessian.AI </span>
+            <br>
+            <span><span class="eq">*</span>equal contribution </span>&nbsp;&nbsp;
+            <span><span class="eq">&dagger;</span>equal supervision </span>
+        </div>
+        <div class="container" style="max-width: 1024px; margin-bottom: 20px">
+            <h1 class="text-center" style="font-size:22px;">CVPR 2026</h1>
+        </div>
+    </div>
+    <div id="container">
+    <div class="buttons text-center" style="margin-top: 8px; margin-bottom: 8px;">
+        <a class="btn btn-light" role="button" href="https://arxiv.org" target="_blank">
+            <svg style="width:24px;height:24px;margin-left:-12px;margin-right:12px" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M16 0H8C6.9 0 6 .9 6 2V18C6 19.1 6.9 20 8 20H20C21.1 20 22 19.1 22 18V6L16 0M20 18H8V2H15V7H20V18M4 4V22H20V24H4C2.9 24 2 23.1 2 22V4H4M10 10V12H18V10H10M10 14V16H15V14H10Z"></path>
+            </svg>Paper
+        </a>
+        <a class="btn btn-light" role="button" href="https://github.com/visinf/cups" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;margin-left:-8px;margin-right:8px" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+            </svg>
+            Code
+        </a>
+        <a class="btn btn-light" role="button" href="https://www.youtube.com/watch?v=lDvgajKB-5w" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                style="width:24px;height:24px;margin-left:-8px;margin-right:8px"
+                viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            Video
+        </a>
+    </div>
+    </div>
+</div>
+
+<hr class="divider" />
+
+<div id="hero" class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <video style="width: 100%" autoplay loop muted playsinline>
+                <source src="videos_web_compressed/videocups_supp_video.mp4" type="video/mp4">
+                Your browser does not support HTML5 video.
+            </video>
+            <p align="justify">
+                <b>TL;DR:</b> We introduce the task of unsupervised video panoptic segmentation, along with a unified evaluation protocol and four competitive baselines. We propose VideoCUPS, the first method that directly tackles it, generating temporally consistent panoptic pseudo-labels from monocular scene-centric videos using depth, motion, and visual cues, then training an accurate VPS model with a novel Video DropLoss.
+            </p>
+        </div>
+    </div>
+</div>
+
+<hr class="divider" />
+
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h2><b>Abstract</b></h2>
+            <p align="justify">
+                Video panoptic segmentation (VPS) aims to jointly detect, segment, and track all objects while partitioning the video into semantically consistent regions. We introduce the task setting of <em>unsupervised</em> VPS, omitting any human supervision. Existing unsupervised scene understanding works mainly focused on image segmentation tasks; the video domain remains underexplored. We propose VideoCUPS, the first unsupervised VPS approach. VideoCUPS generates temporally consistent panoptic video pseudo-labels from scene-centric videos by exploiting unsupervised depth, motion, and visual cues. Training on these pseudo-labels using a novel Video DropLoss yields an accurate, unsupervised VPS model. To benchmark progress, we introduce a comprehensive evaluation protocol and four competitive baselines, extending state-of-the-art unsupervised panoptic image and instance video segmentation models to VPS. VideoCUPS outperforms all baselines and demonstrates strong label-efficient learning. With VideoCUPS, our evaluation protocol, and baselines, we provide a strong foundation for future research on unsupervised VPS.
+            </p>
+        </div>
+    </div>
+</div>
+
+<hr class="divider" />
+
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h2><b>Method</b></h2>
+            <img src="data/method_figure.png" alt="VideoCUPS pseudo-label generation pipeline" style="width: 100%; height: auto; display: block;">
+            <p align="justify" style="margin-top: 12px;">
+                VideoCUPS generates temporally consistent video panoptic pseudo-labels from monocular scene-centric videos. Instance pseudo-labels come from motion-based region growing on self-supervised optical flow (SMURF) and depth (DynamoDepth). Semantic pseudo-labels come from distilled DINO features (k-means) refined by depth-guided inference. Temporally, instances are propagated and tracked via warped-IoU + Hungarian matching, semantics are smoothed by a 3-frame majority vote, and semantic&harr;instance assignments are aligned per clip. A pixel-ratio threshold splits things from stuff. The resulting pseudo-labels supervise a Panoptic Cascade MaskTrack R-CNN with DINO ResNet-50, trained with our Video DropLoss and self-enhanced video copy-paste augmentation.
+            </p>
+        </div>
+    </div>
+</div>
+
+<hr class="divider" />
+
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h2><b>Quantitative results</b></h2>
+            <p align="justify">
+                We compare VideoCUPS against four competitive baselines that pair state-of-the-art unsupervised semantic, video-instance, or panoptic image segmentation methods with unsupervised tracking, evaluated with STQ, AQ, and SQ (all in %, higher is better) on Cityscapes-VPS, KITTI-STEP, Waymo, and the out-of-domain MOTS benchmark. Despite training only on monocular videos, VideoCUPS outperforms every baseline on every dataset and metric, including CUPS&nbsp;+&nbsp;SORT, which uses stereo video at training time.
+            </p>
+            <p style="color: #555; font-size: 13px; margin-top: 6px;"><sup>&dagger;</sup> CUPS trained with monocular videos. Supervised reference in gray.</p>
+            <div style="overflow-x: auto;">
+            <table class="table table-bordered" style="text-align: center; font-size: 13px;">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="vertical-align: middle;">Method</th>
+                        <th colspan="3">Cityscapes</th>
+                        <th colspan="3">KITTI-STEP</th>
+                        <th colspan="3">Waymo</th>
+                        <th colspan="3">MOTS <em>(OOD)</em></th>
+                    </tr>
+                    <tr>
+                        <th>STQ</th><th>AQ</th><th>SQ</th>
+                        <th>STQ</th><th>AQ</th><th>SQ</th>
+                        <th>STQ</th><th>AQ</th><th>SQ</th>
+                        <th>STQ</th><th>AQ</th><th>SQ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="color: #888;"><td>Supervised</td>
+                        <td>42.0</td><td>27.0</td><td>65.3</td>
+                        <td>53.9</td><td>59.9</td><td>48.4</td>
+                        <td>22.3</td><td>12.6</td><td>39.4</td>
+                        <td>20.5</td><td>12.7</td><td>33.1</td></tr>
+                    <tr><td>DepthG + VideoCutLER</td>
+                        <td>9.9</td><td>3.4</td><td>28.2</td>
+                        <td>13.2</td><td>8.7</td><td>20.1</td>
+                        <td>7.9</td><td>2.6</td><td>23.9</td>
+                        <td>14.5</td><td>6.8</td><td>30.7</td></tr>
+                    <tr><td>U2Seg + SORT</td>
+                        <td>11.4</td><td>5.6</td><td>23.0</td>
+                        <td>24.0</td><td>21.1</td><td>27.2</td>
+                        <td>10.4</td><td>4.8</td><td>22.6</td>
+                        <td>14.9</td><td>7.2</td><td>30.8</td></tr>
+                    <tr><td>CUPS + SORT</td>
+                        <td>20.6</td><td>13.3</td><td>31.8</td>
+                        <td>34.2</td><td>37.7</td><td>31.1</td>
+                        <td>17.5</td><td>9.9</td><td>30.8</td>
+                        <td>16.7</td><td>10.4</td><td>27.0</td></tr>
+                    <tr><td>CUPS<sup>&dagger;</sup> + SORT</td>
+                        <td>17.8</td><td>10.6</td><td>29.9</td>
+                        <td>32.9</td><td>35.4</td><td>30.5</td>
+                        <td>16.6</td><td>9.3</td><td>29.8</td>
+                        <td>14.9</td><td>7.8</td><td>28.3</td></tr>
+                    <tr style="background: #f4f0e8;"><td><b>VideoCUPS (ours)</b></td>
+                        <td><b>22.2</b></td><td><b>15.3</b></td><td><b>32.3</b></td>
+                        <td><b>37.3</b></td><td><b>43.6</b></td><td><b>32.0</b></td>
+                        <td><b>18.4</b></td><td><b>10.7</b></td><td><b>31.6</b></td>
+                        <td><b>18.6</b></td><td><b>10.5</b></td><td><b>33.0</b></td></tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="divider" />
+
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h2><b>Label-efficient learning</b></h2>
+            <img src="data/label_efficient.png" alt="Label-efficient learning plot" style="width: 100%; height: auto; display: block;">
+            <p align="justify" style="margin-top: 12px;">
+                We fine-tune a VideoCUPS-pretrained model on varying fractions of Cityscapes-VPS labels and compare against the same architecture initialized with DINO. With only 10% of the labels, VideoCUPS already reaches the STQ of a randomly initialized supervised model trained on the full Cityscapes-VPS train set, and improves over the DINO-initialized baseline by 4.6% STQ. At 100% labels, VideoCUPS still improves over DINO by +2.6% STQ, +2.3% AQ, and +3.5% SQ.
+            </p>
+        </div>
+    </div>
+</div>
+
+<hr class="divider" />
+
+<div class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h2><b>Qualitative comparisons</b></h2>
+            <p align="justify">
+                Below, we showcase video panoptic predictions on Cityscapes demo video sequences. Where the baselines struggle with temporal consistency, VideoCUPS produces stable, temporally coherent panoptic masks.
+            </p>
+
+            <!-- Example 1 -->
+            <div class="vid-comp-block">
+                <div class="vid-comp-tabs" data-example="1">
+                    <button class="active" data-baseline="depthgvideocutler" data-label="DepthG + VideoCutLER">DepthG + VideoCutLER</button>
+                    <button data-baseline="u2segsort" data-label="U2Seg + SORT">U2Seg + SORT</button>
+                    <button data-baseline="cupssort" data-label="CUPS + SORT (stereo)">CUPS + SORT (stereo)</button>
+                    <button data-baseline="monocupssort" data-label="CUPS&dagger; + SORT (mono)">CUPS<sup>&dagger;</sup> + SORT (mono)</button>
+                </div>
+                <div class="vid-comp-container">
+                    <span class="vid-comp-corner vid-comp-corner-left">VideoCUPS (ours)</span>
+                    <span class="vid-comp-corner vid-comp-corner-right">DepthG + VideoCutLER</span>
+                    <video class="vid-comp-base"    autoplay muted loop playsinline preload="auto"
+                           src="videos_web_compressed/depthgvideocutler_1.mp4"></video>
+                    <video class="vid-comp-overlay" autoplay muted loop playsinline preload="auto"
+                           src="videos_web_compressed/videocups_1.mp4"></video>
+                </div>
+            </div>
+
+            <!-- Example 2 -->
+            <div class="vid-comp-block">
+                <div class="vid-comp-tabs" data-example="2">
+                    <button class="active" data-baseline="depthgvideocutler" data-label="DepthG + VideoCutLER">DepthG + VideoCutLER</button>
+                    <button data-baseline="u2segsort" data-label="U2Seg + SORT">U2Seg + SORT</button>
+                    <button data-baseline="cupssort" data-label="CUPS + SORT (stereo)">CUPS + SORT (stereo)</button>
+                    <button data-baseline="monocupssort" data-label="CUPS&dagger; + SORT (mono)">CUPS<sup>&dagger;</sup> + SORT (mono)</button>
+                </div>
+                <div class="vid-comp-container">
+                    <span class="vid-comp-corner vid-comp-corner-left">VideoCUPS (ours)</span>
+                    <span class="vid-comp-corner vid-comp-corner-right">DepthG + VideoCutLER</span>
+                    <video class="vid-comp-base"    autoplay muted loop playsinline preload="auto"
+                           src="videos_web_compressed/depthgvideocutler_2.mp4"></video>
+                    <video class="vid-comp-overlay" autoplay muted loop playsinline preload="auto"
+                           src="videos_web_compressed/videocups_2.mp4"></video>
+                </div>
+            </div>
+
+            <!-- Example 3 -->
+            <div class="vid-comp-block">
+                <div class="vid-comp-tabs" data-example="3">
+                    <button class="active" data-baseline="depthgvideocutler" data-label="DepthG + VideoCutLER">DepthG + VideoCutLER</button>
+                    <button data-baseline="u2segsort" data-label="U2Seg + SORT">U2Seg + SORT</button>
+                    <button data-baseline="cupssort" data-label="CUPS + SORT (stereo)">CUPS + SORT (stereo)</button>
+                    <button data-baseline="monocupssort" data-label="CUPS&dagger; + SORT (mono)">CUPS<sup>&dagger;</sup> + SORT (mono)</button>
+                </div>
+                <div class="vid-comp-container">
+                    <span class="vid-comp-corner vid-comp-corner-left">VideoCUPS (ours)</span>
+                    <span class="vid-comp-corner vid-comp-corner-right">DepthG + VideoCutLER</span>
+                    <video class="vid-comp-base"    autoplay muted loop playsinline preload="auto"
+                           src="videos_web_compressed/depthgvideocutler_3.mp4"></video>
+                    <video class="vid-comp-overlay" autoplay muted loop playsinline preload="auto"
+                           src="videos_web_compressed/videocups_3.mp4"></video>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="divider" />
+
+<div id="bibtex" class="container" style="max-width: 768px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h2><b>BibTeX</b></h2>
+            <pre style="background: #f7f7f7; padding: 14px; border-radius: 4px; font-size: 13px; overflow-x: auto;">@inproceedings{Reich:2026:VideoCUPS,
+  title     = {Scene-Centric Unsupervised Video Panoptic Segmentation},
+  author    = {Reich, Christoph and Hahn, Oliver and Araslanov, Nikita and
+               Leal-Taix{\'e}, Laura and Rupprecht, Christian and
+               Cremers, Daniel and Roth, Stefan},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2026}
+}</pre>
+        </div>
+    </div>
+</div>
+
+<hr class="divider" />
+
+<div class="container" style="max-width: 768px;">
+    <p align="justify" style="font-size: 11px; color: grey;">
+        <b>Acknowledgments: </b> This project was partially supported by the European Research Council (ERC) Advanced Grant SIMULACRON (grant agreement No. 884679), DFG project CR 250/26-1 &ldquo;4D-YouTube&rdquo;, and GNI Project &ldquo;AICC&rdquo;. This project was also partially supported by the ERC under the European Union&rsquo;s Horizon 2020 research and innovation programme (grant agreement No. 866008). Additionally, this work has been co-funded by the LOEWE initiative (Hesse, Germany) within the emergenCITY center [LOEWE/1/12/519/03/05.001(0016)/72] and by the Deutsche Forschungsgemeinschaft (German Research Foundation, DFG) under Germany&rsquo;s Excellence Strategy (EXC 3066/1 &ldquo;The Adaptive Mind&rdquo;, Project No. 533717223). Christoph Reich is supported by the Konrad Zuse School of Excellence in Learning and Intelligent Systems (<a href="https://eliza.school">ELIZA</a>) through the DAAD programme Konrad Zuse Schools of Excellence in Artificial Intelligence, sponsored by the German Federal Ministry of Education and Research. Christian Rupprecht is supported by an Amazon Research Award. Finally, we acknowledge the support of the European Laboratory for Learning and Intelligent Systems (ELLIS) and thank Simone Schaub-Meyer for insightful discussions. Website template from <a href="https://dreamfusion3d.github.io/">DreamFusion</a> and <a href="https://mv-dream.github.io/">MVDream</a>.
+    </p>
+    <div style="display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 12px; margin: 28px 0 18px; width: 100%;">
+        <img src="data/logos/tum.png"        alt="TU Munich"            style="max-height: 32px; max-width: 13%; height: auto; width: auto;">
+        <img src="data/logos/tuda.png"       alt="TU Darmstadt"         style="max-height: 34px; max-width: 13%; height: auto; width: auto;">
+        <img src="data/logos/nvidia.png"     alt="NVIDIA"               style="max-height: 30px; max-width: 13%; height: auto; width: auto;">
+        <img src="data/logos/oxford.png"     alt="University of Oxford" style="max-height: 34px; max-width: 13%; height: auto; width: auto;">
+        <img src="data/logos/mcml.png"       alt="MCML"                 style="max-height: 22px; max-width: 13%; height: auto; width: auto;">
+        <img src="data/logos/eliza.png"      alt="ELIZA"                style="max-height: 22px; max-width: 13%; height: auto; width: auto;">
+        <img src="data/logos/hessian-ai.png" alt="hessian.AI"           style="max-height: 22px; max-width: 13%; height: auto; width: auto;">
+    </div>
+</div>
+
+<script>
+// === Vid-comp slider (port of CUPS initComparisons, adapted for <video>) ===
+function initVidComparisons() {
+  document.querySelectorAll('.vid-comp-overlay').forEach(function (overlay) {
+    var container = overlay.parentElement;
+    var slider = document.createElement('DIV');
+    var line   = document.createElement('DIV');
+    line.className = 'vid-comp-slider-horizontalline';
+    slider.appendChild(line);
+    slider.className = 'vid-comp-slider';
+    container.insertBefore(slider, overlay);
+
+    var clicked = 0;
+
+    function getW() { return container.offsetWidth; }
+
+    function place(x) {
+      var w = getW();
+      if (x < 0) x = 0;
+      if (x > w) x = w;
+      overlay.style.width = x + 'px';
+      slider.style.left = (x - slider.offsetWidth / 2) + 'px';
+    }
+
+    function init() { place(getW() / 2); }
+    if (overlay.readyState >= 1) init();
+    else overlay.addEventListener('loadedmetadata', init);
+
+    window.addEventListener('resize', function () { place(overlay.offsetWidth); });
+
+    function cursorX(e) {
+      var ev = e.changedTouches ? e.changedTouches[0] : e;
+      var rect = container.getBoundingClientRect();
+      return ev.pageX - rect.left - window.pageXOffset;
+    }
+
+    function move(e) { if (!clicked) return; place(cursorX(e)); }
+
+    slider.addEventListener('mousedown', function (e) { e.preventDefault(); clicked = 1;
+      window.addEventListener('mousemove', move);
+      window.addEventListener('touchmove', move);
+    });
+    slider.addEventListener('touchstart', function (e) { e.preventDefault(); clicked = 1;
+      window.addEventListener('mousemove', move);
+      window.addEventListener('touchmove', move);
+    });
+    window.addEventListener('mouseup',  function () { clicked = 0; });
+    window.addEventListener('touchend', function () { clicked = 0; });
+  });
+}
+
+// === Baseline picker: swap base src and resync both videos to time 0 ===
+function initBaselinePicker() {
+  document.querySelectorAll('.vid-comp-tabs').forEach(function (tabs) {
+    var example    = tabs.dataset.example;
+    var block      = tabs.closest('.vid-comp-block');
+    var baseVid    = block.querySelector('.vid-comp-base');
+    var overlayVid = block.querySelector('.vid-comp-overlay');
+    var rightLbl   = block.querySelector('.vid-comp-corner-right');
+    tabs.querySelectorAll('button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        tabs.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        if (rightLbl) rightLbl.innerHTML = btn.innerHTML;
+        baseVid.src = 'videos_web_compressed/' + btn.dataset.baseline + '_' + example + '.mp4';
+        try { overlayVid.currentTime = 0; } catch (e) {}
+        baseVid.load();
+        var onReady = function () {
+          baseVid.removeEventListener('loadeddata', onReady);
+          try { baseVid.currentTime = 0; } catch (e) {}
+          try { overlayVid.currentTime = 0; } catch (e) {}
+          baseVid.play().catch(function () {});
+          overlayVid.play().catch(function () {});
+        };
+        baseVid.addEventListener('loadeddata', onReady);
+      });
+    });
+  });
+}
+
+window.addEventListener('load', function () {
+  initVidComparisons();
+  initBaselinePicker();
+});
+</script>
+</body>
+</html>
