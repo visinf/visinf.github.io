@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ReconSplat - PCD Viewer</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --panel2: #1e222b; --line: #2a2f3a;
+    --fg: #e6e9ef; --dim: #8b93a3; --accent: #6ea8fe; --warn: #ff7b72;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; height: 100vh; display: grid;
+         grid-template-columns: 230px 1fr 232px; grid-template-rows: 1fr 180px;
+         font: 13px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+         background: var(--bg); color: var(--fg); overflow: hidden; }
+  .panel { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; }
+  #sidebar { grid-column: 1; grid-row: 1 / 3; }
+  #stage   { grid-column: 2; grid-row: 1; position: relative; background: #0b0d11; overflow: hidden; }
+  #filmWrap { grid-column: 2; grid-row: 2; background: var(--panel);
+              border-top: 1px solid var(--line); display: flex; flex-direction: column;
+              overflow: hidden; }
+  #legend  { flex: none; display: flex; align-items: center; gap: 14px; padding: 5px 9px 0;
+             color: var(--dim); font-size: 11px; }
+  #legend .sw { display: inline-block; width: 11px; height: 11px; border-radius: 3px;
+                border: 2px solid var(--accent); vertical-align: -2px; margin-right: 5px; }
+  #film    { flex: 1; display: flex; align-items: center; padding: 4px 7px 7px;
+             overflow-x: auto; overflow-y: hidden; }
+  #filmInner { display: flex; gap: 5px; align-items: center; }
+  #player  { position: absolute; top: 10px; right: 10px; z-index: 5;
+             background: #0e1116e8; border: 1px solid var(--line); border-radius: 8px;
+             padding: 6px; cursor: pointer; transition: border-color .15s, transform .15s; }
+  #player:hover { border-color: var(--accent); transform: translateY(-1px); }
+  #player .pair { position: relative; display: flex; gap: 4px; }
+  #pvPlay  { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+             pointer-events: none; opacity: .82; transition: opacity .15s; }
+  #pvPlay span { width: 34px; height: 34px; border-radius: 50%; background: #000000a8;
+                 border: 1.5px solid #ffffffcc; color: #fff; font-size: 14px; line-height: 32px;
+                 text-align: center; padding-left: 3px; }
+  #player:hover #pvPlay { opacity: 1; }
+  #player.playing #pvPlay { opacity: 0; }
+  #pvHint  { text-align: center; color: var(--accent); font-size: 10px; margin-top: 4px;
+             letter-spacing: .02em; }
+  #player:hover { border-color: var(--accent); }
+  #player .pair { display: flex; gap: 4px; }
+  #player img { display: block; height: 96px; border-radius: 4px; background: #000; }
+  #player .cap { display: flex; justify-content: space-between; color: var(--dim);
+                 font-size: 10px; margin-top: 3px; }
+  #pvBar { height: 3px; background: var(--line); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+  #pvBar i { display: block; height: 100%; width: 0%; background: var(--accent); }
+  #right   { grid-column: 3; grid-row: 1 / 3; border-right: none;
+             border-left: 1px solid var(--line); padding: 11px; }
+  #cv { display: block; width: 100%; height: 100%; }
+  h2 { font-size: 10px; text-transform: uppercase; letter-spacing: .09em; color: var(--dim);
+       margin: 13px 11px 5px; font-weight: 600; }
+  #right h2:first-child { margin-top: 0; }
+  .scene { padding: 6px 11px; cursor: pointer; border-left: 3px solid transparent; font-size: 12px;
+           display: flex; justify-content: space-between; gap: 6px; }
+  .scene:hover { background: var(--panel2); }
+  .scene.sel { background: var(--panel2); border-left-color: var(--accent); }
+  .scene .id { font-family: ui-monospace, monospace; overflow: hidden; text-overflow: ellipsis;
+               white-space: nowrap; }
+  .scene .tag { color: var(--dim); font-size: 10px; flex: none; text-transform: uppercase; }
+  label { display: flex; justify-content: space-between; margin: 9px 0 3px;
+          color: var(--dim); font-size: 11px; }
+  label b { color: var(--fg); font-weight: 500; font-family: ui-monospace, monospace; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  select, button { background: var(--panel2); color: var(--fg); border: 1px solid var(--line);
+                   border-radius: 5px; padding: 5px 7px; font: inherit; font-size: 12px; width: 100%; }
+  button { cursor: pointer; } button:hover { border-color: var(--accent); }
+  .row { display: flex; gap: 5px; } .row > * { flex: 1; }
+  .btn2 { font-size: 11px; padding: 4px 5px; }
+  .chk { display: flex; align-items: center; gap: 6px; margin: 7px 0; color: var(--dim); }
+  .chk input { accent-color: var(--accent); }
+  #status { position: absolute; left: 10px; top: 10px; background: #000a; padding: 4px 8px;
+            border-radius: 5px; font-family: ui-monospace, monospace; font-size: 11px; }
+  #err { position: absolute; left: 10px; bottom: 10px; color: var(--warn); background: #000a;
+         padding: 5px 9px; border-radius: 5px; max-width: 70%; display: none; }
+  .thumb { flex: none; text-align: center; color: var(--dim); font-size: 10px; cursor: pointer; }
+  .thumb img { display: block; height: 68px; border-radius: 4px; border: 2px solid transparent;
+               margin-bottom: 2px; }
+  .thumb.ctx img { border-color: var(--accent); }
+  .thumb.off { opacity: .28; } .thumb.off img { filter: grayscale(1); }
+  .hint { color: var(--dim); font-size: 11px; margin: 7px 11px; }
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "https://unpkg.com/three@0.161.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.161.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+
+<script>
+  window.__booted = false;
+  window.addEventListener("error", (e) => {
+    const el = document.getElementById("err");
+    if (el) { el.style.display = "block"; el.textContent = "JS error: " + (e.message || e.error); }
+  });
+  setTimeout(() => {
+    if (window.__booted) return;
+    const el = document.getElementById("err");
+    if (el) { el.style.display = "block";
+      el.textContent = "Viewer did not start — three.js could not be loaded. Check the console."; }
+  }, 6000);
+</script>
+
+<div id="sidebar" class="panel">
+  <h2>Dataset</h2>
+  <div style="padding:0 11px"><select id="dsFilter"><option value="">ALL</option></select></div>
+  <h2>Scenes <span id="sceneCount" style="color:var(--dim)"></span></h2>
+  <div id="sceneList"></div>
+  <div class="hint">[ / ] previous / next</div>
+</div>
+
+<div id="stage">
+  <canvas id="cv"></canvas>
+  <div id="status">loading…</div>
+  <div id="player" title="click to replay">
+    <div class="pair">
+      <img id="pvC" alt="predicted color" /><img id="pvD" alt="predicted depth" />
+      <div id="pvPlay"><span>&#9654;</span></div>
+    </div>
+    <div class="cap"><span>color / depth</span><span id="pvFrame">—</span></div>
+    <div id="pvBar"><i id="pvFill"></i></div>
+    <div id="pvHint">click to replay</div>
+  </div>
+  <div id="err"></div>
+</div>
+
+<div id="right" class="panel">
+  <h2>Frames to unproject</h2>
+  <label>selected <b id="frameVal">all</b></label>
+  <div class="row">
+    <button class="btn2" id="selAll">all</button>
+    <button class="btn2" id="selNone">none</button>
+    <button class="btn2" id="selInv">invert</button>
+    <button class="btn2" id="selCtx">input</button>
+  </div>
+
+  <h2>Display</h2>
+  <label>point size <b id="psVal">5</b></label>
+  <input type="range" id="psSlider" min="0.2" max="16" step="0.1" value="5" />
+  <div class="chk"><input type="checkbox" id="constSize" /><span>constant point size</span></div>
+  <label>color by</label>
+  <select id="colorMode">
+    <option value="0" selected>predicted RGB</option>
+    <option value="1">depth</option>
+    <option value="2">frame index</option>
+  </select>
+  <div class="chk"><input type="checkbox" id="showCams" checked /><span>camera frustums
+    (<span style="color:#22d3ee">input</span> / <span style="color:#f87171">novel</span>)</span></div>
+  <div class="row" style="margin-top:8px"><button id="recenter">recenter view</button></div>
+</div>
+
+<div id="filmWrap">
+  <div id="legend">
+    <span><span class="sw"></span>input (context) views</span>
+    <span>click a frame to toggle it</span>
+    <span>shift-click to isolate one</span>
+  </div>
+  <div id="film"><div id="filmInner"></div></div>
+</div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
+import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
+import { LineMaterial } from "three/addons/lines/LineMaterial.js";
+
+const $ = (id) => document.getElementById(id);
+const state = { scenes: [], sel: null, geom: null, points: null, n: 0,
+                cams: null, camMat: null, frames: new Set(), radius: 1 };
+
+const renderer = new THREE.WebGLRenderer({ canvas: $("cv"), antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0d11);
+const camera = new THREE.PerspectiveCamera(55, 1, 0.01, 5000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+const uniforms = {
+  uPointSize: { value: 5 }, uSizeMode: { value: 0 }, uColorMode: { value: 0 },
+  uSceneScale: { value: 1 }, uNumFrames: { value: 50 },
+  uSel: { value: new Float32Array(64).fill(1) },
+  // matplotlib "Spectral", 32 stops
+  uCmap: { value: [[0.6196,0.0039,0.2588], [0.6873,0.0790,0.2748], [0.7549,0.1540,0.2908], [0.8226,0.2291,0.3068], [0.8710,0.2973,0.2960], [0.9092,0.3552,0.2812], [0.9473,0.4130,0.2664], [0.9652,0.4874,0.2904], [0.9776,0.5774,0.3319], [0.9887,0.6574,0.3689], [0.9930,0.7246,0.4159], [0.9942,0.7862,0.4676], [0.9956,0.8554,0.5257], [0.9968,0.9023,0.5851], [0.9981,0.9404,0.6491], [0.9993,0.9785,0.7130], [0.9827,0.9931,0.7220], [0.9519,0.9808,0.6740], [0.9212,0.9685,0.6261], [0.8747,0.9497,0.6016], [0.7931,0.9165,0.6182], [0.7205,0.8870,0.6330], [0.6441,0.8563,0.6435], [0.5592,0.8231,0.6448], [0.4637,0.7857,0.6461], [0.3840,0.7429,0.6544], [0.3200,0.6716,0.6840], [0.2561,0.6002,0.7135], [0.2062,0.5202,0.7349], [0.2604,0.4501,0.7017], [0.3145,0.3799,0.6685], [0.3686,0.3098,0.6353]].map((c) => new THREE.Vector3(...c)) },
+};
+
+const material = new THREE.ShaderMaterial({
+  uniforms,
+  vertexShader: `
+    uniform float uPointSize, uSizeMode, uSceneScale, uNumFrames;
+    uniform float uSel[64];
+    uniform int uColorMode;
+    const int N_CMAP = 32;
+    uniform vec3 uCmap[32];
+    attribute vec3 aColor; attribute float aFrame; attribute float aDepth;
+    varying vec3 vColor; varying float vDrop;
+    // Depth uses SPECTRAL, matching the depth images exactly. model_wrapper.py imports
+    // render_depth_map_percentile AS render_depth_map, and that variant is cmap="Spectral" with
+    // 5th/95th-percentile clipping -- NOT the magma min/max render_depth_map the name suggests.
+    // Confirmed against the saved PNGs: mean distance to the Spectral LUT 0.003, magma 0.202.
+    // The hue ramp below stays for the frame-index mode, which encodes identity rather than depth.
+    vec3 spectral(float t) {
+      t = clamp(t, 0.0, 1.0) * float(N_CMAP - 1);
+      int i = int(floor(t));
+      int j = min(i + 1, N_CMAP - 1);
+      return mix(uCmap[i], uCmap[j], t - float(i));
+    }
+    vec3 ramp(float t) {
+      t = clamp(t, 0.0, 1.0);
+      return vec3(0.28 + 0.72*t, 0.32 + 0.45*sin(3.14159*t), 0.95 - 0.7*t);
+    }
+    void main() {
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * mv;
+      vDrop = uSel[int(aFrame + 0.5)] < 0.5 ? 1.0 : 0.0;
+      gl_PointSize = vDrop > 0.5 ? 0.0
+                   : (uSizeMode > 0.5 ? clamp(uPointSize, 1.0, 64.0)
+                      : clamp(uPointSize * uSceneScale / max(-mv.z, 1e-3), 1.0, 24.0));
+      if (vDrop > 0.5) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      if (uColorMode == 1)      vColor = spectral(aDepth);
+      else if (uColorMode == 2) vColor = ramp(aFrame / max(uNumFrames - 1.0, 1.0));
+      else                      vColor = aColor;
+    }`,
+  fragmentShader: `
+    varying vec3 vColor; varying float vDrop;
+    void main() {
+      if (vDrop > 0.5) discard;
+      vec2 d = gl_PointCoord - vec2(0.5);
+      if (dot(d, d) > 0.25) discard;
+      gl_FragColor = vec4(vColor, 1.0);
+    }`,
+});
+
+function resize() {
+  const s = $("stage");
+  renderer.setSize(s.clientWidth, s.clientHeight, false);
+  camera.aspect = s.clientWidth / Math.max(s.clientHeight, 1);
+  camera.updateProjectionMatrix();
+  if (state.camMat) state.camMat.resolution.set(renderer.domElement.width, renderer.domElement.height);
+}
+addEventListener("resize", resize);
+(function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+
+const showErr = (m) => { const e = $("err"); e.textContent = m; e.style.display = m ? "block" : "none"; };
+
+// ---------------------------------------------------------------------------------------------
+// Manifest + scene list
+// ---------------------------------------------------------------------------------------------
+async function boot() {
+  let j;
+  try { j = await (await fetch("index.json")).json(); }
+  catch (e) { return showErr("index.json not found next to this page — run export_pcd_web.py first."); }
+  state.scenes = j.scenes || [];
+  [...new Set(state.scenes.map((s) => s.dataset))].forEach((d) => $("dsFilter").add(new Option(d.toUpperCase(), d)));
+  renderList();
+  if (state.scenes.length) selectScene(visible()[0]);
+  else showErr("index.json contains no scenes.");
+}
+
+const visible = () => state.scenes.filter((s) => !$("dsFilter").value || s.dataset === $("dsFilter").value);
+
+function renderList() {
+  const list = $("sceneList"); list.innerHTML = "";
+  const shown = visible();
+  $("sceneCount").textContent = `(${shown.length})`;
+  shown.forEach((s) => {
+    const el = document.createElement("div");
+    el.className = "scene" + (state.sel && state.sel.id === s.id ? " sel" : "");
+    el.innerHTML = `<span class="id">${s.scene.slice(0, 16)}</span><span class="tag">${s.dataset}</span>`;
+    el.onclick = () => selectScene(s);
+    list.appendChild(el);
+  });
+}
+$("dsFilter").onchange = renderList;
+
+// ---------------------------------------------------------------------------------------------
+// Loading a "baked" cloud
+// ---------------------------------------------------------------------------------------------
+async function selectScene(s) {
+  if (!s) return;
+  state.sel = s; renderList(); showErr("");
+  $("status").textContent = `loading ${s.scene.slice(0, 16)}…`;
+
+  let buf;
+  try { buf = await (await fetch(s.cloud)).arrayBuffer(); }
+  catch (e) { return showErr(`could not fetch ${s.cloud}`); }
+
+  // Layout written by export_pcd_web.py. Float XYZ first so the uint16 frame array stays aligned.
+  const dv = new DataView(buf);
+  if (String.fromCharCode(...new Uint8Array(buf, 0, 4)) !== "PCDW") return showErr("bad cloud header");
+  const n = dv.getUint32(4, true), nFrames = dv.getUint32(8, true);
+  let o = 12;
+  const pos = new Float32Array(buf, o, n * 3); o += n * 12;
+  const frame = new Uint16Array(buf, o, n);    o += n * 2;
+  const rgb = new Uint8Array(buf, o, n * 3);   o += n * 3;
+  const dep = new Uint8Array(buf, o, n);
+
+  const col = new Float32Array(n * 3), fFrame = new Float32Array(n), fDep = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    col[i*3] = rgb[i*3] / 255; col[i*3+1] = rgb[i*3+1] / 255; col[i*3+2] = rgb[i*3+2] / 255;
+    fFrame[i] = frame[i]; fDep[i] = dep[i] / 255;
+  }
+
+  if (state.points) { scene.remove(state.points); state.geom.dispose(); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  g.setAttribute("aColor", new THREE.BufferAttribute(col, 3));
+  g.setAttribute("aFrame", new THREE.BufferAttribute(fFrame, 1));
+  g.setAttribute("aDepth", new THREE.BufferAttribute(fDep, 1));
+  state.geom = g; state.n = n;
+  state.points = new THREE.Points(g, material);
+  state.points.frustumCulled = false;      // point size is computed per-vertex; let the GPU decide
+  scene.add(state.points);
+
+  uniforms.uNumFrames.value = Math.max(nFrames, 1);
+  state.frames = new Set(s.frames);
+  buildFilmstrip();
+  preloadPreviews(s);
+  applySelection();
+  recenter();          // frame the complete cloud before animating, or the camera would fit frame 0
+  playAnim();
+  $("status").textContent =
+    `${s.scene.slice(0, 16)} · ${n.toLocaleString()} pts · ${s.frames.length}/${nFrames} frames`;
+}
+
+// Frame the cloud on its selected points only, using a robust radius.
+function recenter() {
+  if (!state.geom) return;
+  const p = state.geom.getAttribute("position").array;
+  const f = state.geom.getAttribute("aFrame").array;
+  const step = Math.max(1, Math.floor(state.n / 20000));
+  const pts = []; const c = new THREE.Vector3();
+  for (let i = 0; i < state.n; i += step) {
+    if (!state.frames.has(f[i])) continue;
+    const v = new THREE.Vector3(p[i*3], p[i*3+1], p[i*3+2]);
+    pts.push(v); c.add(v);
+  }
+  if (!pts.length) return;
+  c.divideScalar(pts.length);
+  const ds = pts.map((v) => v.distanceTo(c)).sort((a, b) => a - b);
+  const r = Math.max(ds[Math.floor(ds.length * 0.9)] || 1, 0.05);
+  state.radius = r; uniforms.uSceneScale.value = r;
+  controls.target.copy(c);
+  camera.position.copy(c).add(new THREE.Vector3(r * 1.6, r * 0.9, r * 1.6));
+  camera.near = r / 500; camera.far = r * 200;
+  camera.updateProjectionMatrix(); controls.update();
+}
+$("recenter").onclick = recenter;
+
+// ---------------------------------------------------------------------------------------------
+// Frustums, from the baked camera centres + per-frame bases
+// ---------------------------------------------------------------------------------------------
+const CTX_COLOR = [0.13, 0.83, 0.93], TGT_COLOR = [0.97, 0.44, 0.44];
+const FRUSTUM_SCALE = 0.05;
+const FRUSTUM_WIDTH = 3.5;
+
+function buildFrustums() {
+  if (state.cams) {
+    scene.remove(state.cams); state.cams.geometry.dispose();
+    if (state.camMat) { state.camMat.dispose(); state.camMat = null; }
+    state.cams = null;
+  }
+  const s = state.sel;
+  if (!s || !$("showCams").checked || !s.cam_basis) return;
+  const L = state.radius * FRUSTUM_SCALE;
+  const W = s.width, H = s.height, ctx = new Set(s.context_frames);
+  const pos = [], col = [];
+  const push = (p, q, c) => { pos.push(...p, ...q); col.push(...c, ...c); };
+
+  s.cam_basis.forEach((B, fi) => {
+    if (!state.frames.has(fi)) return;
+    const K = s.intrinsics[fi];
+    const fx = K[0][0] * W, fy = K[1][1] * H, cx = K[0][2] * W, cy = K[1][2] * H;
+    const o = s.cameras[fi];
+    const corner = (u, v) => {
+      const d = [(u - cx) / fx, (v - cy) / fy, 1];
+      const w = [0, 1, 2].map((r) => B[r][0]*d[0] + B[r][1]*d[1] + B[r][2]*d[2]);
+      const nn = Math.hypot(...w) || 1;
+      return [0, 1, 2].map((k) => o[k] + (w[k] / nn) * L);
+    };
+    const c = ctx.has(fi) ? CTX_COLOR : TGT_COLOR;
+    const q = [corner(0, 0), corner(W, 0), corner(W, H), corner(0, H)];
+    q.forEach((k) => push(o, k, c));
+    for (let i = 0; i < 4; i++) push(q[i], q[(i + 1) % 4], c);
+  });
+  if (!pos.length) return;
+
+  const g = new LineSegmentsGeometry();
+  g.setPositions(pos); g.setColors(col);
+  const mat = new LineMaterial({ vertexColors: true, worldUnits: false,
+                                 linewidth: FRUSTUM_WIDTH });
+  mat.resolution.set(renderer.domElement.width, renderer.domElement.height);
+  state.camMat = mat;
+  state.cams = new LineSegments2(g, mat);
+  state.cams.frustumCulled = false;
+  scene.add(state.cams);
+}
+$("showCams").onchange = buildFrustums;
+
+// ---------------------------------------------------------------------------------------------
+// Frame selection
+// ---------------------------------------------------------------------------------------------
+function applySelection() {
+  const s = state.sel; if (!s) return;
+  const m = uniforms.uSel.value;
+  for (let i = 0; i < 64; i++) m[i] = state.frames.has(i) ? 1 : 0;
+  $("frameVal").textContent = state.frames.size === s.frames.length ? "all"
+    : state.frames.size === 0 ? "none" : `${state.frames.size} / ${s.frames.length}`;
+  document.querySelectorAll("#film .thumb").forEach((el) => {
+    el.classList.toggle("off", !state.frames.has(parseInt(el.dataset.f)));
+  });
+  buildFrustums();
+}
+const setFrames = (pred) => {
+  stopAnim();
+  state.frames = new Set(state.sel.frames.filter(pred));
+  applySelection();
+};
+$("selAll").onclick  = () => setFrames(() => true);
+$("selNone").onclick = () => setFrames(() => false);
+$("selInv").onclick  = () => { stopAnim(); const old = state.frames;
+  state.frames = new Set(state.sel.frames.filter((i) => !old.has(i))); applySelection(); };
+$("selCtx").onclick  = () => { const c = new Set(state.sel.context_frames);
+  setFrames((i) => c.has(i)); };
+
+const thumbOf = (s, fi) => s.thumbs[fi] || s.thumbs[String(fi)] || {};
+
+function buildFilmstrip() {
+  const f = $("filmInner"), s = state.sel; f.innerHTML = "";
+  const ctx = new Set(s.context_frames);
+  s.frames.forEach((fi) => {
+    const t = thumbOf(s, fi);
+    if (!t.c && !t.d) return;
+    const el = document.createElement("div");
+    el.className = "thumb" + (ctx.has(fi) ? " ctx" : "");
+    el.dataset.f = fi;
+    el.innerHTML =
+      (t.c ? `<img loading="lazy" src="${t.c}" />` : "") +
+      (t.d ? `<img loading="lazy" src="${t.d}" />` : "") +
+      `<span>${s.target_index[fi]}${ctx.has(fi) ? " in" : ""}</span>`;
+    el.onclick = (ev) => {
+      stopAnim();                        // manual interaction wins over the running animation
+      if (ev.shiftKey) state.frames = new Set([fi]);
+      else if (state.frames.has(fi)) state.frames.delete(fi);
+      else state.frames.add(fi);
+      applySelection();
+    };
+    f.appendChild(el);
+  });
+}
+
+// ---------------------------------------------------------------------------------------------
+// Flipbook player + progressive unprojection
+// ---------------------------------------------------------------------------------------------
+const ANIM_FPS = 14;
+let animTimer = null;
+
+function stopAnim() {
+  if (animTimer) { clearInterval(animTimer); animTimer = null; }
+  $("player").classList.remove("playing");
+}
+
+function showPreview(fi) {
+  const t = thumbOf(state.sel, fi);
+  if (t.c) $("pvC").src = t.c;
+  if (t.d) $("pvD").src = t.d;
+  $("pvFrame").textContent = state.sel.target_index[fi];
+}
+
+function setProgress(x) { $("pvFill").style.width = `${Math.round(100 * x)}%`; }
+
+// Warm the browser cache so the flipbook does not stutter on its first pass.
+function preloadPreviews(s) {
+  s.frames.forEach((fi) => {
+    const t = thumbOf(s, fi);
+    [t.c, t.d].forEach((u) => { if (u) { const im = new Image(); im.src = u; } });
+  });
+}
+
+function playAnim() {
+  const s = state.sel;
+  if (!s || !s.frames.length) return;
+  stopAnim();
+  $("player").classList.add("playing");
+  let k = 0;
+  state.frames = new Set();
+  applySelection();
+  setProgress(0);
+  animTimer = setInterval(() => {
+    if (k >= s.frames.length) {          // settle on the full cloud
+      stopAnim();
+      state.frames = new Set(s.frames);
+      applySelection();
+      setProgress(1);
+      return;
+    }
+    const fi = s.frames[k];
+    state.frames.add(fi);
+    showPreview(fi);
+    setProgress((k + 1) / s.frames.length);
+    applySelection();
+    k++;
+  }, Math.max(1000 / ANIM_FPS, 16));
+}
+$("player").onclick = playAnim;
+
+$("psSlider").oninput = (e) => {
+  uniforms.uPointSize.value = parseFloat(e.target.value);
+  $("psVal").textContent = parseFloat(e.target.value).toFixed(1);
+};
+$("constSize").onchange = (e) => { uniforms.uSizeMode.value = e.target.checked ? 1 : 0; };
+$("colorMode").onchange = (e) => { uniforms.uColorMode.value = parseInt(e.target.value); };
+
+addEventListener("keydown", (e) => {
+  const shown = visible();
+  const i = shown.findIndex((s) => state.sel && s.id === state.sel.id);
+  if (e.key === "[" && i > 0) selectScene(shown[i - 1]);
+  if (e.key === "]" && i < shown.length - 1) selectScene(shown[i + 1]);
+});
+
+resize();
+boot();
+window.__booted = true;
+</script>
+</body>
+</html>

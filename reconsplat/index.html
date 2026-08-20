@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="ReconSplat: a feed-forward 3D Gaussian Splatting + multi-view latent diffusion model that jointly reconstructs geometrically consistent novel views and depth, even for unobserved, extrapolated viewpoints.">
+  <meta name="keywords" content="3D Reconstruction, Novel View Synthesis, Generative Modeling, Gaussian Splatting, ReconSplat, ECCV 2026">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReconSplat: Generalizable 3D Scene Reconstruction beyond Observed Views</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/katex.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.ico" type="image/x-icon">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script defer src="./static/js/katex.min.js"></script>
+  <script defer src="./static/js/katex-auto-render.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-end">
+      <a class="navbar-item" href="https://github.com/visinf/reconsplat">
+        <span class="icon"><i class="fab fa-github"></i></span>
+        <span>Code</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <!-- <span class="tag is-medium venue-badge">ECCV 2026</span> -->
+          <h1 class="title is-1 publication-title"><span class="reconsplat">ReconSplat</span></h1>
+          <h2 class="subtitle is-4 publication-subtitle">Generalizable 3D Scene Reconstruction Beyond Observed Views</h2>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/visinf_team_details_147200.en.jsp">Giuseppe Stracquadanio</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://kevinyitshak.github.io/">Kevin Raj</a><sup>1,2</sup>,</span>
+            <span class="author-block"><a href="https://gejulia.github.io/">Julia Grabinski</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/stefan_roth.en.jsp">Stefan Roth</a><sup>1,2,3</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>TU Darmstadt,</span>
+            <span class="author-block"><sup>2</sup>Zuse School ELIZA,</span>
+            <span class="author-block"><sup>3</sup>hessian.AI</span>
+          </div>
+
+          <p class="has-text-weight-semibold is-size-4">ECCV 2026</p>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a class="button is-normal is-rounded is-dark" disabled>
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper (coming soon)</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a class="button is-normal is-rounded is-dark" disabled>
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code (coming soon)</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section teaser-section">
+  <div class="container is-max-desktop">
+    <div class="section-heading">
+      <p class="section-eyebrow">TL;DR</p>
+      <h2 class="title is-3">Plausible Appearance <em>and</em> Accurate Geometry, <em>jointly</em></h2>
+    </div>
+    <div class="content has-text-justified">
+      <p>
+        Previous generative approaches can synthesize plausible appearance in unobserved regions, but the newly generated content is not accompanied by equally plausible and consistent geometry. 
+        As a result, methods such as MVSplat360 and latentSplat often produce visually convincing novel views while yielding noisy or fragmented depth. 
+        Conversely, regression-based methods such as DepthSplat recover reliable geometry from observed evidence, but cannot generate missing scene content beyond the input views.
+        <br><br>
+        <span class="reconsplat">ReconSplat</span> closes this gap by making both appearance and geometry generative. 
+        It represents the observed scene with a multi-view-consistent variational 3DGS latent field and uses these latents to guide a multi-view diffusion model that jointly refines observed evidence and completes unobserved RGB and depth. 
+        This yields photorealistic novel views together with sharp, consistent geometry across views and modalities.
+      </p>
+    </div>
+    <div class="teaser-row">
+      <div class="teaser-col">
+      <h3 class="dataset-label">DL3DV-10K</h3>
+      <div class="table-container">
+        <table class="table is-narrow is-fullwidth compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th colspan="2">Novel View 1</th>
+              <th colspan="2">Novel View 2</th>
+            </tr>
+            <tr>
+              <th></th><th>Color</th><th>Depth</th><th>Color</th><th>Depth</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="ours-row">
+              <td><span class="vlabel"><span class="reconsplat">ReconSplat</span> <em>(Ours)</em></span></td>
+              <td><img src="static/images/teaser/dl3dv/crop_ours_c_000192.png" alt="ReconSplat color, view 1"></td>
+              <td><img src="static/images/teaser/dl3dv/crop_ours_d_000192.png" alt="ReconSplat depth, view 1"></td>
+              <td><img src="static/images/teaser/dl3dv/crop_ours_c_000229.png" alt="ReconSplat color, view 2"></td>
+              <td><img src="static/images/teaser/dl3dv/crop_ours_d_000229.png" alt="ReconSplat depth, view 2"></td>
+            </tr>
+            <tr>
+              <td><span class="vlabel">MVSplat360</span></td>
+              <td><img src="static/images/teaser/dl3dv/crop_360_c_000192.png" alt="MVSplat360 color, view 1"></td>
+              <td><img src="static/images/teaser/dl3dv/crop_360_d_000192.png" alt="MVSplat360 depth, view 1"></td>
+              <td><img src="static/images/teaser/dl3dv/crop_360_c_000229.png" alt="MVSplat360 color, view 2"></td>
+              <td><img src="static/images/teaser/dl3dv/crop_360_d_000229.png" alt="MVSplat360 depth, view 2"></td>
+            </tr>
+            <tr>
+              <td><span class="vlabel">DepthSplat</span></td>
+              <td><img src="static/images/teaser/dl3dv/crop_ds_c_000192.png" alt="DepthSplat color, view 1"></td>
+              <td><img src="static/images/teaser/dl3dv/crop_ds_d_000192.png" alt="DepthSplat depth, view 1"></td>
+              <td><img src="static/images/teaser/dl3dv/crop_ds_c_000229.png" alt="DepthSplat color, view 2"></td>
+              <td><img src="static/images/teaser/dl3dv/crop_ds_d_000229.png" alt="DepthSplat depth, view 2"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+      <div class="teaser-col">
+      <h3 class="dataset-label">RealEstate10K</h3>
+      <div class="table-container">
+        <table class="table is-narrow is-fullwidth compare-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th colspan="2">Novel View 1</th>
+              <th colspan="2">Novel View 2</th>
+            </tr>
+            <tr>
+              <th></th><th>Color</th><th>Depth</th><th>Color</th><th>Depth</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="ours-row">
+              <td><span class="vlabel"><span class="reconsplat">ReconSplat</span> <em>(Ours)</em></span></td>
+              <td><img src="static/images/teaser/re10k/ours_c_000056.png" alt="ReconSplat color, view 1"></td>
+              <td><img src="static/images/teaser/re10k/ours_d_000056.png" alt="ReconSplat depth, view 1"></td>
+              <td><img src="static/images/teaser/re10k/ours_c_000082.png" alt="ReconSplat color, view 2"></td>
+              <td><img src="static/images/teaser/re10k/ours_d_000082.png" alt="ReconSplat depth, view 2"></td>
+            </tr>
+            <tr>
+              <td><span class="vlabel">latentSplat</span></td>
+              <td><img src="static/images/teaser/re10k/ls_c_000056.png" alt="latentSplat color, view 1"></td>
+              <td><img src="static/images/teaser/re10k/ls_d_000056.png" alt="latentSplat depth, view 1"></td>
+              <td><img src="static/images/teaser/re10k/ls_c_000082.png" alt="latentSplat color, view 2"></td>
+              <td><img src="static/images/teaser/re10k/ls_d_000082.png" alt="latentSplat depth, view 2"></td>
+            </tr>
+            <tr>
+              <td><span class="vlabel">DepthSplat</span></td>
+              <td><img src="static/images/teaser/re10k/ds_c_000056.png" alt="DepthSplat color, view 1"></td>
+              <td><img src="static/images/teaser/re10k/ds_d_000056.png" alt="DepthSplat depth, view 1"></td>
+              <td><img src="static/images/teaser/re10k/ds_c_000082.png" alt="DepthSplat color, view 2"></td>
+              <td><img src="static/images/teaser/re10k/ds_d_000082.png" alt="DepthSplat depth, view 2"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <div class="section-heading">
+          <p class="section-eyebrow">Overview</p>
+          <h2 class="title is-3">Abstract</h2>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            We introduce <span class="reconsplat">ReconSplat</span>, a feed-forward model for 3D scene
+            reconstruction that aims to address the longstanding trade-off between plausible view
+            generation for unobserved regions and geometric consistency, providing both geometrically
+            aligned novel views and sharp depth estimates.
+          </p>
+          <p>
+            Our approach builds on 3D Gaussian splatting (3DGS) as an intermediate differentiable scene
+            representation and integrates it with a multi-view latent diffusion model (MV-LDM) trained to
+            act simultaneously as a <em>refiner</em> and an <em>inpainter</em> for appearance and scene
+            geometry. We enforce geometric consistency by guiding the diffusion process with variational
+            3D latent features for appearance and geometry, encoded by the feed-forward 3DGS
+            representation and rasterized to 2D latent space.
+          </p>
+          <p>
+            <span class="reconsplat">ReconSplat</span> produces both photorealistic novel views and
+            accurate depth maps on real-world benchmarks, RealEstate10K and DL3DV-10K, outperforming
+            existing methods in challenging extrapolation setups. Notably, <span class="reconsplat">ReconSplat</span>
+            allows the extrapolation of unseen and challenging viewpoints jointly with coherent and precise
+            scene geometry.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <div class="section-heading">
+          <p class="section-eyebrow">Approach</p>
+          <h2 class="title is-3">Method</h2>
+        </div>
+        <img src="static/images/method/architecture.png"
+             class="method-figure"
+             alt="ReconSplat architecture overview: a two-stage pipeline combining a feed-forward 3DGS encoder with a multi-view latent diffusion model.">
+        <div class="content has-text-justified">
+          <p>
+            <strong>Overview of <span class="reconsplat">ReconSplat</span>.</strong>
+            From $N$ sparse context views $\mathcal{I}^c = \{\mathbf{I}^c_i\}_{i=1}^{N}$, we regress a
+            3DGS representation $\mathcal{G}$ encoding variational appearance and geometry latent fields.
+            Given target viewpoints $\mathcal{P}^{\odot}$, we rasterize these variational distributions
+            from 3D into 2D, $\mathcal{R}(\mathcal{G} \mid \mathcal{P}^{\odot})$, and sample preliminary
+            2D latents $\tilde{\mathcal{Z}}^{\odot}$. A multi-view diffusion model then refines these
+            latents into target latents $\mathcal{Z}^{\odot}$, conditioned on the context views
+            $\mathcal{I}^c$, yielding high-quality novel views and depth maps.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Interactive point-cloud viewer, embedded as an iframe.-->
+<section class="section" id="pointclouds">
+  <div class="container is-max-widescreen">
+    <div class="section-heading">
+      <p class="section-eyebrow">Explore</p>
+      <h2 class="title is-3">Point Clouds</h2>
+    </div>
+    <p class="panel-intro">
+      Unprojected color <em>and</em> depth predictions, as 3D point clouds you can
+      orbit. <strong>Pick a scene on the left</strong>, and optionally toggle individual frames in the strip
+      below. Blue borders mark the model's input views.
+    </p>
+    <div class="pcd-embed">
+      <iframe src="static/pcd/index.html" loading="lazy" title="ReconSplat interactive point-cloud viewer"
+              allowfullscreen></iframe>
+    </div>
+    <p class="pcd-fallback">
+     You can also <a href="static/pcd/index.html" target="_blank" rel="noopener">open the viewer in a new tab</a>.
+    </p>
+  </div>
+</section>
+
+<section class="section" id="videos">
+  <div class="container is-max-widescreen">
+    <div class="section-heading">
+      <p class="section-eyebrow">Trajectory NVS</p>
+      <h2 class="title is-3">Video Comparisons</h2>
+    </div>
+    <div class="content has-text-justified">
+      <p>
+        Novel views rendered along dense camera trajectories, with color on top and the corresponding
+        depth below. Drag the divider in any tile to wipe between
+        <span class="reconsplat">ReconSplat</span> and the selected baseline: one divider controls
+        both the color and the depth view, so appearance and geometry are always compared at the same
+        camera pose. Use the arrows to step through the scenes and the buttons on top to select the highlighted baseline.
+      </p>
+    </div>
+
+    <h3 class="dataset-label">DL3DV-10K <span class="dataset-meta">35 scenes</span></h3>
+      <div class="baseline-switch vswitch">
+        <button type="button" class="baseline-switch-option" data-method="depthsplat">DepthSplat</button>
+        <button type="button" class="baseline-switch-option is-active" data-method="mvsplat360">MVSplat360</button>
+        <button type="button" class="baseline-switch-option" data-method="latentsplat">latentSplat</button>
+      </div>
+    <div class="vgrid is-compact" style="--min-tile: 200px" data-ar="448 / 256" data-method="mvsplat360"
+         data-window="5"
+         data-scenes='[{"id":"1de58be515696102c364b767f296600ffff853d4145a60dd30ece9d935317654","dir":"static/videos/dl3dv"},{"id":"26fd23358fa11fff0fb3180ef0b65591b486e20dcf753ce4a7aae49a37e370c7","dir":"static/videos/dl3dv"},{"id":"286239bd0d4436b747987c40f8cbfc0675bb69435d4ab19a3f73b9d816d0c09a","dir":"static/videos/dl3dv"},{"id":"2cbfe28643b6636f9c70813cae7625aa858a352109493ac70fb429ce94dd55b3","dir":"static/videos/dl3dv"},{"id":"2beaca318994c25409dcbb6d0bdd96c3620f2f18aec44ea3f20edd302f18ca78","dir":"static/videos/dl3dv"},{"id":"341b4ff3dfd3d377d7167bd81f443bedafbff003bf04881b99760fc0aeb69510","dir":"static/videos/dl3dv"},{"id":"35872363e17af5d173b6a0b09fcf5de94627ad5dc5f8a9ad4c579f3e70b4797a","dir":"static/videos/dl3dv"},{"id":"374ffd0c5ff8e544f588f1da3ce0d5b69dc39ff3af95d7ccec480fe5e533c45e","dir":"static/videos/dl3dv"},{"id":"444da1b4a3f1ca019d4c9c1b405a579427746ccc96cab6dab7dcba5cb4fc998c","dir":"static/videos/dl3dv"},{"id":"513e4ea2e8477b06f2b32417d5c243aec71d491cb0596a60e9fe304c635f20a1","dir":"static/videos/dl3dv"},{"id":"56452d9cd9e2e034764132a57058517ab085e1352f9664d2d1e10e98741334fc","dir":"static/videos/dl3dv"},{"id":"565553aa894be621e8b4773cac288e60ad0c2cf7edb621be62b348c9a0f78380","dir":"static/videos/dl3dv"},{"id":"54bf355ca7e08ed1bc86f5772e564ac0f92981ca25dab24d86b694e915fc4c43","dir":"static/videos/dl3dv"},{"id":"5c3af581028068a3c402c7cbe16ecf9471ddf2897c34ab634b7b1b6cf81aba00","dir":"static/videos/dl3dv"},{"id":"5f0041e53d59d67c3ca25db97b269db183a532c4566a6bc46ca0e69cfa4234ad","dir":"static/videos/dl3dv"},{"id":"71b2dc8a2aa553da09b8b94b9f0d5e8abcca307def74d26301616ee238464d46","dir":"static/videos/dl3dv"},{"id":"8324b3ca22085040c2a0ecb7284e0cdf776b1f846b73a7c0df893587cb4a45f8","dir":"static/videos/dl3dv"},{"id":"8cb2e97d26a639f05a571476240a8fa86988e6853f0f13cc05830d1578002aad","dir":"static/videos/dl3dv"},{"id":"9e9a89ae6fed06d6e2f4749b4b0059f35ca97f848cedc4a14345999e746f7884","dir":"static/videos/dl3dv"},{"id":"9fb0588ff045ec64119c5bc91b44a4b7400e5fae5a17e67762b29e6855b57118","dir":"static/videos/dl3dv"},{"id":"a17a984ca90a9b5840fdf85b15104b0d18e25975981c1aa90fcdfd6eeeb285f3","dir":"static/videos/dl3dv"},{"id":"a62f9a1c6362e7c8a3440261ea0921a0a4b60cf5822bd19579836694f26b3abd","dir":"static/videos/dl3dv"},{"id":"a726c1112ad026efc92f59f196c0698e67abd12a04135a7ff6349b1d31b089eb","dir":"static/videos/dl3dv"},{"id":"b3bf9079b442c681749f6bd95cfb0659c6d844f2228b2f4fa4b602a0e3627b9a","dir":"static/videos/dl3dv"},{"id":"b92b499c9bf92327d5f3a44c9db49bde3400dcb1cfec48d6488831e2b304d0bb","dir":"static/videos/dl3dv"},{"id":"cc08c0bdc34ddd2867705d0b17a86ec2a9d7c7926ce99070ed1fdc66a812de07","dir":"static/videos/dl3dv"},{"id":"d3812aad538261e7f73c75762ff55f23b468bcc76f376d52ac86ca6cf3c44b4b","dir":"static/videos/dl3dv"},{"id":"dac9796dd69e1c25277e29d7e30af4f21e3b575d62a0a208c2b3d1211e2d5d77","dir":"static/videos/dl3dv"},{"id":"df04f58064684c1a31aa0ffbbcf34199d01d0a0ff289588eb2d6c6cf50a3922c","dir":"static/videos/dl3dv"},{"id":"df29c225863d0173e060b1f3fde4e6eb5a57a4e4edabd397026ba1a028aeb39e","dir":"static/videos/dl3dv"},{"id":"e9360e7a89bee835dc847cf8796093e634b759ff582558788dcfe8326f6e8901","dir":"static/videos/dl3dv"},{"id":"e8ce51b6abfe05bf8dca47e29c8be6c1e6de27a8c9fece7a121400b931b2ca0f","dir":"static/videos/dl3dv"},{"id":"ec305787b70029b782c71c1bf296c3885c7c22619e5661bd40085533ddfee5e4","dir":"static/videos/dl3dv"},{"id":"ec1e44d4dc0f8fa77610866495f9297a7f82158c43e1777668b84fd4b736c7bc","dir":"static/videos/dl3dv"},{"id":"f004c810d94bac93f527606a2ff859d646f99fcac0868c6c6905b29c718fa37b","dir":"static/videos/dl3dv"}]'></div>
+
+    <h3 class="dataset-label">RealEstate10K <span class="dataset-meta">12 scenes</span></h3>
+      <div class="baseline-switch vswitch">
+        <button type="button" class="baseline-switch-option" data-method="depthsplat">DepthSplat</button>
+        <button type="button" class="baseline-switch-option is-active" data-method="mvsplat360">MVSplat360</button>
+        <button type="button" class="baseline-switch-option" data-method="latentsplat">latentSplat</button>
+      </div>
+    <div class="vgrid is-compact" style="--min-tile: 160px" data-ar="1 / 1" data-method="mvsplat360"
+         data-window="6"
+         data-scenes='[{"id":"92836b807c80435b","dir":"static/videos/re10k"},{"id":"d069fcb4a4c1e9eb","dir":"static/videos/re10k"},{"id":"7157ac7d5d3f39dd","dir":"static/videos/re10k"},{"id":"70919fa802cc8193","dir":"static/videos/re10k"},{"id":"857500a0287b787f","dir":"static/videos/re10k"},{"id":"ab3d616a3d001515","dir":"static/videos/re10k"},{"id":"b00a2bc609d0ac6e","dir":"static/videos/re10k"},{"id":"b7a740bab983da12","dir":"static/videos/re10k"},{"id":"c97a79c1bcf51705","dir":"static/videos/re10k"},{"id":"dbb340f63c6ae50b","dir":"static/videos/re10k"},{"id":"e76f1912e6e1d50f","dir":"static/videos/re10k"},{"id":"ff887646981745a6","dir":"static/videos/re10k"}]'></div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="section-heading">
+      <p class="section-eyebrow">Set NVS</p>
+      <h2 class="title is-3">Qualitative Results</h2>
+    </div>
+    <div class="content has-text-justified">
+      <p>
+        Each example shows the sparse input views alongside the ground-truth target and the novel-view color/depth
+        renderings produced by <span class="reconsplat">ReconSplat</span> and by each baseline. Additional
+        results on dense camera trajectories, rendered as videos, can be found above.
+      </p>  
+    </div>
+
+    <h3 class="dataset-label">DL3DV-10K <span class="dataset-meta">256&times;448</span></h3>
+    <div class="qual-tabs">
+      <div class="qual-tablist" role="tablist" aria-label="DL3DV-10K qualitative comparisons">
+        <button type="button" class="qual-tab is-active" role="tab"
+                id="qt-dl3dv-all" aria-controls="qp-dl3dv-all"
+                aria-selected="true">All baselines
+          <span class="qual-tab-badge">Interactive</span></button>
+        <button type="button" class="qual-tab" role="tab"
+                id="qt-dl3dv-scenes" aria-controls="qp-dl3dv-scenes"
+                aria-selected="false" tabindex="-1">More scenes
+          <span class="qual-tab-badge">Interactive</span></button>
+      </div>
+
+      <div class="qual-panel" role="tabpanel" id="qp-dl3dv-all"
+           aria-labelledby="qt-dl3dv-all">
+      <p class="panel-intro">Three scenes compared against every baseline, in color and depth. Use the <strong>Generative-based</strong> and <strong>Regression-based</strong> buttons at the top of the table to switch which two baselines are shown.</p>
+      <div class="qual-block">
+        <div class="table-container">
+          <table class="table is-narrow is-fullwidth qual-table">
+          <colgroup>
+            <col class="qcol-img">
+            <col class="qcol-img">
+            <col class="qcol-gap">
+            <col class="qcol-img">
+            <col class="qcol-img">
+            <col class="qcol-img">
+            <col class="qcol-orient">
+          </colgroup>
+          <thead>
+            <tr class="baseline-switch-row">
+              <th colspan="4"></th>
+              <th colspan="2">
+                <div class="baseline-switch">
+                  <button type="button" class="baseline-switch-option is-active" data-group="generative">Generative-based</button>
+                  <button type="button" class="baseline-switch-option" data-group="regression">Regression-based</button>
+                </div>
+              </th>
+              <th></th>
+            </tr>
+            <tr>
+              <th>Input Views</th>
+              <th>Target View</th>
+              <th class="col-gap"></th>
+              <th><span class="reconsplat">ReconSplat</span> <em>(Ours)</em></th>
+              <th><span class="m-gen">MVSplat360</span><span class="m-reg">DepthSplat</span></th>
+              <th><span class="m-gen">latentSplat</span><span class="m-reg">pixelSplat</span></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="qual-example">
+            <tr>
+              <td rowspan="2">
+                <div class="context-grid context-grid-4">
+                  <img src="static/images/qualitative/dl3dv/row1/context_image_000087.png" alt="Input view 1">
+                  <img src="static/images/qualitative/dl3dv/row1/context_image_000108.png" alt="Input view 2">
+                  <img src="static/images/qualitative/dl3dv/row1/context_image_000124.png" alt="Input view 3">
+                  <img src="static/images/qualitative/dl3dv/row1/context_image_000155.png" alt="Input view 4">
+                </div>
+              </td>
+              <td rowspan="2"><img src="static/images/qualitative/dl3dv/row1/gt_target_000118.png" alt="Ground-truth target"></td>
+              <td class="col-gap" rowspan="2"></td>
+              <td><img src="static/images/qualitative/dl3dv/row1/ours_c_000118.png" alt="ReconSplat color"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row1/360_c_000118.png" alt="MVSplat360 color">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row1/ds_c_000118.png" alt="DepthSplat color">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row1/resized_ls_c_000118.png" alt="latentSplat color">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row1/resized_ps_c_000118.png" alt="pixelSplat color">
+              </td>
+              <td class="orient-label"><span>Color</span></td>
+            </tr>
+            <tr>
+              <td><img src="static/images/qualitative/dl3dv/row1/ours_d_000118.png" alt="ReconSplat depth"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row1/360_d_000118.png" alt="MVSplat360 depth">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row1/ds_d_000118.png" alt="DepthSplat depth">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row1/resized_ls_d_000118.png" alt="latentSplat depth">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row1/resized_ps_d_000118.png" alt="pixelSplat depth">
+              </td>
+              <td class="orient-label"><span>Depth</span></td>
+            </tr>
+          </tbody>
+          <tbody class="qual-example">
+            <tr>
+              <td rowspan="2">
+                <div class="context-grid context-grid-4">
+                  <img src="static/images/qualitative/dl3dv/row2/context_image_000084.png" alt="Input view 1">
+                  <img src="static/images/qualitative/dl3dv/row2/context_image_000106.png" alt="Input view 2">
+                  <img src="static/images/qualitative/dl3dv/row2/context_image_000123.png" alt="Input view 3">
+                  <img src="static/images/qualitative/dl3dv/row2/context_image_000159.png" alt="Input view 4">
+                </div>
+              </td>
+              <td rowspan="2"><img src="static/images/qualitative/dl3dv/row2/gt_target_000154.png" alt="Ground-truth target"></td>
+              <td class="col-gap" rowspan="2"></td>
+              <td><img src="static/images/qualitative/dl3dv/row2/ours_c_000154.png" alt="ReconSplat color"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row2/360_c_000154.png" alt="MVSplat360 color">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row2/ds_c_000154.png" alt="DepthSplat color">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row2/resized_ls_c_000154.png" alt="latentSplat color">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row2/resized_ps_c_000154.png" alt="pixelSplat color">
+              </td>
+              <td class="orient-label"><span>Color</span></td>
+            </tr>
+            <tr>
+              <td><img src="static/images/qualitative/dl3dv/row2/ours_d_000154.png" alt="ReconSplat depth"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row2/360_d_000154.png" alt="MVSplat360 depth">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row2/ds_d_000154.png" alt="DepthSplat depth">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row2/resized_ls_d_000154.png" alt="latentSplat depth">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row2/resized_ps_d_000154.png" alt="pixelSplat depth">
+              </td>
+              <td class="orient-label"><span>Depth</span></td>
+            </tr>
+          </tbody>
+          <tbody class="qual-example">
+            <tr>
+              <td rowspan="2">
+                <div class="context-grid context-grid-4">
+                  <img src="static/images/qualitative/dl3dv/row4/context_image_000068.png" alt="Input view 1">
+                  <img src="static/images/qualitative/dl3dv/row4/context_image_000101.png" alt="Input view 2">
+                  <img src="static/images/qualitative/dl3dv/row4/context_image_000132.png" alt="Input view 3">
+                  <img src="static/images/qualitative/dl3dv/row4/context_image_000180.png" alt="Input view 4">
+                </div>
+              </td>
+              <td rowspan="2"><img src="static/images/qualitative/dl3dv/row4/gt_target_000161.png" alt="Ground-truth target"></td>
+              <td class="col-gap" rowspan="2"></td>
+              <td><img src="static/images/qualitative/dl3dv/row4/ours_c_000161.png" alt="ReconSplat color"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row4/360_c_000161.png" alt="MVSplat360 color">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row4/ds_c_000161.png" alt="DepthSplat color">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row4/resized_ls_c_000161.png" alt="latentSplat color">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row4/resized_ps_c_000161.png" alt="pixelSplat color">
+              </td>
+              <td class="orient-label"><span>Color</span></td>
+            </tr>
+            <tr>
+              <td><img src="static/images/qualitative/dl3dv/row4/ours_d_000161.png" alt="ReconSplat depth"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row4/360_d_000161.png" alt="MVSplat360 depth">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row4/ds_d_000161.png" alt="DepthSplat depth">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/dl3dv/row4/resized_ls_d_000161.png" alt="latentSplat depth">
+                <img class="m-reg" src="static/images/qualitative/dl3dv/row4/resized_ps_d_000161.png" alt="pixelSplat depth">
+              </td>
+              <td class="orient-label"><span>Depth</span></td>
+            </tr>
+          </tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+
+      <div class="qual-panel" role="tabpanel" id="qp-dl3dv-scenes"
+           aria-labelledby="qt-dl3dv-scenes" hidden>
+      <p class="panel-intro">Cycling through novel views (unordered).
+        <strong>Click any of the 6 scenes below</strong> to switch.</p>
+      <div class="traj-viewer" data-interval="1100" data-scenes='[{"base":"static/images/more-results/dl3dv/ff59","ctx":["context/1.png","context/2.png","context/3.png","context/4.png"],"frames":["000081","000115","000121","000138"]},{"base":"static/images/more-results/dl3dv/1da88","ctx":["context/1.png","context/2.png","context/3.png","context/4.png"],"frames":["000057","000075","000097","000106"]},{"base":"static/images/more-results/dl3dv/2cbfe","ctx":["context/1.png","context/2.png","context/3.png","context/4.png"],"frames":["000044","000059","000062","000142"]},{"base":"static/images/more-results/dl3dv/280abf","ctx":["context/1.png","context/2.png","context/3.png","context/4.png"],"frames":["000010","000012","000032","000043"]},{"base":"static/images/more-results/dl3dv/9e9a","ctx":["context/1.png","context/2.png","context/3.png","context/4.png"],"frames":["000030","000035","000049","000060"]},{"base":"static/images/more-results/dl3dv/b92b","ctx":["context/1.png","context/2.png","context/3.png","context/4.png"],"frames":["000014","000035","000057","000127"]}]'>
+        <div class="scene-strip-label">Choose a scene</div>
+        <div class="scene-strip" role="tablist" aria-label="Choose scene">
+          <button type="button" class="scene-thumb is-active" data-scene="0" aria-label="Scene 1"><img src="static/images/more-results/dl3dv/ff59/000081/gt.png" alt="Scene 1 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="1" aria-label="Scene 2"><img src="static/images/more-results/dl3dv/1da88/000057/gt.png" alt="Scene 2 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="2" aria-label="Scene 3"><img src="static/images/more-results/dl3dv/2cbfe/000044/gt.png" alt="Scene 3 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="3" aria-label="Scene 4"><img src="static/images/more-results/dl3dv/280abf/000010/gt.png" alt="Scene 4 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="4" aria-label="Scene 5"><img src="static/images/more-results/dl3dv/9e9a/000030/gt.png" alt="Scene 5 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="5" aria-label="Scene 6"><img src="static/images/more-results/dl3dv/b92b/000014/gt.png" alt="Scene 6 thumbnail"></button>
+        </div>
+
+        <div class="traj-grid">
+          <div class="slide-cell">
+            <div class="slide-label">Input Views</div>
+            <div class="context-grid context-grid-4">
+              <img data-ctx="0" src="static/images/more-results/dl3dv/ff59/context/1.png" alt="Input view 1">
+              <img data-ctx="1" src="static/images/more-results/dl3dv/ff59/context/2.png" alt="Input view 2">
+              <img data-ctx="2" src="static/images/more-results/dl3dv/ff59/context/3.png" alt="Input view 3">
+              <img data-ctx="3" src="static/images/more-results/dl3dv/ff59/context/4.png" alt="Input view 4">
+            </div>
+          </div>
+          <div class="slide-cell">
+            <div class="slide-label">Target View</div>
+            <img data-role="gt" src="static/images/more-results/dl3dv/ff59/000081/gt.png" alt="Ground-truth target">
+          </div>
+          <div class="slide-cell">
+            <div class="slide-label"><span class="reconsplat">ReconSplat</span> <em>(Ours)</em></div>
+            <img data-role="ours_c" src="static/images/more-results/dl3dv/ff59/000081/ours_c.png" alt="ReconSplat color">
+            <img data-role="ours_d" src="static/images/more-results/dl3dv/ff59/000081/ours_d.png" alt="ReconSplat depth">
+          </div>
+          <div class="slide-cell">
+            <div class="slide-label">MVSplat360</div>
+            <img data-role="360_c" src="static/images/more-results/dl3dv/ff59/000081/360_c.png" alt="MVSplat360 color">
+            <img data-role="360_d" src="static/images/more-results/dl3dv/ff59/000081/360_d.png" alt="MVSplat360 depth">
+          </div>
+          <div class="slide-cell">
+            <div class="slide-label">latentSplat</div>
+            <img data-role="ls_c" src="static/images/more-results/dl3dv/ff59/000081/ls_c.png" alt="latentSplat color">
+            <img data-role="ls_d" src="static/images/more-results/dl3dv/ff59/000081/ls_d.png" alt="latentSplat depth">
+          </div>
+          <div class="slide-cell slide-orient">
+            <div class="slide-label">&nbsp;</div>
+            <span class="orient-text">Color</span>
+            <span class="orient-text">Depth</span>
+          </div>
+        </div>
+        <div class="traj-controls">
+          <button type="button" class="traj-playpause" aria-label="Pause view playback">
+            <span class="icon-pause">&#10074;&#10074;</span><span class="icon-play">&#9654;</span>
+          </button>
+          <span class="traj-dots"></span>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <h3 class="dataset-label">RealEstate10K <span class="dataset-meta">256&times;256</span></h3>
+    <div class="qual-tabs">
+      <div class="qual-tablist" role="tablist" aria-label="RealEstate10K qualitative comparisons">
+        <button type="button" class="qual-tab is-active" role="tab"
+                id="qt-re10k-all" aria-controls="qp-re10k-all"
+                aria-selected="true">All baselines
+          <span class="qual-tab-badge">Interactive</span></button>
+        <button type="button" class="qual-tab" role="tab"
+                id="qt-re10k-scenes" aria-controls="qp-re10k-scenes"
+                aria-selected="false" tabindex="-1">More scenes
+          <span class="qual-tab-badge">Interactive</span></button>
+        <button type="button" class="qual-tab" role="tab"
+                id="qt-re10k-lvsm" aria-controls="qp-re10k-lvsm"
+                aria-selected="false" tabindex="-1">vs. LVSM</button>
+      </div>
+
+      <div class="qual-panel" role="tabpanel" id="qp-re10k-all"
+           aria-labelledby="qt-re10k-all">
+      <p class="panel-intro">Four scenes compared against every baseline, in color and depth. Use the <strong>Generative-based</strong> and <strong>Regression-based</strong> buttons at the top of the table to switch which two baselines are shown.</p>
+      <div class="qual-block">
+        <div class="table-container">
+          <table class="table is-narrow is-fullwidth qual-table">
+          <colgroup>
+            <col class="qcol-img">
+            <col class="qcol-img">
+            <col class="qcol-gap">
+            <col class="qcol-img">
+            <col class="qcol-img">
+            <col class="qcol-img">
+            <col class="qcol-orient">
+          </colgroup>
+          <thead>
+            <tr class="baseline-switch-row">
+              <th colspan="4"></th>
+              <th colspan="2">
+                <div class="baseline-switch">
+                  <button type="button" class="baseline-switch-option is-active" data-group="generative">Generative-based</button>
+                  <button type="button" class="baseline-switch-option" data-group="regression">Regression-based</button>
+                </div>
+              </th>
+              <th></th>
+            </tr>
+            <tr>
+              <th>Input Views</th>
+              <th>Target View</th>
+              <th class="col-gap"></th>
+              <th><span class="reconsplat">ReconSplat</span> <em>(Ours)</em></th>
+              <th><span class="m-gen">MVSplat360</span><span class="m-reg">DepthSplat</span></th>
+              <th><span class="m-gen">latentSplat</span><span class="m-reg">pixelSplat</span></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="qual-example">
+            <tr>
+              <td rowspan="2">
+                <div class="context-grid context-grid-2">
+                  <img src="static/images/qualitative/re10k/row1/context_image_000194.png" alt="Input view 1">
+                  <img src="static/images/qualitative/re10k/row1/context_image_000252.png" alt="Input view 2">
+                </div>
+              </td>
+              <td rowspan="2"><img src="static/images/qualitative/re10k/row1/gt_target_000127.png" alt="Ground-truth target"></td>
+              <td class="col-gap" rowspan="2"></td>
+              <td><img src="static/images/qualitative/re10k/row1/ours_c_000127.png" alt="ReconSplat color"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row1/360_c_000127.png" alt="MVSplat360 color">
+                <img class="m-reg" src="static/images/qualitative/re10k/row1/ds_c_000127.png" alt="DepthSplat color">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row1/ls_c_000127.png" alt="latentSplat color">
+                <img class="m-reg" src="static/images/qualitative/re10k/row1/ps_c_000127.png" alt="pixelSplat color">
+              </td>
+              <td class="orient-label"><span>Color</span></td>
+            </tr>
+            <tr>
+              <td><img src="static/images/qualitative/re10k/row1/ours_d_000127.png" alt="ReconSplat depth"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row1/360_d_000127.png" alt="MVSplat360 depth">
+                <img class="m-reg" src="static/images/qualitative/re10k/row1/ds_d_000127.png" alt="DepthSplat depth">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row1/ls_d_000127.png" alt="latentSplat depth">
+                <img class="m-reg" src="static/images/qualitative/re10k/row1/ps_d_000127.png" alt="pixelSplat depth">
+              </td>
+              <td class="orient-label"><span>Depth</span></td>
+            </tr>
+          </tbody>
+          <tbody class="qual-example">
+            <tr>
+              <td rowspan="2">
+                <div class="context-grid context-grid-2">
+                  <img src="static/images/qualitative/re10k/row2/context_image_000065.png" alt="Input view 1">
+                  <img src="static/images/qualitative/re10k/row2/context_image_000140.png" alt="Input view 2">
+                </div>
+              </td>
+              <td rowspan="2"><img src="static/images/qualitative/re10k/row2/gt_target_000014.png" alt="Ground-truth target"></td>
+              <td class="col-gap" rowspan="2"></td>
+              <td><img src="static/images/qualitative/re10k/row2/ours_c_000014.png" alt="ReconSplat color"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row2/360_c_000014.png" alt="MVSplat360 color">
+                <img class="m-reg" src="static/images/qualitative/re10k/row2/ds_c_000014.png" alt="DepthSplat color">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row2/ls_c_000014.png" alt="latentSplat color">
+                <img class="m-reg" src="static/images/qualitative/re10k/row2/ps_c_000014.png" alt="pixelSplat color">
+              </td>
+              <td class="orient-label"><span>Color</span></td>
+            </tr>
+            <tr>
+              <td><img src="static/images/qualitative/re10k/row2/ours_d_000014.png" alt="ReconSplat depth"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row2/360_d_000014.png" alt="MVSplat360 depth">
+                <img class="m-reg" src="static/images/qualitative/re10k/row2/ds_d_000014.png" alt="DepthSplat depth">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row2/ls_d_000014.png" alt="latentSplat depth">
+                <img class="m-reg" src="static/images/qualitative/re10k/row2/ps_d_000014.png" alt="pixelSplat depth">
+              </td>
+              <td class="orient-label"><span>Depth</span></td>
+            </tr>
+          </tbody>
+          <tbody class="qual-example">
+            <tr>
+              <td rowspan="2">
+                <div class="context-grid context-grid-2">
+                  <img src="static/images/qualitative/re10k/row3/context_image_000075.png" alt="Input view 1">
+                  <img src="static/images/qualitative/re10k/row3/context_image_000128.png" alt="Input view 2">
+                </div>
+              </td>
+              <td rowspan="2"><img src="static/images/qualitative/re10k/row3/gt_target_000010.png" alt="Ground-truth target"></td>
+              <td class="col-gap" rowspan="2"></td>
+              <td><img src="static/images/qualitative/re10k/row3/ours_c_000010.png?v=2" alt="ReconSplat color"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row3/360_c_000010.png" alt="MVSplat360 color">
+                <img class="m-reg" src="static/images/qualitative/re10k/row3/ds_c_000010.png" alt="DepthSplat color">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row3/ls_c_000010.png" alt="latentSplat color">
+                <img class="m-reg" src="static/images/qualitative/re10k/row3/ps_c_000010.png" alt="pixelSplat color">
+              </td>
+              <td class="orient-label"><span>Color</span></td>
+            </tr>
+            <tr>
+              <td><img src="static/images/qualitative/re10k/row3/ours_d_000010.png?v=2" alt="ReconSplat depth"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row3/360_d_000010.png" alt="MVSplat360 depth">
+                <img class="m-reg" src="static/images/qualitative/re10k/row3/ds_d_000010.png" alt="DepthSplat depth">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row3/ls_d_000010.png" alt="latentSplat depth">
+                <img class="m-reg" src="static/images/qualitative/re10k/row3/ps_d_000010.png" alt="pixelSplat depth">
+              </td>
+              <td class="orient-label"><span>Depth</span></td>
+            </tr>
+          </tbody>
+          <tbody class="qual-example">
+            <tr>
+              <td rowspan="2">
+                <div class="context-grid context-grid-2">
+                  <img src="static/images/qualitative/re10k/row4/context_image_000087.png" alt="Input view 1">
+                  <img src="static/images/qualitative/re10k/row4/context_image_000156.png" alt="Input view 2">
+                </div>
+              </td>
+              <td rowspan="2"><img src="static/images/qualitative/re10k/row4/gt_target_000000.png" alt="Ground-truth target"></td>
+              <td class="col-gap" rowspan="2"></td>
+              <td><img src="static/images/qualitative/re10k/row4/ours_c_000000.png" alt="ReconSplat color"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row4/360_c_000000.png" alt="MVSplat360 color">
+                <img class="m-reg" src="static/images/qualitative/re10k/row4/ds_c_000000.png" alt="DepthSplat color">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row4/ls_c_000000.png" alt="latentSplat color">
+                <img class="m-reg" src="static/images/qualitative/re10k/row4/ps_c_000000.png" alt="pixelSplat color">
+              </td>
+              <td class="orient-label"><span>Color</span></td>
+            </tr>
+            <tr>
+              <td><img src="static/images/qualitative/re10k/row4/ours_d_000000.png" alt="ReconSplat depth"></td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row4/360_d_000000.png" alt="MVSplat360 depth">
+                <img class="m-reg" src="static/images/qualitative/re10k/row4/ds_d_000000.png" alt="DepthSplat depth">
+              </td>
+              <td>
+                <img class="m-gen" src="static/images/qualitative/re10k/row4/ls_d_000000.png" alt="latentSplat depth">
+                <img class="m-reg" src="static/images/qualitative/re10k/row4/ps_d_000000.png" alt="pixelSplat depth">
+              </td>
+              <td class="orient-label"><span>Depth</span></td>
+            </tr>
+          </tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+
+      <div class="qual-panel" role="tabpanel" id="qp-re10k-scenes"
+           aria-labelledby="qt-re10k-scenes" hidden>
+      <p class="panel-intro">Eight further scenes, each with <strong>two independent
+        <span class="reconsplat">ReconSplat</span> samples</strong> of the same target view.
+        <strong>Click a thumbnail below</strong> to compare a different scene.</p>
+      <div class="traj-viewer traj-2sample" data-interval="1100" data-scenes='[{"base":"static/images/more-results/re10k/row7","ctx":["context/1.png","context/2.png"],"frames":["000002"]},{"base":"static/images/more-results/re10k/row3","ctx":["context/1.png","context/2.png"],"frames":["000068"]},{"base":"static/images/more-results/re10k/row8","ctx":["context/1.png","context/2.png"],"frames":["000192"]},{"base":"static/images/more-results/re10k/row5","ctx":["context/1.png","context/2.png"],"frames":["000209"]},{"base":"static/images/more-results/re10k/row4","ctx":["context/1.png","context/2.png"],"frames":["000180"]},{"base":"static/images/more-results/re10k/row6","ctx":["context/1.png","context/2.png"],"frames":["000109"]},{"base":"static/images/more-results/re10k/row1","ctx":["context/1.png","context/2.png"],"frames":["000069"]},{"base":"static/images/more-results/re10k/row2","ctx":["context/1.png","context/2.png"],"frames":["000166"]}]'>
+        <div class="scene-strip-label">Choose a scene</div>
+        <div class="scene-strip" role="tablist" aria-label="Choose scene">
+          <button type="button" class="scene-thumb is-active" data-scene="0" aria-label="Scene 1"><img src="static/images/more-results/re10k/row7/000002/gt.png" alt="Scene 1 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="1" aria-label="Scene 2"><img src="static/images/more-results/re10k/row3/000068/gt.png" alt="Scene 2 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="2" aria-label="Scene 3"><img src="static/images/more-results/re10k/row8/000192/gt.png" alt="Scene 3 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="3" aria-label="Scene 4"><img src="static/images/more-results/re10k/row5/000209/gt.png" alt="Scene 4 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="4" aria-label="Scene 5"><img src="static/images/more-results/re10k/row4/000180/gt.png" alt="Scene 5 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="5" aria-label="Scene 6"><img src="static/images/more-results/re10k/row6/000109/gt.png" alt="Scene 6 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="6" aria-label="Scene 7"><img src="static/images/more-results/re10k/row1/000069/gt.png" alt="Scene 7 thumbnail"></button>
+          <button type="button" class="scene-thumb" data-scene="7" aria-label="Scene 8"><img src="static/images/more-results/re10k/row2/000166/gt.png" alt="Scene 8 thumbnail"></button>
+        </div>
+
+        <div class="traj-grid">
+          <div class="slide-cell">
+            <div class="slide-label">Input Views<span class="slide-sublabel">&nbsp;</span></div>
+            <div class="context-grid context-grid-2">
+              <img data-ctx="0" src="static/images/more-results/re10k/row7/context/1.png" alt="Input view 1">
+              <img data-ctx="1" src="static/images/more-results/re10k/row7/context/2.png" alt="Input view 2">
+            </div>
+          </div>
+          <div class="slide-cell">
+            <div class="slide-label">Target View<span class="slide-sublabel">&nbsp;</span></div>
+            <img data-role="gt" src="static/images/more-results/re10k/row7/000002/gt.png" alt="Ground-truth target">
+          </div>
+          <div class="slide-cell">
+            <div class="slide-label"><span class="reconsplat">ReconSplat</span><span class="slide-sublabel"><em>(Ours)</em> &middot; Sample 1</span></div>
+            <img data-role="ours_c" src="static/images/more-results/re10k/row7/000002/ours_c.png" alt="ReconSplat sample 1, color">
+            <img data-role="ours_d" src="static/images/more-results/re10k/row7/000002/ours_d.png" alt="ReconSplat sample 1, depth">
+          </div>
+          <div class="slide-cell">
+            <div class="slide-label"><span class="reconsplat">ReconSplat</span><span class="slide-sublabel"><em>(Ours)</em> &middot; Sample 2</span></div>
+            <img data-role="ours2_c" src="static/images/more-results/re10k/row7/000002/ours2_c.png" alt="ReconSplat sample 2, color">
+            <img data-role="ours2_d" src="static/images/more-results/re10k/row7/000002/ours2_d.png" alt="ReconSplat sample 2, depth">
+          </div>
+          <div class="slide-cell">
+            <div class="slide-label">MVSplat360<span class="slide-sublabel">&nbsp;</span></div>
+            <img data-role="360_c" src="static/images/more-results/re10k/row7/000002/360_c.png" alt="MVSplat360 color">
+            <img data-role="360_d" src="static/images/more-results/re10k/row7/000002/360_d.png" alt="MVSplat360 depth">
+          </div>
+          <div class="slide-cell">
+            <div class="slide-label">latentSplat<span class="slide-sublabel">&nbsp;</span></div>
+            <img data-role="ls_c" src="static/images/more-results/re10k/row7/000002/ls_c.png" alt="latentSplat color">
+            <img data-role="ls_d" src="static/images/more-results/re10k/row7/000002/ls_d.png" alt="latentSplat depth">
+          </div>
+          <div class="slide-cell slide-orient">
+            <div class="slide-label">&nbsp;<span class="slide-sublabel">&nbsp;</span></div>
+            <span class="orient-text">Color</span>
+            <span class="orient-text">Depth</span>
+          </div>
+        </div>
+        <div class="traj-controls">
+          <button type="button" class="traj-playpause" aria-label="Pause view playback">
+            <span class="icon-pause">&#10074;&#10074;</span><span class="icon-play">&#9654;</span>
+          </button>
+          <span class="traj-dots"></span>
+        </div>
+        </div>
+      </div>
+
+      <div class="qual-panel" role="tabpanel" id="qp-re10k-lvsm"
+           aria-labelledby="qt-re10k-lvsm" tabindex="0" hidden>
+      <p class="panel-intro">
+        LVSM is a state-of-the-art novel-view-synthesis transformer that regresses pixels directly,
+        without an explicit 3D representation. As a result, it predicts
+        <strong>no geometry</strong>, so no depth comparison is possible here. On RealEstate10K
+        extrapolation, LVSM achieves a better LPIPS (<strong>0.172</strong> vs. 0.222), as
+        single-reference metrics favor predictions that remain close to the ground-truth image.
+        In contrast, <span class="reconsplat">ReconSplat</span> achieves a better FID
+        (<strong>4.89</strong> vs. 5.20). Examples shown below reflect a fundamental difference under uncertainty:
+        deterministic regression tends to average over plausible outcomes, whereas our generative model
+        can represent plausible scene appearance (and geometry) <em>beyond the observed views</em>.
+      </p>
+      <div class="table-container">
+        <table class="table is-narrow lvsm-table">
+          <colgroup>
+            <col class="lcol-img">
+            <col class="lcol-img">
+            <col class="lcol-img">
+            <col class="lcol-img">
+            <col class="lcol-img">
+            <col class="lcol-orient">
+          </colgroup>
+          <tbody>
+            <tr>
+              <td><img src="static/images/lvsm/0bf152ef84195293/gt.png" alt="GT scene 1"></td>
+              <td><img src="static/images/lvsm/0c0f298ace7c875b/gt.png" alt="GT scene 2"></td>
+              <td><img src="static/images/lvsm/0e512d350465a63c/gt.png" alt="GT scene 3"></td>
+              <td><img src="static/images/lvsm/2c596a5abfd67267/gt.png" alt="GT scene 4"></td>
+              <td><img src="static/images/lvsm/fee67103bcabbb0a/gt.png" alt="GT scene 5"></td>
+              <td class="orient-label"><span>GT</span></td>
+            </tr>
+            <tr>
+              <td><img src="static/images/lvsm/0bf152ef84195293/lvsm.png" alt="LVSM scene 1"></td>
+              <td><img src="static/images/lvsm/0c0f298ace7c875b/lvsm.png" alt="LVSM scene 2"></td>
+              <td><img src="static/images/lvsm/0e512d350465a63c/lvsm.png" alt="LVSM scene 3"></td>
+              <td><img src="static/images/lvsm/2c596a5abfd67267/lvsm.png" alt="LVSM scene 4"></td>
+              <td><img src="static/images/lvsm/fee67103bcabbb0a/lvsm.png" alt="LVSM scene 5"></td>
+              <td class="orient-label"><span>LVSM</span></td>
+            </tr>
+            <tr class="ours-row">
+              <td><img src="static/images/lvsm/0bf152ef84195293/ours.png" alt="Ours scene 1"></td>
+              <td><img src="static/images/lvsm/0c0f298ace7c875b/ours.png" alt="Ours scene 2"></td>
+              <td><img src="static/images/lvsm/0e512d350465a63c/ours.png" alt="Ours scene 3"></td>
+              <td><img src="static/images/lvsm/2c596a5abfd67267/ours.png" alt="Ours scene 4"></td>
+              <td><img src="static/images/lvsm/fee67103bcabbb0a/ours.png" alt="Ours scene 5"></td>
+              <td class="orient-label"><span>Ours</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="section-heading">
+      <p class="section-eyebrow">Evaluation</p>
+      <h2 class="title is-3">Quantitative Results</h2>
+    </div>
+
+    <h3 class="dataset-label">RealEstate10K</h3>
+    <div class="content has-text-justified">
+      <p>
+        <span class="reconsplat">ReconSplat</span> outperforms both regression-based and generative-based
+        prior methods, often substantially, in the challenging extrapolation setting (except in SSIM),
+        demonstrating the generalizability of our approach. <span class="reconsplat">ReconSplat</span> also
+        outperforms generative approaches in the interpolation setting across all metrics (except SSIM,
+        where all generative methods are close). <strong>Bold</strong> is best, <u>underlined</u> is
+        second-best.
+      </p>
+    </div>
+    <div class="table-container">
+      <table class="table is-narrow is-fullwidth results-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Method</th>
+            <th colspan="5">Interpolation</th>
+            <th colspan="5">Extrapolation</th>
+          </tr>
+          <tr>
+            <th>&darr;&nbsp;FID</th><th>&darr;&nbsp;LPIPS</th><th>&darr;&nbsp;DISTS</th><th>&uarr;&nbsp;PSNR</th><th>&uarr;&nbsp;SSIM</th>
+            <th>&darr;&nbsp;FID</th><th>&darr;&nbsp;LPIPS</th><th>&darr;&nbsp;DISTS</th><th>&uarr;&nbsp;PSNR</th><th>&uarr;&nbsp;SSIM</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="11" class="group-row"><em>Regression-based</em></td></tr>
+          <tr>
+            <td>pixelSplat</td>
+            <td>4.58</td><td>0.178</td><td>0.109</td><td>24.29</td><td>0.820</td>
+            <td>11.18</td><td>0.259</td><td>0.154</td><td>20.65</td><td>0.728</td>
+          </tr>
+          <tr>
+            <td>MVSplat</td>
+            <td><u>3.49</u></td><td>0.161</td><td>0.097</td><td>24.12</td><td><u>0.845</u></td>
+            <td>9.83</td><td>0.245</td><td>0.145</td><td>20.49</td><td><u>0.752</u></td>
+          </tr>
+          <tr>
+            <td>DepthSplat</td>
+            <td><strong>2.70</strong></td><td><strong>0.109</strong></td><td><strong>0.069</strong></td><td><strong>27.65</strong></td><td><strong>0.894</strong></td>
+            <td>11.81</td><td><u>0.227</u></td><td>0.139</td><td>20.71</td><td><strong>0.776</strong></td>
+          </tr>
+          <tr><td colspan="11" class="group-row"><em>Generative-based</em></td></tr>
+          <tr>
+            <td>latentSplat</td>
+            <td>3.84</td><td>0.169</td><td>0.097</td><td>23.83</td><td>0.807</td>
+            <td>6.93</td><td>0.234</td><td><u>0.127</u></td><td><u>21.60</u></td><td>0.732</td>
+          </tr>
+          <tr>
+            <td>MVSplat360</td>
+            <td>4.94</td><td>0.180</td><td>0.120</td><td>22.77</td><td>0.813</td>
+            <td><u>5.49</u></td><td>0.245</td><td>0.148</td><td>20.46</td><td>0.748</td>
+          </tr>
+          <tr class="ours-row">
+            <td><span class="reconsplat">ReconSplat</span> <em>(Ours)</em></td>
+            <td>4.26</td><td><u>0.155</u></td><td><u>0.093</u></td><td><u>24.56</u></td><td>0.808</td>
+            <td><strong>4.89</strong></td><td><strong>0.222</strong></td><td><strong>0.120</strong></td><td><strong>21.92</strong></td><td>0.735</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="dataset-label">DL3DV-10K</h3>
+    <div class="content has-text-justified">
+      <p>
+        <span class="reconsplat">ReconSplat</span> outperforms both regression-based and generative-based
+        methods on reconstruction, perceptual, and FID metrics, demonstrating its generalizability.
+        <strong>Note:</strong> DepthSplat* is trained on the full DL3DV-10K dataset (&sim;5&times; more
+        data), making direct comparison less meaningful.
+      </p>
+    </div>
+    <div class="table-container">
+      <table class="table is-narrow is-fullwidth results-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Method</th>
+            <th colspan="5">Two-round (<span class="mathvar">N</span><sub class="mathsub">traj</sub>&nbsp;=&nbsp;300)</th>
+            <th colspan="5">One round (<span class="mathvar">N</span><sub class="mathsub">traj</sub>&nbsp;=&nbsp;150)</th>
+          </tr>
+          <tr>
+            <th>&darr;&nbsp;FID</th><th>&darr;&nbsp;LPIPS</th><th>&darr;&nbsp;DISTS</th><th>&uarr;&nbsp;PSNR</th><th>&uarr;&nbsp;SSIM</th>
+            <th>&darr;&nbsp;FID</th><th>&darr;&nbsp;LPIPS</th><th>&darr;&nbsp;DISTS</th><th>&uarr;&nbsp;PSNR</th><th>&uarr;&nbsp;SSIM</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="11" class="group-row"><em>Regression-based</em></td></tr>
+          <tr>
+            <td>pixelSplat</td>
+            <td>132.79</td><td>0.472</td><td>0.287</td><td><u>17.15</u></td><td><u>0.494</u></td>
+            <td>108.63</td><td>0.424</td><td>0.255</td><td><u>18.46</u></td><td><u>0.551</u></td>
+          </tr>
+          <tr>
+            <td>MVSplat</td>
+            <td>97.73</td><td>0.476</td><td>0.235</td><td>15.59</td><td>0.358</td>
+            <td>70.23</td><td>0.429</td><td>0.191</td><td>16.14</td><td>0.356</td>
+          </tr>
+          <tr class="grey-row">
+            <td>DepthSplat*</td>
+            <td>55.84</td><td>0.297</td><td>0.155</td><td>19.41</td><td>0.633</td>
+            <td>43.67</td><td>0.221</td><td>0.115</td><td>21.51</td><td>0.716</td>
+          </tr>
+          <tr><td colspan="11" class="group-row"><em>Generative-based</em></td></tr>
+          <tr>
+            <td>latentSplat</td>
+            <td>73.08</td><td><u>0.411</u></td><td><u>0.182</u></td><td>16.32</td><td>0.472</td>
+            <td>65.04</td><td><u>0.363</u></td><td><u>0.164</u></td><td>17.50</td><td>0.535</td>
+          </tr>
+          <tr>
+            <td>MVSplat360</td>
+            <td><u>52.86</u></td><td>0.461</td><td>0.191</td><td>14.17</td><td>0.332</td>
+            <td><u>44.16</u></td><td>0.419</td><td>0.170</td><td>14.84</td><td>0.346</td>
+          </tr>
+          <tr class="ours-row">
+            <td><span class="reconsplat">ReconSplat</span> <em>(Ours)</em></td>
+            <td><strong>43.87</strong></td><td><strong>0.351</strong></td><td><strong>0.137</strong></td><td><strong>17.58</strong></td><td><strong>0.508</strong></td>
+            <td><strong>35.83</strong></td><td><strong>0.274</strong></td><td><strong>0.112</strong></td><td><strong>19.71</strong></td><td><strong>0.598</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="dataset-label">ScanNet++ <span class="dataset-meta">novel-view depth, cross-dataset</span></h3>
+    <div class="split-row">
+      <div class="split-text">
+        <div class="content has-text-justified">
+          <p>
+            Novel-view <em>depth</em> synthesis on ScanNet++, which provides ground-truth depth. This is a
+            cross-dataset generalization setting: we evaluate the DL3DV-10K model weights directly, with no
+            ScanNet++ training.
+          </p>
+          <p>
+            <span class="reconsplat">ReconSplat</span> improves AbsRel, RMSE, and
+            RMSE<sub class="mathsub">log</sub>, which measure how closely the predicted depth matches
+            the ground truth across absolute and relative depth scales. DepthSplat, in contrast,
+            retains the best threshold accuracy
+            <span class="mathvar">&delta;</span><sub class="mathsub">1</sub>.
+            <strong>Bold</strong> indicates the best result, while <u>underlined</u> indicates the second-best.
+          </p>
+        </div>
+        <div class="table-container">
+          <table class="table is-narrow depth-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>&uarr;&nbsp;<span class="mathvar">&delta;</span><sub class="mathsub">1</sub></th>
+                <th>&darr;&nbsp;AbsRel</th>
+                <th>&darr;&nbsp;RMSE</th>
+                <th>&darr;&nbsp;RMSE<sub class="mathsub">log</sub></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MVSplat360</td>
+                <td>42.17</td><td>0.410</td><td>0.753</td><td>0.404</td>
+              </tr>
+              <tr>
+                <td>DepthSplat</td>
+                <td><strong>70.58</strong></td><td><u>0.255</u></td><td><u>0.492</u></td><td><u>0.266</u></td>
+              </tr>
+              <tr class="ours-row">
+                <td><span class="reconsplat">ReconSplat</span> <em>(Ours)</em></td>
+                <td><u>67.32</u></td><td><strong>0.206</strong></td><td><strong>0.467</strong></td><td><strong>0.238</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="split-aside">
+        <div class="imgcmp" data-ar="448 / 256" data-base="static/images/scannet"
+             data-views='["950ee70817_000003","dc9763176c_000009","518e393115_000002","950ee70817_000032","29646b6dfe_000003"]'></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <div class="section-heading">
+      <p class="section-eyebrow">Citation</p>
+      <h2 class="title is-3">BibTeX</h2>
+    </div>
+    <pre><code>@inproceedings{stracquadanio2026reconsplat,
+  title     = {ReconSplat: Generalizable 3D Scene Reconstruction Beyond Observed Views},
+  author    = {Stracquadanio, Giuseppe and Raj, Kevin and Grabinski, Julia and Roth, Stefan},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2026}
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://github.com/visinf/reconsplat" class="external-link">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content has-text-centered">
+          <p>
+            This project has received funding from the European Research Council (ERC) under the European
+            Union's Horizon 2020 research and innovation programme (grant agreement No.&nbsp;866008), and
+            from the DFG under Germany's Excellence Strategy (EXC-3057/1 &ldquo;Reasonable Artificial
+            Intelligence&rdquo;, Project No.&nbsp;533677015). KR is supported by the Konrad Zuse School of
+            Excellence in Learning and Intelligent Systems (<a href="https://eliza.school/">ELIZA</a>)
+            through the DAAD programme Konrad Zuse Schools of Excellence in Artificial Intelligence,
+            sponsored by the German Federal Ministry of Education and Research. We gratefully acknowledge
+            support from the hessian.AI Service Center (funded by the Federal Ministry of Research,
+            Technology and Space, BMFTR, grant No.&nbsp;16IS22091) and the hessian.AI Innovation Lab (funded
+            by the Hessian Ministry for Digital Strategy and Innovation, grant No.&nbsp;S-DIW04/0013/003).
+          </p>
+          <p>
+            This website is adapted from the <a href="https://nerfies.github.io">Nerfies</a> project page
+            template, licensed under a
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons
+            Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

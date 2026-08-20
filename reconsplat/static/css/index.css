@@ -1,0 +1,1235 @@
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.footer .icon-link {
+    font-size: 25px;
+    color: #000;
+}
+
+.link-block a {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.reconsplat {
+  font-variant: small-caps;
+  font-weight: 600;
+  /* small-caps sets tighter than it looks like it should at display sizes */
+  letter-spacing: 0.02em;
+}
+
+/* Match the poster identity: "Recon" traverses the warm half of the Spectral
+   palette, then "Splat" traverses the cool half. The hard midpoint deliberately
+   omits Spectral's pale, low-contrast center at the syllable boundary. */
+.publication-title .reconsplat {
+  color: #9e0142;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .publication-title .reconsplat {
+    background: linear-gradient(
+      90deg,
+      #9e0142 0%,
+      #d9542f 49.9%,
+      #2a8a8f 50.1%,
+      #5e4fa2 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+/* Outlined rather than solid: the filled blue badge was the loudest element
+   on the page and competed with the title it sits above. */
+.venue-badge {
+  display: block;
+  margin: 0 auto 1.25rem auto;
+  width: fit-content;
+  background-color: transparent;
+  border: 1px solid hsl(204, 86%, 53%);
+  color: hsl(204, 86%, 45%);
+  font-weight: 600;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.publication-title {
+    font-family: 'Google Sans', sans-serif;
+    line-height: 1.1;
+    margin-bottom: 0.6rem !important;
+}
+
+.publication-subtitle {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 400;
+    color: #6b6b6b;
+    line-height: 1.35;
+    margin-bottom: 1.25rem !important;
+}
+
+/* --- Section headings: small tracked eyebrow above the title --- */
+
+.section-heading {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section-eyebrow {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: hsl(204, 86%, 45%);
+  margin-bottom: 0.4rem;
+}
+
+.section-heading .title {
+  margin-bottom: 0 !important;
+}
+
+/* --- Dataset labels: a caption, not a shrunken title --- */
+
+.dataset-label {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a7a7a;
+  margin: 2rem 0 0.6rem 0;
+}
+
+.dataset-label.is-centered {
+  text-align: center;
+}
+
+.dataset-meta {
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: #b0b0b0;
+}
+
+.dataset-meta::before {
+  content: "\00b7";
+  margin: 0 0.4em;
+}
+
+.publication-authors {
+    font-family: 'Google Sans', sans-serif;
+}
+
+.author-block {
+  display: inline-block;
+}
+
+/* --- Teaser / comparison tables --- */
+
+/* DL3DV left, RealEstate10K right. Each column has a flex-basis rather than a
+   percentage width, so the pair reflows to stacked below ~2x that basis instead
+   of squeezing five table columns into half a phone screen. */
+.teaser-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem 1.75rem;
+}
+
+.teaser-col {
+  flex: 1 1 26rem;
+  min-width: 0;
+}
+
+/* .dataset-label's 2rem top margin is meant to separate stacked sections; as the
+   heading of a side-by-side column it just pushes both tables down. */
+.teaser-col .dataset-label {
+  margin-top: 1.25rem;
+}
+
+/* At half width the table was spending more of the column on chrome than on
+   pictures -- Bulma's 0.5em/0.75em cell padding plus a nowrap method column left
+   the images at 62px. These two rules are what buy the width back; the method
+   column is allowed to wrap and capped, since "ReconSplat (Ours)" on one line was
+   reserving ~130px of a 466px column. */
+.teaser-col .compare-table th,
+.teaser-col .compare-table td {
+  padding: 0.12rem 0.18rem;
+}
+
+/* Method names run vertically, as in the paper's Fig. 1. This is the single
+   biggest win available for image size here: read horizontally, "ReconSplat
+   (Ours)" reserved ~88px of a 466px half-column; on its side the column costs
+   ~22px and the four images split the difference.
+   writing-mode + rotate(180deg) reads bottom-to-top, matching LaTeX's
+   \rotatebox[origin=lB]{90}. The rotation goes on an inner span, not the <td>:
+   transforms on table cells are not reliably supported. */
+.teaser-col .compare-table th:first-child,
+.teaser-col .compare-table td:first-child {
+  width: 1.5rem;
+  padding: 0 0.1rem;
+  text-align: center;
+}
+
+.vlabel {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.teaser-col .compare-table th {
+  font-size: 0.78rem;
+}
+
+
+.compare-table th,
+.compare-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.compare-table td:first-child,
+.compare-table th:first-child {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.compare-table thead th {
+  text-align: center !important;
+}
+
+.compare-table thead th:first-child {
+  text-align: left !important;
+}
+
+.compare-table img {
+  width: 100%;
+  max-width: 220px;
+  border-radius: 4px;
+}
+
+.ours-row {
+  background-color: rgba(50, 115, 220, 0.08);
+}
+
+/* --- Method figure --- */
+
+.method-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 1.5rem auto;
+}
+
+/* --- Quantitative results tables --- */
+
+.results-table th,
+.results-table td {
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.results-table th {
+  text-align: center;
+}
+
+.results-table td {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.results-table th:first-child,
+.results-table td:first-child {
+  text-align: left !important;
+  white-space: nowrap;
+}
+
+.results-table thead tr:first-child th {
+  text-align: center !important;
+}
+
+.results-table thead tr:last-child th {
+  text-align: right !important;
+}
+
+.results-table thead tr:first-child th:first-child {
+  text-align: left !important;
+}
+
+.results-table thead tr:first-child th:not(:first-child) {
+  border-bottom: none !important;
+  position: relative;
+}
+
+.results-table thead tr:first-child th:not(:first-child)::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+  border-bottom: 1px solid #363636;
+}
+
+.results-table .group-row {
+  text-align: left !important;
+  background-color: #fafafa;
+}
+
+.results-table .grey-row {
+  color: #888;
+}
+
+/* booktabs-style rules: no lines between ordinary rows, only
+   a top rule, a rule under the header, and a bottom rule. */
+.results-table th,
+.results-table td {
+  border-bottom: none !important;
+}
+
+.results-table thead tr:first-child th {
+  border-top: 2px solid #363636 !important;
+}
+
+.results-table thead tr:last-child th {
+  border-bottom: 2px solid #363636 !important;
+}
+
+.results-table tbody tr:last-child td {
+  border-bottom: 2px solid #363636 !important;
+}
+
+/* --- Depth-metrics table (single header row) -----------------------------
+   Deliberately NOT .results-table: that class carries rules keyed to a
+   two-row grouped header (cmidrule ::after, first/last-row alignment) which
+   collide when the header is a single row. Same booktabs look, own rules. */
+
+.depth-table {
+  margin: 0 auto;
+  max-width: 34rem;
+}
+
+/* Text left, compact table right (mirrors the paper's minipage pairing).
+   Both sides have a flex-basis, so they stack on narrow viewports. */
+.split-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+}
+
+.split-text {
+  flex: 1 1 20rem;
+  min-width: 0;
+}
+
+.split-aside {
+  flex: 1 1 21rem;
+  min-width: 0;
+}
+
+.split-text .content:last-child {
+  margin-bottom: 0;
+}
+
+.split-text .depth-table {
+  width: 100%;
+  max-width: none;
+  margin: 1.25rem 0 0 0;
+}
+
+/* --- ScanNet++ ReconSplat-vs-GT wipe comparison (under the depth table) ----
+   Reuses the .vcmp-* widget from the video grids (see initImgCompare); only the
+   container and caption are specific to it. Lives inside .split-aside so it
+   lines up with the table. */
+
+/* --imgcmp-max is THE size knob for this widget: both panes scale with it, so
+   the whole tile grows/shrinks proportionally (each pane is width / --ar tall).
+   Override per instance from the HTML if needed, e.g.
+       <div class="imgcmp" style="--imgcmp-max: 22rem" ...> */
+.imgcmp {
+  --imgcmp-max: 20rem;
+  max-width: var(--imgcmp-max);
+  margin: 0 auto;
+}
+
+.imgcmp .vcar-bar {
+  margin-bottom: 0.5rem;
+}
+
+.imgcmp .vcar-counter {
+  min-width: 7rem;
+}
+
+.imgcmp-caption {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #7a7a7a;
+  text-align: center;
+}
+
+.imgcmp-modality {
+  color: #363636;
+  font-weight: 600;
+}
+
+.depth-table th,
+.depth-table td {
+  font-size: 0.9rem;
+  vertical-align: middle;
+  border: none !important;
+}
+
+.depth-table th,
+.depth-table td {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.depth-table th:first-child,
+.depth-table td:first-child {
+  text-align: left !important;
+  white-space: nowrap;
+}
+
+.depth-table thead th {
+  border-top: 2px solid #363636 !important;
+  border-bottom: 2px solid #363636 !important;
+}
+
+.depth-table tbody tr:last-child td {
+  border-bottom: 2px solid #363636 !important;
+}
+
+/* --- LaTeX-ish inline math ---------------------------------------------
+   A serif italic variable with an upright subscript, which is what makes
+   $N_{\mathrm{traj}}$ read as math rather than as prose. Castoro is already
+   loaded in the page's Google Fonts request. */
+
+.mathvar {
+  font-family: 'Castoro', Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.mathsub {
+  font-family: 'Castoro', Georgia, 'Times New Roman', serif;
+  font-style: normal;
+  font-size: 0.68em;
+  letter-spacing: 0.01em;
+}
+
+/* --- Qualitative results tables --- */
+
+/* Fixed layout + colgroup so every image column is exactly the same width
+   (otherwise auto table layout sizes columns by content and "Ours" ends up
+   narrower than the baseline columns). */
+.qual-table {
+  table-layout: fixed;
+}
+
+.qual-table .qcol-img {
+  width: 18.8%;
+}
+
+.qual-table .qcol-gap {
+  width: 3%;
+}
+
+.qual-table .qcol-orient {
+  width: 3%;
+}
+
+.qual-table th,
+.qual-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.qual-table thead th {
+  text-align: center !important;
+  font-size: 0.9rem;
+}
+
+.qual-table .col-gap {
+  padding: 0 !important;
+}
+
+/* Bulma draws a border-bottom on every cell, which fragmented the horizontal
+   rules: they broke at the borderless gap column and stopped short under the
+   rowspan="2" Input Views / Target cells. Instead: no per-cell borders at all,
+   plus one rule spanning every column at the foot of each example. The
+   rowspanned cells end on the same row as the Depth row, so both selectors
+   draw at the same y and form a single continuous line. */
+.qual-table th,
+.qual-table td {
+  border: none !important;
+}
+
+.qual-table thead tr:last-child th {
+  border-bottom: 1px solid #dbdbdb !important;
+}
+
+.qual-example tr:last-child td,
+.qual-example tr:first-child td[rowspan] {
+  border-bottom: 1px solid #dbdbdb !important;
+}
+
+.qual-table img {
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+/* Vertical row labels down the right edge, reading bottom-to-top (mirrors the
+   paper's \rotatebox{90} row labels). Shared by .qual-table and .lvsm-table. */
+.orient-label {
+  padding: 0 !important;
+}
+
+/* Rotation lives on an inner span: `transform` on a table-cell box is not
+   reliably supported, an inline-block child is. */
+.orient-label span {
+  display: inline-block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.context-grid {
+  display: grid;
+  gap: 2px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.context-grid-4 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.context-grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.context-grid img {
+  max-width: 100%;
+  border-radius: 2px;
+}
+
+/* --- LVSM comparison (color only: LVSM predicts no geometry) ------------
+   Presented as a figure rather than a table, matching the paper: 3 method rows
+   x 5 scene columns, no rules. */
+
+.lvsm-table {
+  table-layout: fixed;
+  margin-bottom: 0;
+}
+
+.lvsm-table th,
+.lvsm-table td {
+  text-align: center;
+  vertical-align: middle;
+  border: none !important;
+  padding: 2px !important;
+}
+
+.lvsm-table .lcol-img {
+  width: 19%;
+}
+
+.lvsm-table .lcol-orient {
+  width: 5%;
+}
+
+.lvsm-table img {
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+/* --- Generative / regression baseline view switch (per table) --- */
+
+/* Generative-based is the default view; regression-based swaps in when the
+   table carries .show-regression. */
+.qual-table .m-reg {
+  display: none;
+}
+
+.qual-table.show-regression .m-gen {
+  display: none;
+}
+
+.qual-table.show-regression img.m-reg {
+  display: block;
+}
+
+.qual-table.show-regression span.m-reg {
+  display: inline;
+}
+
+/* The switch sits in its own header row, spanning only the baseline columns. */
+.baseline-switch-row th {
+  border-bottom: none !important;
+  padding-bottom: 0.35rem !important;
+}
+
+.baseline-switch {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.baseline-switch-option {
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  color: #4a4a4a;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  padding: 0.3rem 0.7rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.baseline-switch-option:first-child {
+  border-radius: 290486px 0 0 290486px;
+}
+
+.baseline-switch-option:last-child {
+  border-radius: 0 290486px 290486px 0;
+}
+
+/* Collapse adjacent borders: with 3 options the middle button would otherwise
+   render a doubled 2px seam against its neighbor. */
+.baseline-switch-option + .baseline-switch-option {
+  border-left: none;
+}
+
+.baseline-switch-option:hover {
+  background: #f5f5f5;
+}
+
+.baseline-switch-option.is-active {
+  background: hsl(204, 86%, 53%);
+  border-color: hsl(204, 86%, 53%);
+  color: #fff;
+}
+
+/* --- "More Results" trajectory viewer ------------------------------------
+   This widget is interactive but sits directly under a static comparison grid
+   with the same columns and headers, so it used to read as "one more row of
+   that table". It is deliberately styled as a *panel* rather than a figure --
+   tinted surface, border, and its own header bar with a badge -- so the change
+   of surface is what tells a first-time visitor this is something to play
+   with. See also initTrajViewer(), which starts playback on scroll-into-view
+   so the motion happens while the widget is actually being looked at. */
+
+/* --- Qualitative comparison tabs -----------------------------------------
+   FOLDER tabs: the selected tab is a card whose bottom edge is missing, sitting
+   1px over the bar's rule so it reads as joined to the panel below it. That
+   "which panel do I own" cue is the reason for this shape rather than a plain
+   underline -- and it stays distinct from .baseline-switch, the pill toggle that
+   lives INSIDE the first panel, because a filled pill would be the same shape one
+   level down and nothing would say which level the reader is operating. */
+
+.qual-tablist {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.3rem;
+  border-bottom: 1px solid #e3e8ee;
+  margin-bottom: 1.5rem;
+}
+
+.qual-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: -1px;              /* overlap the bar's rule, so the active
+                                       tab's background can cut through it */
+  padding: 0.6rem 1rem;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.95rem;
+  color: #8a8a8a;
+  cursor: pointer;
+}
+
+.qual-tab:hover:not(.is-active) {
+  background: #f7f9fb;
+  color: #4a4a4a;
+}
+
+/* The accent lid is an inset box-shadow, NOT a thicker border-top: growing the
+   border from 1px to 3px would shift the label down 2px on selection, so the tab
+   bar would twitch every time you switched. */
+.qual-tab.is-active {
+  background: #fff;
+  border-color: #e3e8ee;
+  box-shadow: inset 0 3px 0 hsl(204, 86%, 53%);
+  color: hsl(204, 86%, 40%);
+  font-weight: 600;
+}
+
+.qual-tab:focus-visible {
+  outline: 2px solid hsl(204, 86%, 53%);
+  outline-offset: 2px;
+}
+
+/* Same "Interactive" badge as the viewer used to carry, but outlined in
+   currentColor rather than filled blue: on an inactive tab a solid pill outshouts
+   the label it qualifies, and there are two of them. Inheriting the colour makes
+   it part of the tab -- grey when inactive, accent when selected. */
+.qual-tab-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 0.15em 0.55em;
+  border: 1px solid currentColor;
+  border-radius: 290486px;
+  opacity: 0.8;
+}
+
+.qual-panel[hidden] {
+  display: none;
+}
+
+/* The viewer's top margin separates it from a table stacked above it. As the
+   only thing in its panel it has nothing to clear, and the gap read as the tab
+   bar being detached from its content. */
+.qual-panel > .traj-viewer {
+  margin-top: 0;
+}
+
+/* No tinted card any more, deliberately. It existed for one reason: the viewer
+   used to sit directly beneath a static grid with identical columns and was being
+   mistaken for one more row of it. Inside a tab panel that confusion cannot
+   happen -- the table and the viewer are never on screen together -- and the card
+   had become the only decorative container among three sibling panels, put a
+   second rule immediately under the tab bar's own, and made the white active tab
+   join a tinted panel instead of matching it. Dropping it also hands the images
+   the 1.5rem of padding it was spending. The class stays: JS selects on it. */
+.traj-viewer {
+  margin-top: 2.5rem;
+  padding: 0.25rem 0 0.5rem;
+}
+
+/* One intro style for every tab panel -- the curated tables, the scene viewers
+   and the LVSM comparison. They used to introduce themselves three different
+   ways (a centred hint inside the viewer's own head, a justified .content
+   paragraph, and nothing at all), which made sibling tabs look unrelated.
+   Replaces the old .traj-head / .traj-hint pair; neither was referenced in JS.
+
+   max-width is the load-bearing bit: this is centred text and the LVSM intro is
+   ~80 words. Without a measure limit, centred text running the full column is
+   genuinely hard to read. */
+.panel-intro {
+  max-width: 46rem;
+  margin: 0 auto 1.1rem;
+  text-align: center;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #6b6b6b;
+}
+
+.panel-intro strong {
+  color: #363636;
+  font-weight: 600;
+}
+
+
+.traj-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.slide-cell {
+  text-align: center;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 200px;
+}
+
+.slide-cell img {
+  width: 100%;
+  max-width: 200px;
+  border-radius: 4px;
+  display: block;
+  margin: 0 auto 4px auto;
+}
+
+.slide-cell .context-grid {
+  max-width: 200px;
+}
+
+/* Same 2px as the curated tables: .context-grid img and .slide-cell img have
+   equal specificity, so without this the later .slide-cell rule won and the
+   thumbnails rendered more rounded than the table ones. */
+.slide-cell .context-grid img {
+  border-radius: 2px;
+}
+
+.slide-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+/* Second label line: "(Ours) - Sample 1" under the bare method name.
+   "(Ours)" is down here rather than up beside "ReconSplat" for a layout reason,
+   not a typographic one -- see the note on label heights below. */
+.slide-sublabel {
+  display: block;
+  font-size: 0.92em;
+  /* One line, always. It is the last thing that can turn a two-line label into a
+     three-line one: at ~800px the cells get narrow enough that "(Ours) - Sample 1"
+     wraps by itself, and only the ReconSplat columns then drop. It is short
+     enough that forbidding the break costs at most a few px of bleed into the
+     grid gap, which is cheaper than a broken row. */
+  white-space: nowrap;
+}
+
+/* Every label in this viewer is exactly two line boxes: a one-word method name
+   on top and a .slide-sublabel underneath -- "(Ours) - Sample N" on the two
+   ReconSplat cells, a &nbsp; spacer on the rest. That is what keeps the image
+   rows starting at the same y across all seven columns.
+
+   Both halves of that matter, and neither is the obvious fix:
+
+   - Equal STRUCTURE, not a min-height. A min-height has to equal the tallest
+     label, and that height is not a constant -- it depends on the viewport,
+     because a label that fits on one line on a desktop wraps on a phone. Two
+     tries at the magic number (2.55em, then "two lines = 3em") both left the
+     samples ~19px low.
+   - "(Ours)" sits on the second line so the first line is the single word
+     "ReconSplat". "ReconSplat (Ours)" is ~50% wider than any other label here,
+     so it was the one label that wrapped to a third line as the cells narrowed,
+     and only that column's images dropped. At one short word it now wraps at
+     roughly the same width as "MVSplat360" and "latentSplat" do. */
+
+/* Vertical Color / Depth labels down the right edge. The cell stretches to the
+   row height, then the two labels split the space below the hidden spacer so
+   each lands beside its own image. */
+.slide-orient {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  flex: 0 0 auto;
+  max-width: 1rem;
+}
+
+.slide-orient .slide-label {
+  visibility: hidden;
+  margin-bottom: 4px;
+}
+
+.slide-orient .orient-text {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+/* --- playback controls --- */
+
+.traj-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* Scenes with a single target view have nothing to animate. */
+.traj-viewer.is-single-frame .traj-controls {
+  display: none;
+}
+
+.traj-playpause {
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 290486px;
+  width: 2rem;
+  height: 2rem;
+  line-height: 1;
+  font-size: 0.7rem;
+  color: #363636;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.traj-playpause:hover {
+  background: #f5f5f5;
+}
+
+.traj-playpause .icon-play {
+  display: none;
+}
+
+.traj-viewer.is-paused .traj-playpause .icon-pause {
+  display: none;
+}
+
+.traj-viewer.is-paused .traj-playpause .icon-play {
+  display: inline;
+}
+
+.traj-dots {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.traj-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #dbdbdb;
+  transition: background-color 0.2s ease;
+}
+
+.traj-dot.is-active {
+  background: hsl(204, 86%, 53%);
+}
+
+/* --- scene thumbnail strip ---
+   Labeled and given a real selected state: an opacity difference alone read as
+   "some images are faded", not as "these are buttons and this one is picked". */
+
+/* The picker sits ABOVE the results now, so these margins run the other way: it
+   needs almost nothing above it (the hint line is right there) and a clear gap
+   below to separate the control from the output it drives. */
+.scene-strip-label {
+  text-align: center;
+  margin-top: 0.1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #6b6b6b;
+}
+
+.scene-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.4rem;
+}
+
+.scene-thumb {
+  cursor: pointer;
+  padding: 0;
+  border: 2px solid #dbdbdb;
+  border-radius: 6px;
+  background: #fff;
+  line-height: 0;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, border-color 0.15s ease, transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.scene-thumb img {
+  display: block;
+  width: 68px;
+  height: auto;
+  border-radius: 4px;
+}
+
+.scene-thumb:hover {
+  opacity: 1;
+  border-color: hsl(204, 86%, 70%);
+  transform: translateY(-2px);
+}
+
+.scene-thumb:focus-visible {
+  outline: 2px solid hsl(204, 86%, 53%);
+  outline-offset: 2px;
+}
+
+.scene-thumb.is-active {
+  opacity: 1;
+  border-color: hsl(204, 86%, 53%);
+  box-shadow: 0 0 0 3px hsla(204, 86%, 53%, 0.2);
+}
+
+/* --- Video comparison grid ------------------------------------------------
+   Each tile stacks color over depth and shares ONE draggable divider that
+   spans both panes, so appearance and geometry are always wiped at the same
+   camera pose. ReconSplat is the clipped overlay; the baseline sits beneath. */
+
+.vswitch {
+  margin-bottom: 1.25rem;
+}
+
+/* --- video carousel ------------------------------------------------------
+   Only a window of scenes is shown at a time (see initVideoGrid): tiles outside
+   the window are display:none, so the existing auto-fill grid collapses to a
+   single row of exactly the visible tiles with no template change needed. */
+
+.vcmp.is-off {
+  display: none;
+}
+
+.vcar-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.vcar-btn {
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 290486px;
+  width: 2.1rem;
+  height: 2.1rem;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: #363636;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.vcar-btn:hover {
+  background: hsl(204, 86%, 53%);
+  border-color: hsl(204, 86%, 53%);
+  color: #fff;
+}
+
+.vcar-btn:focus-visible {
+  outline: 2px solid hsl(204, 86%, 53%);
+  outline-offset: 2px;
+}
+
+.vcar-counter {
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  min-width: 12rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.vgrid {
+  display: grid;
+  /* --min-tile is set per grid: wide DL3DV tiles stay large, square RE10K
+     tiles go compact. auto-fill keeps it responsive on narrow screens. */
+  grid-template-columns: repeat(auto-fill, minmax(var(--min-tile, 300px), 1fr));
+  gap: 1.5rem 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+/* Compact tiles: shrink the chrome so it doesn't overwhelm a ~175px tile. */
+.vgrid.is-compact .vcmp-handle {
+  width: 18px;
+  height: 18px;
+  font-size: 0.45rem;
+}
+
+.vgrid.is-compact .vcmp-tag {
+  font-size: 0.53rem;
+  padding: 1px 4px;
+  top: 4px;
+}
+
+.vgrid.is-compact .vcmp-tag-a { left: 4px; }
+.vgrid.is-compact .vcmp-tag-b { right: 4px; }
+
+.vgrid.is-compact figcaption {
+  font-size: 0.62rem;
+  margin-top: 0.35rem;
+}
+
+.vcmp {
+  margin: 0;
+}
+
+.vcmp-stack {
+  --pos: 50%;
+  position: relative;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #f0f0f0;
+  cursor: ew-resize;
+  touch-action: none;          /* let us own horizontal drags on touch */
+  user-select: none;
+}
+
+.vcmp-pane {
+  position: relative;
+  aspect-ratio: var(--ar, 1 / 1);
+  overflow: hidden;
+}
+
+.vcmp-pane + .vcmp-pane {
+  border-top: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+/* Also matches img: the ScanNet++ comparison reuses this widget with <img>. */
+.vcmp-pane video,
+.vcmp-pane img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The frames are purely visual -- every gesture belongs to .vcmp-stack, which
+   owns the wipe. Images need this spelled out because, unlike <video>, they are
+   natively draggable: without it a press-and-drag starts an HTML5 image drag
+   instead of moving the divider. draggable="false" is set on the elements too;
+   -webkit-user-drag covers Safari, which has ignored the attribute in the past,
+   and pointer-events keeps the gesture on the stack regardless. */
+.vcmp-pane img {
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Clip rather than resize: scaling the overlay would misalign it. */
+.vcmp-clip {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+}
+
+.vcmp-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos);
+  width: 2px;
+  margin-left: -1px;
+  background: #fff;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.vcmp-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: #363636;
+  letter-spacing: -0.05em;
+}
+
+.vcmp-stack:focus-visible {
+  outline: 2px solid hsl(204, 86%, 53%);
+  outline-offset: 2px;
+}
+
+.vcmp-tag {
+  position: absolute;
+  top: 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.vcmp-tag-a { left: 6px; }
+.vcmp-tag-b { right: 6px; }
+
+.vcmp figcaption {
+  margin-top: 0.45rem;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.7rem;
+  color: #8a8a8a;
+  word-break: break-all;
+  line-height: 1.3;
+}
+
+
+.vcmp-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: #aaa;
+}
+
+/* --- Embedded point-cloud viewer -----------------------------------------
+   The viewer is its own document in an iframe, so nothing here can style its
+   internals -- only the frame it sits in. Height is explicit because an iframe
+   has no intrinsic size and the app inside is a full-height grid: it needs a
+   real box, not one that collapses to 150px (the HTML default). The two side
+   panels are fixed-width, so on narrow screens the stage is what shrinks;
+   below the breakpoint the frame gets taller to keep it usable. */
+.pcd-embed {
+  position: relative;
+  width: 100%;
+  height: min(78vh, 820px);
+  min-height: 560px;
+  border: 1px solid #e3e8ee;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0f1115;
+}
+
+.pcd-embed iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.pcd-fallback {
+  margin-top: 0.6rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #8a8a8a;
+}
+
+@media screen and (max-width: 900px) {
+  .pcd-embed { height: 80vh; min-height: 620px; }
+}
