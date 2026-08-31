@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WiFlow: Estimating Optical Flow using WiFi CSI</title>
+
+  <!-- Bulma CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Academicons (arXiv icon) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans:wght@400;700&family=Castoro:ital@0;1&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="static/css/index.css" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</head>
+<body>
+
+<!-- ===================== HERO / TITLE ===================== -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+
+          <h1 class="title is-1 publication-title">
+            WiFlow: Estimating Optical Flow using WiFi Channel State Information
+          </h1>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://www.tu-darmstadt.de/" target="_blank">Thomas Weigel</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/visinf_team_details_125120.en.jsp" target="_blank">Simon Kiefhaber</a><sup>1,3</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.tudelft.nl/" target="_blank">Fabian Portner</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.seemo.tu-darmstadt.de/" target="_blank">Matthias Hollick</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://schaubsi.github.io/" target="_blank">Simone Schaub-Meyer</a><sup>1,3</sup>
+            </span>
+          </div>
+
+          <div class="is-size-6 publication-authors" style="margin-top: 0.5rem;">
+            <span class="author-block"><sup>1</sup>TU Darmstadt,&nbsp;</span>
+            <span class="author-block"><sup>2</sup>TU Delft,&nbsp;</span>
+            <span class="author-block"><sup>3</sup>Hessian Center for AI (hessian.AI)</span>
+          </div>
+
+          <div class="column has-text-centered" style="margin-top: 1rem;">
+            <div class="publication-links">
+
+              <!-- Paper link -->
+              <span class="link-block">
+                <a href="#" data-coming-soon
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+
+              <!-- arXiv link -->
+              <span class="link-block">
+                <a href="#" data-coming-soon
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+
+              <!-- Code link -->
+              <span class="link-block">
+                <a href="https://github.com/visinf/wiflow" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code</span>
+                </a>
+              </span>
+
+              <!-- Dataset link -->
+              <span class="link-block">
+                <a href="https://download.visinf.tu-darmstadt.de/data/wiflow/WiFlow.zip"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-database"></i></span>
+                  <span>Dataset</span>
+                </a>
+              </span>
+
+            </div>
+          </div>
+          <!-- End paper links -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End hero -->
+
+
+<!-- ===================== TEASER ===================== -->
+<section class="hero teaser">
+  <div class="hero-body">
+    <div class="container is-max-widescreen">
+      <figure class="pdf-figure">
+        <img src="static/images/teaser.svg" style="width: 80%;" alt="WiFlow overview: CSI input is processed by WiFlow to predict optical flow, supervised by pseudo ground truth from synchronized video frames." />
+      </figure>
+      <div class="container is-max-desktop">
+        <h2 class="subtitle has-text-centered" style="margin-top: 1rem;">
+          <strong>WiFlow</strong> estimates optical flow directly from WiFi Channel State Information (CSI).
+          Pseudo ground truth is generated from synchronized video frames to supervise training.
+          At inference time, no camera is required.
+        </h2>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End teaser -->
+
+
+<!-- ===================== ABSTRACT ===================== -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Knowing where and how fast objects are moving within a scene is important across various domains.
+            Usually, cameras are used to capture the data necessary for this task, but adding cameras often raises
+            privacy concerns, and the quality of captured frames is heavily influenced by lighting conditions.
+            In this work, we explore using WiFi <em>channel state information</em> (CSI) instead of camera frames
+            for optical flow estimation. We propose <strong>WiFlow</strong>, a CSI-based flow estimator,
+            a preprocessor evaluation for CSI, and three model architectures that offer different trade-offs
+            between accuracy and complexity. Further, we create the first dataset for training and evaluating
+            CSI-based optical flow estimators, and our experiments provide insights into key design elements
+            for this task. Code and data are available at
+            <a href="https://visinf.github.io/wiflow" target="_blank">https://visinf.github.io/wiflow</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End abstract -->
+
+
+<!-- ===================== METHOD ===================== -->
+<section class="section" id="method">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Method</h2>
+
+    <div class="content has-text-justified">
+      <p>
+        WiFlow maps WiFi CSI sequences to 2D optical flow fields. Raw CSI consists of complex-valued
+        measurements across antennas, subcarriers, and time snapshots. We apply a CSI preprocessor
+        to obtain a suitable representation and feed it into a RAFT-inspired architecture.
+      </p>
+    </div>
+
+    <!-- WiFlow Block -->
+    <div style="margin-top: 2rem;">
+      <figure class="pdf-figure">
+        <img src="static/images/basicblock.svg" style="width: 80%;" alt="WiFlow block diagram: CSI data is preprocessed and fed into a RAFT-like architecture with Context Network, Feature Network, and Refinement Network." />
+      </figure>
+      <p class="has-text-centered is-size-6" style="margin-top: 0.5rem; color: #666;">
+        <strong>Fig. 1 — WiFlow block.</strong>
+        CSI data is preprocessed and processed by a RAFT-like architecture to predict optical flow or a motion mask.
+      </p>
+    </div>
+
+    <!-- Three Architectures -->
+    <div class="content has-text-justified" style="margin-top: 2rem;">
+      <h3 class="title is-4">Three Architectures</h3>
+      <p>
+        We propose three architectures with varying complexity, all built on the WiFlow block:
+      </p>
+      <ul>
+        <li>
+          <strong>WiFlow<sub>Simple</sub></strong> — A single flow block that directly predicts optical flow.
+          Lightweight and fast, but produces noise in static background regions.
+        </li>
+        <li>
+          <strong>WiFlow<sub>RoI</sub></strong> — A mask block first localizes moving regions;
+          optical flow is then computed only within those bounding boxes using RoIAlign.
+          Inspired by Mask R-CNN.
+        </li>
+        <li>
+          <strong>WiFlow<sub>Combo</sub></strong> — Combines flow and mask blocks in parallel.
+          The predicted motion mask sharpens the flow output, achieving the best accuracy.
+        </li>
+      </ul>
+    </div>
+
+    <div style="margin-top: 1rem;">
+      <figure class="pdf-figure">
+        <img src="static/images/architecture.svg" style="width: 80%;" alt="Three WiFlow architectures: WiFlowSimple, WiFlowRoI, and WiFlowCombo." />
+      </figure>
+      <p class="has-text-centered is-size-6" style="margin-top: 0.5rem; color: #666;">
+        <strong>Fig. 2 — Architectures.</strong>
+        WiFlow<sub>Simple</sub> uses a single flow block.
+        WiFlow<sub>RoI</sub> adds bounding box-guided flow prediction.
+        WiFlow<sub>Combo</sub> combines flow and mask branches in parallel.
+      </p>
+    </div>
+
+    <!-- Training Loss -->
+    <div class="content has-text-justified" style="margin-top: 2rem;">
+      <h3 class="title is-4">Training Loss</h3>
+      <p>
+        Due to the static camera, most pixels exhibit zero flow. We prevent collapse to the trivial
+        all-zero prediction by up-weighting errors on non-zero flow pixels using a modified sequence loss:
+      </p>
+      <div class="has-text-centered" style="font-size: 1.1rem; margin: 1.5rem 0; padding: 1rem; background: #f5f5f5; border-radius: 8px;">
+        <em>
+          L = &Sigma;<sub>m=1</sub><sup>M</sup> &gamma;<sup>M&minus;m</sup> (F<sub>gt</sub> &minus; F<sub>m</sub>)<sup>4</sup>
+        </em>
+      </div>
+      <p>
+        The 4th power loss amplifies penalization of absent but expected motion, working in concert with
+        our separate moving-pixel evaluation metric EPE<sub>M</sub>.
+      </p>
+    </div>
+
+  </div>
+</section>
+<!-- End method -->
+
+
+<!-- ===================== DATASET ===================== -->
+<section class="section hero is-light" id="dataset">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">WiFlow Dataset</h2>
+
+    <div class="content has-text-justified">
+      <p>
+        We collect the <strong>first dataset</strong> designed for CSI-based optical flow estimation.
+        Existing CSI datasets lack synchronized video or multi-antenna, multi-device measurements
+        at the resolution needed for this task. Our dataset fills this gap.
+      </p>
+    </div>
+
+    <!-- Capture Setup -->
+    <div class="columns is-vcentered" style="margin-top: 1.5rem;">
+      <div class="column is-6">
+        <figure class="pdf-figure">
+          <img src="static/images/floorplan-2.svg" alt="Floorplan of the capture setup showing the locations of routers, cameras, movement area, and off-area." />
+        </figure>
+        <p class="has-text-centered is-size-6" style="margin-top: 0.5rem; color: #666;">
+          <strong>Fig. 3 — Capture setup.</strong>
+          1 transmitter, 4 receivers (Rx1–Rx4), and 2 cameras in a 5.2 m × 5.5 m movement area.
+        </p>
+      </div>
+      <div class="column is-6 content">
+        <h3 class="title is-5">Capture Setup</h3>
+        <ul>
+          <li><strong>Transmitter:</strong> USRP N2954-R @ 1 kHz, channel 157, 80 MHz bandwidth</li>
+          <li><strong>Receivers:</strong> 4× Asus RT-AC86U (4 antennas each) via NexmonCSI → 16 total antennas</li>
+          <li><strong>Cameras:</strong> Side-view (30 Hz) and bird-view (50 Hz)</li>
+          <li><strong>Subjects:</strong> 10 people, 9 actions (slow-walk, fast-walk, together, collect, knee, mill, waving, off-area, void)</li>
+          <li><strong>Scale:</strong> 328 sequences, 164 min total</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Three views -->
+    <div class="content has-text-justified" style="margin-top: 2rem;">
+      <h3 class="title is-4">Three Data Views</h3>
+      <div class="columns is-centered">
+        <div class="column is-10">
+          <div class="columns">
+            <div class="column has-text-centered">
+              <div class="box">
+                <p class="title is-5">sideview</p>
+                <p>Side-view camera<br />K = 10 CSI per frame<br />6 Hz image frame rate</p>
+              </div>
+            </div>
+            <div class="column has-text-centered">
+              <div class="box">
+                <p class="title is-5">birdview</p>
+                <p>Ceiling camera<br />K = 10 CSI per frame<br />10 Hz image frame rate</p>
+              </div>
+            </div>
+            <div class="column has-text-centered">
+              <div class="box">
+                <p class="title is-5">birdview<sub>+</sub></p>
+                <p>Ceiling camera<br />K = 100 CSI per frame<br />10 Hz image frame rate</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Motion distributions -->
+    <div class="columns is-centered" style="margin-top: 1rem;">
+      <div class="column is-5">
+        <figure class="pdf-figure">
+          <img src="static/images/sideview.svg" alt="Motion angle and magnitude distributions for the sideview dataset." />
+        </figure>
+        <p class="has-text-centered is-size-6" style="margin-top: 0.5rem; color: #666;">
+          <strong>sideview</strong> — predominantly horizontal motion.
+        </p>
+      </div>
+      <div class="column is-5">
+        <figure class="pdf-figure">
+          <img src="static/images/birdview.svg" alt="Motion angle and magnitude distributions for the birdview dataset." />
+        </figure>
+        <p class="has-text-centered is-size-6" style="margin-top: 0.5rem; color: #666;">
+          <strong>birdview</strong> — more uniform angular distribution, larger magnitudes.
+        </p>
+      </div>
+    </div>
+    <p class="has-text-centered is-size-6" style="color: #666; margin-top: 0.25rem;">
+      <strong>Fig. 4 — Motion distributions.</strong>
+    </p>
+
+    <!-- Pseudo Ground Truth -->
+    <div class="content has-text-justified" style="margin-top: 2rem;">
+      <h3 class="title is-4">Pseudo Ground Truth</h3>
+      <p>
+        Optical flow labels are produced by an ensemble of state-of-the-art flow estimators
+        (rpknet, MS-RAFT+, SEA-RAFT, MemFlow, DPFlow) applied to subsampled video frames at 168×128 px.
+        Predictions are averaged and motions below 0.5 px magnitude are thresholded to zero to minimize
+        background noise.
+      </p>
+    </div>
+
+    <!-- Evaluation metrics box -->
+    <div class="content has-text-justified" style="margin-top: 2rem;">
+      <h3 class="title is-4">Evaluation Metrics</h3>
+      <p>
+        Because the static camera makes the overall EPE trivially minimizable by predicting zero flow,
+        we report three complementary metrics:
+      </p>
+      <div class="columns is-centered">
+        <div class="column is-10">
+          <div class="columns">
+            <div class="column">
+              <div class="box has-text-centered">
+                <p class="title is-5 has-text-danger">EPE<sub>M</sub></p>
+                <p>EPE on <em>moving</em> pixels only<br />(PseudoGT norm &gt; 0.5)</p>
+              </div>
+            </div>
+            <div class="column">
+              <div class="box has-text-centered">
+                <p class="title is-5 has-text-info">EPE<sub>S</sub></p>
+                <p>EPE on <em>static</em> pixels<br />(background accuracy)</p>
+              </div>
+            </div>
+            <div class="column">
+              <div class="box has-text-centered">
+                <p class="title is-5 has-text-success">EPE<sub>A</sub></p>
+                <p>All pixels, error amplified ×4<br />(penalizes missing motion)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- End dataset -->
+
+
+<!-- ===================== EXPERIMENTS ===================== -->
+<section class="section" id="results">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Experiments</h2>
+
+    <!-- Preprocessing -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">CSI Preprocessing</h3>
+      <p>
+        We evaluate five preprocessing strategies. The <strong>Quotient</strong> preprocessor — which
+        normalizes per-antenna measurements by a reference antenna to cancel shared phase offsets —
+        achieves the lowest EPE<sub>M</sub> and EPE<sub>A</sub>, and is used in all subsequent
+        experiments. The gap between Raw and Quotient confirms that preprocessing is essential before
+        feeding CSI to a neural network.
+      </p>
+    </div>
+
+    <!-- Architecture comparison table -->
+    <div class="content has-text-justified" style="margin-top: 2rem;">
+      <h3 class="title is-4">Architecture Comparison</h3>
+
+      <div class="table-container">
+        <table class="table is-bordered is-striped is-hoverable is-fullwidth has-text-centered">
+          <thead>
+            <tr>
+              <th rowspan="2">Perspective</th>
+              <th rowspan="2">Architecture</th>
+              <th colspan="3">Subject Split</th>
+              <th colspan="3">Time Split</th>
+            </tr>
+            <tr>
+              <th>EPE ↓</th>
+              <th>EPE<sub>M</sub> ↓</th>
+              <th>EPE<sub>S</sub> ↓</th>
+              <th>EPE ↓</th>
+              <th>EPE<sub>M</sub> ↓</th>
+              <th>EPE<sub>S</sub> ↓</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="3"><em>sideview</em></td>
+              <td>WiFlow<sub>Simple</sub></td>
+              <td>0.51</td><td><strong>2.22</strong></td><td>0.40</td>
+              <td>0.53</td><td><strong>2.07</strong></td><td>0.43</td>
+            </tr>
+            <tr>
+              <td>WiFlow<sub>RoI</sub></td>
+              <td>0.18</td><td>2.36</td><td>0.04</td>
+              <td>0.16</td><td>2.21</td><td>0.04</td>
+            </tr>
+            <tr>
+              <td>WiFlow<sub>Combo</sub></td>
+              <td><strong>0.16</strong></td><td>2.36</td><td><strong>0.02</strong></td>
+              <td><strong>0.15</strong></td><td>2.18</td><td><strong>0.03</strong></td>
+            </tr>
+            <tr>
+              <td rowspan="3"><em>birdview</em></td>
+              <td>WiFlow<sub>Simple</sub></td>
+              <td>0.55</td><td><strong>3.53</strong></td><td>0.40</td>
+              <td>0.56</td><td><strong>3.24</strong></td><td>0.43</td>
+            </tr>
+            <tr>
+              <td>WiFlow<sub>RoI</sub></td>
+              <td>0.21</td><td>3.73</td><td>0.05</td>
+              <td>0.20</td><td>3.40</td><td>0.04</td>
+            </tr>
+            <tr>
+              <td>WiFlow<sub>Combo</sub></td>
+              <td><strong>0.19</strong></td><td>3.71</td><td><strong>0.03</strong></td>
+              <td><strong>0.18</strong></td><td>3.38</td><td><strong>0.03</strong></td>
+            </tr>
+            <tr>
+              <td rowspan="3"><em>birdview<sub>+</sub></em></td>
+              <td>WiFlow<sub>Simple</sub></td>
+              <td>0.45</td><td><strong>3.24</strong></td><td>0.32</td>
+              <td>0.41</td><td><strong>2.89</strong></td><td>0.29</td>
+            </tr>
+            <tr>
+              <td>WiFlow<sub>RoI</sub></td>
+              <td>0.21</td><td>3.41</td><td>0.05</td>
+              <td>0.19</td><td>3.13</td><td>0.05</td>
+            </tr>
+            <tr>
+              <td>WiFlow<sub>Combo</sub></td>
+              <td><strong>0.18</strong></td><td>3.50</td><td><strong>0.02</strong></td>
+              <td><strong>0.17</strong></td><td>3.13</td><td><strong>0.02</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="is-size-6 has-text-centered" style="color: #666; margin-top: 0.5rem;">
+        EPE (↓) metrics on each evaluation setting. WiFlow<sub>Combo</sub> achieves the best overall accuracy;
+        results are consistent across subject and time splits, confirming cross-subject generalization.
+      </p>
+    </div>
+
+    <!-- Computational requirements -->
+    <div class="content has-text-justified" style="margin-top: 2rem;">
+      <h3 class="title is-4">Computational Requirements</h3>
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-hoverable is-fullwidth has-text-centered">
+              <thead>
+                <tr>
+                  <th>Architecture</th>
+                  <th>Time (ms)</th>
+                  <th>FLOPs (×10<sup>9</sup>)</th>
+                  <th>Memory (MB)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>WiFlow<sub>Simple</sub></td>
+                  <td><strong>23</strong></td>
+                  <td><strong>22</strong></td>
+                  <td><strong>380</strong></td>
+                </tr>
+                <tr>
+                  <td>WiFlow<sub>RoI</sub></td>
+                  <td>26</td>
+                  <td>22</td>
+                  <td>380</td>
+                </tr>
+                <tr>
+                  <td>WiFlow<sub>Combo</sub></td>
+                  <td>47</td>
+                  <td>43</td>
+                  <td>763</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="is-size-6 has-text-centered" style="color: #666; margin-top: 0.5rem;">
+            Inference on a single NVIDIA RTX 6000 Ada GPU, averaged over 1000 runs on birdview<sub>+</sub>.
+            All models fit comfortably within 1 GB VRAM.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Qualitative results -->
+    <div class="content has-text-justified" style="margin-top: 2rem;">
+      <h3 class="title is-4">Qualitative Results</h3>
+      <p>
+        The figure below compares all three architectures against the pseudo ground truth on birdview<sub>+</sub>
+        (time split). WiFlow<sub>Simple</sub> predicts spurious motion in the static background, while
+        WiFlow<sub>RoI</sub> and WiFlow<sub>Combo</sub> produce clean, spatially localized flow fields.
+      </p>
+      <figure class="pdf-figure" style="margin-top: 1rem;">
+        <img src="static/images/qualitative.svg" alt="Qualitative comparison of WiFlowSimple, WiFlowRoI, and WiFlowCombo against PseudoGT for single and multi-person scenarios." />
+      </figure>
+      <p class="has-text-centered is-size-6" style="margin-top: 0.5rem; color: #666;">
+        <strong>Fig. 5 — Qualitative results</strong> on birdview<sub>+</sub> (time split).
+        Top rows: single person. Bottom rows: two people moving simultaneously.
+      </p>
+    </div>
+
+    <!-- Cross-subject generalization note -->
+    <div class="notification is-info is-light" style="margin-top: 2rem;">
+      <strong>Cross-Subject Generalization.</strong>
+      Accuracy is very similar between the time split and subject split across all architectures,
+      demonstrating that WiFlow generalizes to unseen subjects without overfitting to the training data.
+    </div>
+
+  </div>
+</section>
+<!-- End experiments -->
+
+
+<!-- ===================== BIBTEX ===================== -->
+<section class="section" id="bibtex">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-3">BibTeX</h2>
+    <pre><code>@inproceedings{Weigel:2026:wiflow,
+    title     = {WiFlow: Estimating Optical Flow using WiFi Channel State Information},
+    author    = {Thomas Weigel and Simon Kiefhaber and Fabian Portner
+                 and Matthias Hollick and Simone Schaub-Meyer},
+    booktitle = {Proceedings of the European Conference on Computer Vision (ECCV)},
+    year      = {2026}
+}</code></pre>
+  </div>
+</section>
+<!-- End bibtex -->
+
+
+<!-- ===================== ACKNOWLEDGEMENTS ===================== -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-3">Acknowledgements</h2>
+    <p>
+      We would like to thank G. Matthes for his technical support during data capture and
+      M. Schulz et al. for publishing the Nexmon firmware, which enabled us to capture
+      CSI from consumer devices.
+    </p>
+    <p>
+      Calculations for this research were conducted on the Lichtenberg high-performance
+      computer of TU Darmstadt.
+      SK has been funded by the Deutsche Forschungsgemeinschaft (DFG) under Germany's Excellence
+      Strategy – EXC-3057.
+      FP has been funded by the European Union's Horizon programme under MSCA-DN-6th Sense
+      (Grant Agreement No. 101119652).
+      MH was supported by the State of Hesse through LOEWE emergenCITY (Grant no. LOEWE/1/12/519/03/05.001(0016)/72).
+      SSM has been funded by the DFG – project No. 529680848.
+    </p>
+    <div class="logo-row">
+      <img src="static/images/tu_logo_web.svg" alt="TU Darmstadt" style="max-height: 4em;"/>
+      <img src="static/images/hessian-ai-logo-color.png" alt="hessian.AI" style="max-height: 4em;"/>
+      <img src="static/images/TU_Delft_Logo.svg.webp" alt="TU Delft" style="max-height: 1.8em;" />
+    </div>
+  </div>
+</section>
+<!-- End acknowledgements -->
+
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+        This page was built using the
+        <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">
+          Academic Project Page Template
+        </a>
+        which was adopted from the
+        <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+        You are free to borrow the source code of this website; we just ask that you link back to this page
+        in the footer.
+      </p>
+    </div>
+  </div>
+</footer>
+<!-- End footer -->
+
+<!-- Coming-soon toast -->
+<div id="coming-soon-toast" style="
+  display: none;
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #363636;
+  color: #fff;
+  padding: 0.85rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  white-space: nowrap;
+">
+  <span class="icon" style="margin-right: 0.4rem;"><i class="fas fa-clock"></i></span>
+  Coming soon — will be provided upon publication.
+</div>
+
+<script>
+  (function () {
+    var toast = document.getElementById('coming-soon-toast');
+    var timer;
+    document.querySelectorAll('[data-coming-soon]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        clearTimeout(timer);
+        toast.style.display = 'block';
+        timer = setTimeout(function () { toast.style.display = 'none'; }, 3000);
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
