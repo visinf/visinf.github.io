@@ -1233,3 +1233,21 @@ body {
 @media screen and (max-width: 900px) {
   .pcd-embed { height: 80vh; min-height: 620px; }
 }
+
+/* --- Teaser movie ---------------------------------------------------------
+   Sits between the hero and the TL;DR. The clip is rendered on white, so a
+   hairline border keeps it from bleeding into the page background. */
+
+.teaser-video-section {
+  padding-top: 1rem;
+  padding-bottom: 0;
+}
+
+.teaser-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #ededed;
+  border-radius: 6px;
+  background-color: #fff;
+}
