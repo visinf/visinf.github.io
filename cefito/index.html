@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="CEFITO: Contrastive Energy Fields for Inference-Time Procedure Planning in Instructional Videos">
+  <meta name="keywords" content="Procedure Planning, Instructional Videos, Contrastive Learning, Inference-Time Optimization, Energy Fields">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CEFITO: Contrastive Energy Fields for Inference-Time Procedure Planning</title>
+
+  <!-- MathJax for rendering LaTeX -->
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.png">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<style>
+  /* Greyed-out, non-clickable button for artifacts that are not released yet. */
+  .button.is-unavailable,
+  .button.is-unavailable:hover,
+  .button.is-unavailable:focus,
+  .button.is-unavailable:active {
+    background-color: #b5b5b5;
+    border-color: #b5b5b5;
+    color: #ffffff;
+    cursor: default;
+    pointer-events: none;
+    box-shadow: none;
+  }
+
+  .hero.teaser {
+    padding-top: 0;
+    margin-top: -1.7rem;
+    margin-bottom: -3.2rem;
+  }
+  .hero.teaser .hero-body {
+    padding-top: 0;
+  }
+
+  .figure-wrapper {
+    text-align: center;
+  }
+  .figure-wrapper img {
+    max-width: 100%;
+    height: auto;
+  }
+  .figure-caption {
+    font-size: 0.9rem;
+    color: #4a4a4a;
+    margin-top: 0.6rem;
+    text-align: justify;
+  }
+
+  .figure-hint {
+    display: none;
+  }
+
+  .acknowledgments {
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 768px) {
+    /* Justified text on a narrow column produces large word gaps; left-align it. */
+    .content.has-text-justified,
+    .has-text-justified,
+    .figure-caption {
+      text-align: left !important;
+    }
+
+    /* Dense figures and result tables stay legible in a horizontal scroller
+       rather than shrinking to the width of the phone. The width is anchored to
+       the viewport, not to the ancestors: Bulma's hero/columns wrappers are flex
+       items that would otherwise be widened by the figure instead of clipping it. */
+    .figure-scroll {
+      width: calc(100vw - 3rem);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .figure-scroll img {
+      max-width: none;
+      width: 700px;
+    }
+    .figure-hint {
+      display: block;
+      font-size: 0.75rem;
+      color: #7a7a7a;
+      font-style: italic;
+      margin-top: 0.35rem;
+      text-align: center;
+    }
+
+    #BibTeX pre {
+      font-size: 0.65rem;
+    }
+
+    /* The display equation is wider than a very narrow phone; let it scroll
+       rather than pushing the whole page sideways. */
+    mjx-container[display="true"] {
+      width: calc(100vw - 3rem);
+      overflow-x: auto;
+      overflow-y: hidden;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+</style>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Contrastive Energy Fields for<br>Inference-Time Procedure Planning in Instructional Videos</h1>
+          <div class="is-size-5 publication-authors">
+            <h2 class="subtitle is-3">GCPR 2026 (Oral)</h2>
+            <span class="author-block">
+              <a href="https://mohamedafham.github.io/">Mohamed Afham</a><sup>1,3</sup></span>
+            &nbsp;
+            <span class="author-block">
+              <a href="https://christophreich1996.github.io/">Christoph Reich</a><sup>1,2,3,4</sup></span>
+            &nbsp;
+            <span class="author-block">
+              <a href="https://olvrhhn.github.io/">Oliver Hahn</a><sup>1</sup></span>
+            &nbsp;
+            <span class="author-block">
+              <a href="https://cvg.cit.tum.de/members/cremers/">Daniel Cremers</a><sup>2,3,4</sup></span>
+            &nbsp;
+            <span class="author-block">
+              <a href="https://www.visinf.tu-darmstadt.de/visual_inference/people_vi/stefan_roth.en.jsp">Stefan Roth</a><sup>1,3,5</sup></span>
+          </div>
+
+          <div class="is-size-6 publication-authors" style="margin-bottom: 10px;">
+            <span class="author-block" style="margin-right: 20px;"><sup>1</sup>TU Darmstadt</span>
+            <span class="author-block" style="margin-right: 20px;"><sup>2</sup>TU Munich</span>
+            <span class="author-block" style="margin-right: 20px;"><sup>3</sup>ELIZA</span>
+            <span class="author-block" style="margin-right: 20px;"><sup>4</sup>MCML</span>
+            <span class="author-block"><sup>5</sup>hessian.AI</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- arXiv Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2608.16457" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- Code Link (not released yet). -->
+              <span class="link-block">
+                <span class="button is-normal is-rounded is-unavailable">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code (Coming Soon)</span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Teaser figure -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <div class="figure-wrapper figure-scroll">
+        <img src="./static/images/teaser.png" alt="Overview of CEFITO">
+      </div>
+      <div class="figure-hint">Scroll the figure sideways &rarr;</div>
+      <div class="figure-caption">
+        <strong>Overview of CEFITO.</strong> <em>Left:</em> Given an initial observation and a sequence of actions,
+        our method maps action sequences to a predicted goal latent. The distance to the encoded goal latent defines
+        the candidate's energy, which we minimize at inference. <em>Right:</em> We learn a task-conditioned energy
+        field via contrastive learning. At inference, CEFITO predicts the task (<em>e.g.</em>, &ldquo;Grill steak&rdquo;),
+        restricting the search to an action subset (pink region). The action sequence with minimal energy is the
+        predicted plan.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TL;DR -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <div class="content has-text-justified">
+          <p>
+            <strong>TL;DR</strong>: CEFITO recasts procedure planning as energy minimization over an action-conditioned
+            representation learned with a contrastive objective. Instead of predicting an action sequence in a single
+            feed-forward or diffusion pass, we search at inference time over a task-restricted action subset, which
+            lets the model explicitly discard irrelevant actions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Abstract -->
+<section class="section hero is-light" style="padding-top: 1rem;">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Procedure planning seeks to estimate a sequence of actions to transition from an observed initial state to
+            a given goal state. Current procedure planning approaches directly predict action sequences from latent
+            representations using feed-forward neural networks or diffusion-based inference. These paradigms treat
+            every action as plausible, lacking the ability to enforce task-specific logical constraints that render
+            certain actions irrelevant or not plausible. We propose CEFITO, a procedure planning approach that learns
+            a predictor to express an action-conditioned representation space. Based on this representation space, we
+            formulate procedure planning as a task-constrained optimization problem. Unlike prior methods, CEFITO
+            explicitly reasons over the action space by omitting irrelevant actions during inference-time planning.
+            This reformulation enables effective procedure planning and achieves state-of-the-art accuracy on two
+            established procedure planning benchmarks.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Method -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+
+        <h2 class="title is-3">Method</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            Procedure planning takes a visual initial state \(v_s\) and a visual goal state \(v_g\), encoded into
+            latents \(x_s\) and \(x_g\), and asks for the sequence of actions \(a_{1:T}\) connecting them. CEFITO
+            splits this into two parts: learning an action-conditioned energy field, and searching over it at
+            inference time.
+          </p>
+        </div>
+
+        <h3 class="title is-4" style="margin-top: 2rem;">Learning the action-conditioned energy field</h3>
+
+        <div class="figure-wrapper figure-scroll">
+          <img src="./static/images/training.png" alt="CEFITO training framework">
+        </div>
+        <div class="figure-hint">Scroll the figure sideways &rarr;</div>
+
+        <div class="content has-text-justified" style="margin-top: 1.5rem;">
+          <p>
+            We train a predictor \(P_\theta\) that maps the initial latent \(x_s\) and a candidate action sequence
+            \(a_{1:T}\) (encoded in language form with a frozen CLIP text encoder) to a predicted goal latent
+            \(\tilde{x}_g = P_\theta(x_s, a_{1:T})\). The distance \(d(P_\theta(x_s, a_{1:T}), x_g)\) then acts as an
+            <strong>energy</strong>: low for correct sequences, high for incorrect ones. Notably, this needs no
+            supervision of intermediate visual states.
+          </p>
+          <p>
+            <strong>Contrastive training.</strong> A margin-based triplet loss pulls the prediction for the ground-truth
+            sequence \(a^+_{1:T}\) towards \(x_g\), while pushing predictions for \(N\) wrong sequences
+            \(a^-_{1:T,i}\) away from it.
+          </p>
+          <p>
+            <strong>Mixed-negative sampling.</strong> Negatives are drawn as a mixture of <em>hard</em> negatives
+            (same task, wrong ordering or composition) and <em>easy</em> negatives (sequences from a different task),
+            controlled by a ratio \(r\). This imposes both low-level structure (action order) and high-level structure
+            (task separation) on the energy field.
+          </p>
+          <p>
+            <strong>Adaptive margins.</strong> A single fixed margin is suboptimal, since negatives differ in how
+            similar they are to the ground truth. We instead set the margin \(\tau_i\) per negative from its action
+            overlap with the positive sequence, so a reordered sequence is separated less aggressively than a sequence
+            of unrelated actions.
+          </p>
+          <p>
+            <strong>Auxiliary action reconstruction.</strong> Since intermediate visual states are unavailable, we feed
+            a learnable mask token per action step and reconstruct the action sequence from the resulting intermediate
+            latents through a decoding head \(D_\phi\), which encourages informative intermediate representations.
+          </p>
+        </div>
+
+        <h3 class="title is-4" style="margin-top: 2.5rem;">Task-constrained inference-time optimization</h3>
+
+        <div class="figure-wrapper figure-scroll">
+          <img src="./static/images/inference.png" alt="CEFITO inference">
+        </div>
+        <div class="figure-hint">Scroll the figure sideways &rarr;</div>
+
+        <div class="content has-text-justified" style="margin-top: 1.5rem;">
+          <p>
+            At inference, planning becomes a discrete search over the action space. Searching the full space is
+            expensive, so a lightweight MLP task classifier first predicts the high-level task \(\hat{c}\) from
+            \((x_s, x_g)\). This restricts the search to the task-specific action subset \(\mathcal{A}(\hat{c})\)
+            derived from the training data, and the plan is the candidate with minimal energy:
+          </p>
+          <p style="text-align: center;">
+            \[ \tilde{a}_{1:T} = \arg\min_{\tilde{a}_{1:T} \in \mathcal{A}(\hat{c})} \big\| P_\theta(x_s, \tilde{a}_{1:T}) - x_g \big\|_2 . \]
+          </p>
+          <p>
+            Unlike feed-forward or diffusion-based planners, this makes the reasoning over the action space explicit:
+            actions irrelevant to the predicted task are never considered.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Results -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+
+        <h2 class="title is-3">Results</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            We evaluate on the CrossTask and COIN procedure planning benchmarks, following the unified protocol of
+            Seminara <em>et al.</em> (five random seeds, mean and 90&nbsp;% confidence interval), and report
+            success rate (SR), mean accuracy (mAcc), and mean IoU (mIoU).
+          </p>
+        </div>
+
+        <h3 class="title is-5" style="margin-top: 1.5rem;">CrossTask</h3>
+        <div class="figure-wrapper figure-scroll">
+          <img src="./static/images/results_crosstask.png" alt="Results on CrossTask">
+        </div>
+        <div class="figure-hint">Scroll the table sideways &rarr;</div>
+
+        <div class="content has-text-justified" style="margin-top: 1.5rem;">
+          <p>
+            CEFITO sets a new state of the art across all metrics and both planning horizons on CrossTask. It does so
+            <strong>without relying on large language models</strong>, outperforming the LLM-based SCHEMA by
+            2.38&nbsp;% SR at \(T=3\), and improving over ViterbiPlanNet by 1.17&nbsp;% and 0.12&nbsp;% SR at
+            \(T=3\) and \(T=4\).
+          </p>
+        </div>
+
+        <h3 class="title is-5" style="margin-top: 2rem;">COIN</h3>
+        <div class="figure-wrapper figure-scroll">
+          <img src="./static/images/results_coin.png" alt="Results on COIN">
+        </div>
+        <div class="figure-hint">Scroll the table sideways &rarr;</div>
+
+        <div class="content has-text-justified" style="margin-top: 1.5rem;">
+          <p>
+            On COIN, CEFITO achieves the best SR, mAcc, and mIoU at \(T=3\), and the best SR and mAcc at \(T=4\).
+            The margins are smaller than on CrossTask, which we attribute to COIN's much wider task distribution
+            (180 tasks vs. 18), leaving fewer training videos per task and thereby weakening the intra-task
+            hard-negative signal that drives our contrastive training.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BibTeX -->
+<section class="section" id="BibTeX" style="padding-top: 0;">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{afham2026cefito,
+      title     = {Contrastive Energy Fields for Inference-Time Procedure Planning in Instructional Videos},
+      author    = {Mohamed Afham and Christoph Reich and Oliver Hahn and Daniel Cremers and Stefan Roth},
+      booktitle = {Proceedings of the 48th German Conference on Pattern Recognition},
+      year      = {2026},
+    }
+  </code></pre>
+  </div>
+</section>
+
+<!-- Acknowledgments -->
+<section class="section" style="padding-top: 0;">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-4">Acknowledgments</h2>
+    <p class="acknowledgments has-text-justified">
+      This project has received funding from the European Research Council (ERC) under the European Union's Horizon
+      2020 research and innovation programme (grant agreement No. 866008). Additionally, this project is also funded by
+      the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany's Excellence Strategy
+      (EXC-3066/1 &ldquo;The Adaptive Mind&rdquo;, Project No. 533717223, EXC-3057/1 &ldquo;Reasonable Artificial
+      Intelligence&rdquo;, Project No. 533677015). Mohamed Afham &amp; Christoph Reich are supported by the Konrad Zuse
+      School of Excellence in Learning and Intelligent Systems (ELIZA) through the DAAD programme Konrad Zuse Schools
+      of Excellence in Artificial Intelligence, sponsored by the Federal Ministry of Education and Research. This work
+      was also supported by the ERC Advanced Grant SIMULACRON, the Georg Nemetschek Institute project AI4TWINNING, and
+      the DFG project 4D-YouTube CR 250/26-1.
+    </p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+          The website template is taken and adapted from
+            <a href="https://github.com/nerfies/nerfies.github.io"> Nerfies</a>
+          and licensed under a
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
